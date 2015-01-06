@@ -1,4 +1,4 @@
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 1
 
 
    1               		.file	"usbdrv.c"
@@ -58,7 +58,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
   55 0022 1F93      		push r17
   56 0024 CF93      		push r28
   57 0026 DF93      		push r29
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 2
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 2
 
 
   58               	/* prologue: function */
@@ -118,7 +118,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  112               	.LM20:
  113 0072 9A81      		ldd r25,Y+2
  114               	.LVL2:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 3
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 3
 
 
  115               	.LM21:
@@ -178,7 +178,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  169 00b0 01F4      		brne .L16
  170               	.LBB72:
  171               	.LM33:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 4
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 4
 
 
  172 00b2 8A81      		ldd r24,Y+2
@@ -238,7 +238,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  226               	.LBE70:
  227               	.LM42:
  228 00f8 CE01      		movw r24,r28
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 5
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 5
 
 
  229               	.LVL20:
@@ -298,7 +298,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  283 012e 8BE4      		ldi r24,lo8(75)
  284               	.LVL32:
  285 0130 8093 0000 		sts usbTxStatus1+1,r24
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 6
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 6
 
 
  286               	.LM50:
@@ -358,7 +358,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  340               	.LVL42:
  341               	.L5:
  342               	.LBE63:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 7
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 7
 
 
  343               	.LM58:
@@ -418,7 +418,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  397 01b0 8093 0000 		sts usbMsgLen,r24
  398               	.LM68:
  399 01b4 8091 0000 		lds r24,usbTxBuf
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 8
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 8
 
 
  400 01b8 98E8      		ldi r25,lo8(-120)
@@ -478,7 +478,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  454 01f0 8D91      		ld r24,X+
  455 01f2 8193      		st Z+,r24
  456               	.LM78:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 9
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 9
 
 
  457 01f4 9150      		subi r25,lo8(-(-1))
@@ -538,7 +538,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  511 022e 01F4      		brne .L40
  512               	.LBE86:
  513               	.LM88:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 10
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 10
 
 
  514 0230 9150      		subi r25,lo8(-(-1))
@@ -598,7 +598,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  568 026c FA01      		movw r30,r20
  569               	.LVL71:
  570               	.L51:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 11
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 11
 
 
  571               	.LM98:
@@ -658,7 +658,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  625 029a 0E94 0000 		call usbGenericSetInterrupt
  626               	.LVL78:
  627               	/* epilogue start */
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 12
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 12
 
 
  628               	.LM108:
@@ -718,7 +718,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  682 0027 E1        		.byte	-31
  683 0028 00        		.byte	0
  684 0029 01        		.byte	1
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 13
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 13
 
 
  685 002a 01        		.byte	1
@@ -778,7 +778,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  739 0030 0C00 0000 		.long	.LEFDE4-.LASFDE4
  740               	.LASFDE4:
  741 0034 0000 0000 		.long	.Lframe0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 14
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 14
 
 
  742 0038 0000 0000 		.long	.LFB4
@@ -838,7 +838,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  796 0051 0C01 0000 		.long	.LVL26-.Ltext0
  797 0055 0100      		.word	0x1
  798 0057 62        		.byte	0x62
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 15
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 15
 
 
  799 0058 1201 0000 		.long	.LVL27-.Ltext0
@@ -898,7 +898,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  853 00e6 0600      		.word	0x6
  854 00e8 68        		.byte	0x68
  855 00e9 93        		.byte	0x93
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 16
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 16
 
 
  856 00ea 01        		.uleb128 0x1
@@ -958,7 +958,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  910 016e 9600 0000 		.long	.LVL6-.Ltext0
  911 0172 9E00 0000 		.long	.LVL7-.Ltext0
  912 0176 0100      		.word	0x1
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 17
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 17
 
 
  913 0178 68        		.byte	0x68
@@ -1018,7 +1018,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  967 020a E801 0000 		.long	.LVL53-.Ltext0
  968 020e F001 0000 		.long	.LVL54-.Ltext0
  969 0212 0100      		.word	0x1
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 18
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 18
 
 
  970 0214 61        		.byte	0x61
@@ -1078,7 +1078,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1024 0285 62        		.byte	0x62
  1025 0286 93        		.byte	0x93
  1026 0287 01        		.uleb128 0x1
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 19
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 19
 
 
  1027 0288 63        		.byte	0x63
@@ -1138,7 +1138,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1081 02f5 0000 0000 		.long	0x0
  1082               	.LLST15:
  1083 02f9 4402 0000 		.long	.LVL66-.Ltext0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 20
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 20
 
 
  1084 02fd 5602 0000 		.long	.LVL68-.Ltext0
@@ -1198,7 +1198,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1138 036f 0100      		.word	0x1
  1139 0371 62        		.byte	0x62
  1140 0372 0000 0000 		.long	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 21
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 21
 
 
  1141 0376 0000 0000 		.long	0x0
@@ -1258,7 +1258,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1195 0027 06        		.byte	0x6
  1196 0028 0000 0000 		.long	.LASF0
  1197 002c 03        		.uleb128 0x3
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 22
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 22
 
 
  1198 002d 0000 0000 		.long	.LASF2
@@ -1318,7 +1318,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1252 0092 02        		.byte	0x2
  1253 0093 23        		.byte	0x23
  1254 0094 00        		.uleb128 0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 23
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 23
 
 
  1255 0095 08        		.uleb128 0x8
@@ -1378,7 +1378,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1309 0107 C900 0000 		.long	0xc9
  1310 010b 0F        		.uleb128 0xf
  1311 010c 0000 0000 		.long	.LASF15
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 24
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 24
 
 
  1312 0110 08        		.byte	0x8
@@ -1438,7 +1438,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1366 0176 01        		.byte	0x1
  1367 0177 03        		.byte	0x3
  1368 0178 11        		.uleb128 0x11
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 25
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 25
 
 
  1369 0179 0000 0000 		.long	.LASF26
@@ -1498,7 +1498,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1423 01eb 12        		.uleb128 0x12
  1424 01ec 7271 00   		.string	"rq"
  1425 01ef 01        		.byte	0x1
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 26
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 26
 
 
  1426 01f0 6801      		.word	0x168
@@ -1558,7 +1558,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1480 0266 1B        		.uleb128 0x1b
  1481 0267 00        		.byte	0x0
  1482 0268 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 27
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 27
 
 
  1483 0269 16        		.uleb128 0x16
@@ -1618,7 +1618,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1537 02d7 02        		.byte	0x2
  1538 02d8 07        		.byte	0x7
  1539 02d9 0000 0000 		.long	.LASF35
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 28
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 28
 
 
  1540 02dd 1D        		.uleb128 0x1d
@@ -1678,7 +1678,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1594 0357 18        		.uleb128 0x18
  1595 0358 7C03 0000 		.long	0x37c
  1596 035c 19        		.uleb128 0x19
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 29
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 29
 
 
  1597 035d 8A01 0000 		.long	0x18a
@@ -1738,7 +1738,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1651 03c7 1A        		.uleb128 0x1a
  1652 03c8 A402 0000 		.long	0x2a4
  1653 03cc 15        		.uleb128 0x15
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 30
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 30
 
 
  1654 03cd 1A        		.uleb128 0x1a
@@ -1798,7 +1798,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1708 043b 20        		.uleb128 0x20
  1709 043c 1B06 0000 		.long	0x61b
  1710 0440 13        		.uleb128 0x13
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 31
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 31
 
 
  1711 0441 6C65 6E00 		.string	"len"
@@ -1858,7 +1858,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1765 04cb 25        		.uleb128 0x25
  1766 04cc 0E02 0000 		.long	0x20e
  1767 04d0 0000 0000 		.long	.LLST4
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 32
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 32
 
 
  1768 04d4 1E        		.uleb128 0x1e
@@ -1918,7 +1918,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1822 0560 00        		.byte	0x0
  1823 0561 00        		.byte	0x0
  1824 0562 27        		.uleb128 0x27
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 33
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 33
 
 
  1825 0563 0000 0000 		.long	.LBB76
@@ -1978,7 +1978,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1879 05f5 25        		.uleb128 0x25
  1880 05f6 C602 0000 		.long	0x2c6
  1881 05fa 0000 0000 		.long	.LLST12
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 34
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 34
 
 
  1882 05fe 00        		.byte	0x0
@@ -2038,7 +2038,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1936 0670 DE        		.byte	0xde
  1937 0671 2500 0000 		.long	0x25
  1938 0675 0000 0000 		.long	.LLST18
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 35
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 35
 
 
  1939 0679 00        		.byte	0x0
@@ -2098,7 +2098,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  1993 06ee 30        		.uleb128 0x30
  1994 06ef 0000 0000 		.long	.LASF52
  1995 06f3 01        		.byte	0x1
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 36
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 36
 
 
  1996 06f4 2F        		.byte	0x2f
@@ -2158,7 +2158,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2050 0763 6D        		.byte	0x6d
  2051 0764 6F07 0000 		.long	0x76f
  2052 0768 01        		.byte	0x1
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 37
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 37
 
 
  2053 0769 05        		.byte	0x5
@@ -2218,7 +2218,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2107 07dd 0000 0000 		.long	.LASF62
  2108 07e1 01        		.byte	0x1
  2109 07e2 4E        		.byte	0x4e
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 38
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 38
 
 
  2110 07e3 EE07 0000 		.long	0x7ee
@@ -2278,7 +2278,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2164 0856 05        		.byte	0x5
  2165 0857 03        		.byte	0x3
  2166 0858 0000 0000 		.long	usbTxStatus3
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 39
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 39
 
 
  2167 085c 0A        		.uleb128 0xa
@@ -2338,7 +2338,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2221 08cb 31        		.uleb128 0x31
  2222 08cc 0000 0000 		.long	.LASF72
  2223 08d0 01        		.byte	0x1
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 40
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 40
 
 
  2224 08d1 1C        		.byte	0x1c
@@ -2398,7 +2398,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2278 001c 00        		.byte	0x0
  2279 001d 00        		.byte	0x0
  2280 001e 03        		.uleb128 0x3
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 41
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 41
 
 
  2281 001f 16        		.uleb128 0x16
@@ -2458,7 +2458,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2335 0055 3B        		.uleb128 0x3b
  2336 0056 05        		.uleb128 0x5
  2337 0057 49        		.uleb128 0x49
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 42
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 42
 
 
  2338 0058 13        		.uleb128 0x13
@@ -2518,7 +2518,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2392 008e 49        		.uleb128 0x49
  2393 008f 13        		.uleb128 0x13
  2394 0090 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 43
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 43
 
 
  2395 0091 00        		.byte	0x0
@@ -2578,7 +2578,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2449 00c7 0C        		.uleb128 0xc
  2450 00c8 20        		.uleb128 0x20
  2451 00c9 0B        		.uleb128 0xb
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 44
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 44
 
 
  2452 00ca 00        		.byte	0x0
@@ -2638,7 +2638,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2506 0100 3B        		.uleb128 0x3b
  2507 0101 05        		.uleb128 0x5
  2508 0102 49        		.uleb128 0x49
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 45
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 45
 
 
  2509 0103 13        		.uleb128 0x13
@@ -2698,7 +2698,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2563 0139 1C        		.uleb128 0x1c
  2564 013a 05        		.uleb128 0x5
  2565 013b 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 46
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 46
 
 
  2566 013c 03        		.uleb128 0x3
@@ -2758,7 +2758,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2620 0172 13        		.uleb128 0x13
  2621 0173 00        		.byte	0x0
  2622 0174 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 47
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 47
 
 
  2623 0175 20        		.uleb128 0x20
@@ -2818,7 +2818,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2677 01ab 24        		.uleb128 0x24
  2678 01ac 0B        		.uleb128 0xb
  2679 01ad 01        		.byte	0x1
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 48
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 48
 
 
  2680 01ae 55        		.uleb128 0x55
@@ -2878,7 +2878,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2734 01e4 13        		.uleb128 0x13
  2735 01e5 02        		.uleb128 0x2
  2736 01e6 0A        		.uleb128 0xa
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 49
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 49
 
 
  2737 01e7 00        		.byte	0x0
@@ -2938,7 +2938,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2791 021d 3B        		.uleb128 0x3b
  2792 021e 0B        		.uleb128 0xb
  2793 021f 49        		.uleb128 0x49
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 50
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 50
 
 
  2794 0220 13        		.uleb128 0x13
@@ -2998,7 +2998,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2848 0256 02        		.uleb128 0x2
  2849 0257 0A        		.uleb128 0xa
  2850 0258 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 51
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 51
 
 
  2851 0259 00        		.byte	0x0
@@ -3058,7 +3058,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2905 0012 7573 6249 		.string	"usbInit"
  2905      6E69 7400 
  2906 001a 2704 0000 		.long	0x427
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 52
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 52
 
 
  2907 001e 7573 6250 		.string	"usbPoll"
@@ -3118,7 +3118,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2927      7475 7331 
  2927      00
  2928 00ff 4A08 0000 		.long	0x84a
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 53
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 53
 
 
  2929 0103 7573 6254 		.string	"usbTxStatus3"
@@ -3178,7 +3178,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  2958 001c 0000 0000 		.long	0x0
  2959               		.section	.debug_ranges,"",@progbits
  2960               	.Ldebug_ranges0:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 54
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 54
 
 
  2961 0000 4200 0000 		.long	.LBB62-.Ltext0
@@ -3238,7 +3238,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  3008 0057 00        		.uleb128 0x0
  3009 0058 00        		.uleb128 0x0
  3010 0059 7374 6469 		.string	"stdint.h"
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 55
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 55
 
 
  3010      6E74 2E68 
@@ -3298,7 +3298,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  3061 00b3 00        		.byte	0x0
  3062 00b4 05        		.uleb128 0x5
  3063 00b5 02        		.byte	0x2
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 56
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 56
 
 
  3064 00b6 0000 0000 		.long	.LM8
@@ -3358,7 +3358,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  3118 010b 0000 0000 		.long	.LM18
  3119 010f 16        		.byte	0x16
  3120 0110 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 57
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 57
 
 
  3121 0111 05        		.uleb128 0x5
@@ -3418,7 +3418,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  3175 0167 05        		.uleb128 0x5
  3176 0168 02        		.byte	0x2
  3177 0169 0000 0000 		.long	.LM29
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 58
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 58
 
 
  3178 016d 15        		.byte	0x15
@@ -3478,7 +3478,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  3232 01c1 0000 0000 		.long	.LM40
  3233 01c5 1E        		.byte	0x1e
  3234 01c6 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 59
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 59
 
 
  3235 01c7 05        		.uleb128 0x5
@@ -3538,7 +3538,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  3289 021c 0000 0000 		.long	.LM51
  3290 0220 E6        		.byte	0xe6
  3291 0221 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 60
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 60
 
 
  3292 0222 05        		.uleb128 0x5
@@ -3598,7 +3598,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  3346 0279 00        		.byte	0x0
  3347 027a 05        		.uleb128 0x5
  3348 027b 02        		.byte	0x2
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 61
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 61
 
 
  3349 027c 0000 0000 		.long	.LM63
@@ -3658,7 +3658,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  3403 02d0 0000 0000 		.long	.LM73
  3404 02d4 15        		.byte	0x15
  3405 02d5 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 62
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 62
 
 
  3406 02d6 05        		.uleb128 0x5
@@ -3718,7 +3718,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  3460 032a 05        		.uleb128 0x5
  3461 032b 02        		.byte	0x2
  3462 032c 0000 0000 		.long	.LM84
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 63
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 63
 
 
  3463 0330 15        		.byte	0x15
@@ -3778,7 +3778,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  3517 0385 05        		.uleb128 0x5
  3518 0386 02        		.byte	0x2
  3519 0387 0000 0000 		.long	.LM95
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 64
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 64
 
 
  3520 038b 16        		.byte	0x16
@@ -3838,7 +3838,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  3574 03df 0000 0000 		.long	.LM106
  3575 03e3 0B        		.byte	0xb
  3576 03e4 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 65
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 65
 
 
  3577 03e5 05        		.uleb128 0x5
@@ -3898,7 +3898,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  3610 0055 7573 6264 		.string	"usbdrv/usbdrv.c"
  3610      7276 2F75 
  3610      7362 6472 
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 66
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 66
 
 
  3610      762E 6300 
@@ -3958,7 +3958,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  3636 00f8 5F5F 6164 		.string	"__addr16"
  3636      6472 3136 
  3636      00
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 67
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 67
 
 
  3637               	.LASF40:
@@ -3997,286 +3997,286 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 1
  3651               	.LASF38:
  3652 0162 7276 616C 		.string	"rval"
  3652      00
- 3653               	.LASF18:
- 3654 0167 7756 616C 		.string	"wValue"
- 3654      7565 00
- 3655               	.LASF69:
- 3656 016e 7573 6244 		.string	"usbDeviceAddr"
- 3656      6576 6963 
- 3656      6541 6464 
- 3656      7200 
- 3657               	.LASF24:
- 3658 017c 7573 6252 		.string	"usbResetDataToggling"
- 3658      6573 6574 
- 3658      4461 7461 
- 3658      546F 6767 
- 3658      6C69 6E67 
- 3659               	.LASF48:
- 3660 0191 7573 624C 		.string	"usbLineStatus"
- 3660      696E 6553 
- 3660      7461 7475 
- 3660      7300 
- 3661               	.LASF66:
- 3662 019f 7573 6254 		.string	"usbTxStatus3"
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 68
+ 3653               	.LASF77:
+ 3654 0167 433A 5C55 		.string	"C:\\Users\\21030\\Documents\\GitHub\\l3\\source"
+ 3654      7365 7273 
+ 3654      5C32 3130 
+ 3654      3330 5C44 
+ 3654      6F63 756D 
+ 3655               	.LASF18:
+ 3656 0191 7756 616C 		.string	"wValue"
+ 3656      7565 00
+ 3657               	.LASF69:
+ 3658 0198 7573 6244 		.string	"usbDeviceAddr"
+ 3658      6576 6963 
+ 3658      6541 6464 
+ 3658      7200 
+ 3659               	.LASF24:
+ 3660 01a6 7573 6252 		.string	"usbResetDataToggling"
+ 3660      6573 6574 
+ 3660      4461 7461 
+ 3660      546F 6767 
+ 3660      6C69 6E67 
+ 3661               	.LASF48:
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 68
 
 
- 3662      7853 7461 
- 3662      7475 7333 
- 3662      00
- 3663               	.LASF1:
- 3664 01ac 756E 7369 		.string	"unsigned char"
- 3664      676E 6564 
- 3664      2063 6861 
- 3664      7200 
- 3665               	.LASF54:
- 3666 01ba 7573 624D 		.string	"usbMsgPtr"
- 3666      7367 5074 
+ 3662 01bb 7573 624C 		.string	"usbLineStatus"
+ 3662      696E 6553 
+ 3662      7461 7475 
+ 3662      7300 
+ 3663               	.LASF66:
+ 3664 01c9 7573 6254 		.string	"usbTxStatus3"
+ 3664      7853 7461 
+ 3664      7475 7333 
+ 3664      00
+ 3665               	.LASF1:
+ 3666 01d6 756E 7369 		.string	"unsigned char"
+ 3666      676E 6564 
+ 3666      2063 6861 
  3666      7200 
- 3667               	.LASF0:
- 3668 01c4 7369 676E 		.string	"signed char"
- 3668      6564 2063 
- 3668      6861 7200 
- 3669               	.LASF22:
- 3670 01d0 666C 6167 		.string	"flags"
- 3670      7300 
- 3671               	.LASF8:
- 3672 01d6 6C6F 6E67 		.string	"long long unsigned int"
- 3672      206C 6F6E 
- 3672      6720 756E 
- 3672      7369 676E 
- 3672      6564 2069 
- 3673               	.LASF37:
- 3674 01ed 7479 7065 		.string	"type"
- 3674      00
- 3675               	.LASF14:
- 3676 01f2 7573 6254 		.string	"usbTxStatus"
- 3676      7853 7461 
- 3676      7475 7300 
- 3677               	.LASF4:
- 3678 01fe 756E 7369 		.string	"unsigned int"
- 3678      676E 6564 
- 3678      2069 6E74 
- 3678      00
- 3679               	.LASF3:
- 3680 020b 7569 6E74 		.string	"uint16_t"
- 3680      3136 5F74 
+ 3667               	.LASF54:
+ 3668 01e4 7573 624D 		.string	"usbMsgPtr"
+ 3668      7367 5074 
+ 3668      7200 
+ 3669               	.LASF0:
+ 3670 01ee 7369 676E 		.string	"signed char"
+ 3670      6564 2063 
+ 3670      6861 7200 
+ 3671               	.LASF22:
+ 3672 01fa 666C 6167 		.string	"flags"
+ 3672      7300 
+ 3673               	.LASF8:
+ 3674 0200 6C6F 6E67 		.string	"long long unsigned int"
+ 3674      206C 6F6E 
+ 3674      6720 756E 
+ 3674      7369 676E 
+ 3674      6564 2069 
+ 3675               	.LASF37:
+ 3676 0217 7479 7065 		.string	"type"
+ 3676      00
+ 3677               	.LASF14:
+ 3678 021c 7573 6254 		.string	"usbTxStatus"
+ 3678      7853 7461 
+ 3678      7475 7300 
+ 3679               	.LASF4:
+ 3680 0228 756E 7369 		.string	"unsigned int"
+ 3680      676E 6564 
+ 3680      2069 6E74 
  3680      00
- 3681               	.LASF34:
- 3682 0214 5F5F 7265 		.string	"__result"
- 3682      7375 6C74 
+ 3681               	.LASF3:
+ 3682 0235 7569 6E74 		.string	"uint16_t"
+ 3682      3136 5F74 
  3682      00
- 3683               	.LASF28:
- 3684 021d 6461 7461 		.string	"dataPtr"
- 3684      5074 7200 
- 3685               	.LASF59:
- 3686 0225 7573 6244 		.string	"usbDescriptorConfiguration"
- 3686      6573 6372 
- 3686      6970 746F 
- 3686      7243 6F6E 
- 3686      6669 6775 
- 3687               	.LASF45:
- 3688 0240 7573 6250 		.string	"usbPoll"
- 3688      6F6C 6C00 
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 69
+ 3683               	.LASF34:
+ 3684 023e 5F5F 7265 		.string	"__result"
+ 3684      7375 6C74 
+ 3684      00
+ 3685               	.LASF28:
+ 3686 0247 6461 7461 		.string	"dataPtr"
+ 3686      5074 7200 
+ 3687               	.LASF59:
+ 3688 024f 7573 6244 		.string	"usbDescriptorConfiguration"
+ 3688      6573 6372 
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 69
 
 
- 3689               	.LASF78:
- 3690 0248 7573 6257 		.string	"usbWord"
- 3690      6F72 6400 
- 3691               	.LASF77:
- 3692 0250 5A3A 5C44 		.string	"Z:\\Documents\\GitHub\\l3\\source"
- 3692      6F63 756D 
- 3692      656E 7473 
- 3692      5C47 6974 
- 3692      4875 625C 
+ 3688      6970 746F 
+ 3688      7243 6F6E 
+ 3688      6669 6775 
+ 3689               	.LASF45:
+ 3690 026a 7573 6250 		.string	"usbPoll"
+ 3690      6F6C 6C00 
+ 3691               	.LASF78:
+ 3692 0272 7573 6257 		.string	"usbWord"
+ 3692      6F72 6400 
  3693               	.LASF25:
- 3694 026e 7573 6252 		.string	"usbResetStall"
+ 3694 027a 7573 6252 		.string	"usbResetStall"
  3694      6573 6574 
  3694      5374 616C 
  3694      6C00 
  3695               	.LASF70:
- 3696 027c 7573 624E 		.string	"usbNewDeviceAddr"
+ 3696 0288 7573 624E 		.string	"usbNewDeviceAddr"
  3696      6577 4465 
  3696      7669 6365 
  3696      4164 6472 
  3696      00
  3697               	.LASF64:
- 3698 028d 7573 6244 		.string	"usbDescriptorStringSerialNumber"
+ 3698 0299 7573 6244 		.string	"usbDescriptorStringSerialNumber"
  3698      6573 6372 
  3698      6970 746F 
  3698      7253 7472 
  3698      696E 6753 
  3699               	.LASF61:
- 3700 02ad 7573 6244 		.string	"usbDescriptorString0"
+ 3700 02b9 7573 6244 		.string	"usbDescriptorString0"
  3700      6573 6372 
  3700      6970 746F 
  3700      7253 7472 
  3700      696E 6730 
  3701               	.LASF13:
- 3702 02c2 7573 6257 		.string	"usbWord_t"
+ 3702 02ce 7573 6257 		.string	"usbWord_t"
  3702      6F72 645F 
  3702      7400 
  3703               	.LASF41:
- 3704 02cc 7761 6E74 		.string	"wantLen"
+ 3704 02d8 7761 6E74 		.string	"wantLen"
  3704      4C65 6E00 
  3705               	.LASF74:
- 3706 02d4 7573 6254 		.string	"usbTxBuf"
+ 3706 02e0 7573 6254 		.string	"usbTxBuf"
  3706      7842 7566 
  3706      00
  3707               	.LASF10:
- 3708 02dd 7573 6254 		.string	"usbTxStatus_t"
+ 3708 02e9 7573 6254 		.string	"usbTxStatus_t"
  3708      7853 7461 
  3708      7475 735F 
  3708      7400 
  3709               	.LASF27:
- 3710 02eb 7573 6244 		.string	"usbDriverSetup"
+ 3710 02f7 7573 6244 		.string	"usbDriverSetup"
  3710      7269 7665 
  3710      7253 6574 
  3710      7570 00
  3711               	.LASF46:
- 3712 02fa 736B 6970 		.string	"skipMsgPtrAssignment"
+ 3712 0306 736B 6970 		.string	"skipMsgPtrAssignment"
  3712      4D73 6750 
  3712      7472 4173 
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 70
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 70
 
 
  3712      7369 676E 
  3712      6D65 6E74 
  3713               	.LASF16:
- 3714 030f 626D 5265 		.string	"bmRequestType"
+ 3714 031b 626D 5265 		.string	"bmRequestType"
  3714      7175 6573 
  3714      7454 7970 
  3714      6500 
  3715               	.LASF32:
- 3716 031d 6461 7461 		.string	"data"
+ 3716 0329 6461 7461 		.string	"data"
  3716      00
  3717               	.LASF9:
- 3718 0322 6275 6666 		.string	"buffer"
+ 3718 032e 6275 6666 		.string	"buffer"
  3718      6572 00
  3719               	.LASF35:
- 3720 0329 7368 6F72 		.string	"short unsigned int"
+ 3720 0335 7368 6F72 		.string	"short unsigned int"
  3720      7420 756E 
  3720      7369 676E 
  3720      6564 2069 
  3720      6E74 00
  3721               	.LASF72:
- 3722 033c 7573 6243 		.string	"usbCurrentTok"
+ 3722 0348 7573 6243 		.string	"usbCurrentTok"
  3722      7572 7265 
  3722      6E74 546F 
  3722      6B00 
  3723               	.LASF60:
- 3724 034a 7573 6244 		.string	"usbDescriptorHidReport"
+ 3724 0356 7573 6244 		.string	"usbDescriptorHidReport"
  3724      6573 6372 
  3724      6970 746F 
  3724      7248 6964 
  3724      5265 706F 
  3725               	.LASF6:
- 3726 0361 6C6F 6E67 		.string	"long unsigned int"
+ 3726 036d 6C6F 6E67 		.string	"long unsigned int"
  3726      2075 6E73 
  3726      6967 6E65 
  3726      6420 696E 
  3726      7400 
  3727               	.LASF50:
- 3728 0373 7573 6253 		.string	"usbSetInterrupt3"
+ 3728 037f 7573 6253 		.string	"usbSetInterrupt3"
  3728      6574 496E 
  3728      7465 7272 
  3728      7570 7433 
  3728      00
  3729               	.LASF12:
- 3730 0384 6279 7465 		.string	"bytes"
+ 3730 0390 6279 7465 		.string	"bytes"
  3730      7300 
  3731               	.LASF63:
- 3732 038a 7573 6244 		.string	"usbDescriptorStringDevice"
+ 3732 0396 7573 6244 		.string	"usbDescriptorStringDevice"
  3732      6573 6372 
  3732      6970 746F 
  3732      7253 7472 
  3732      696E 6744 
  3733               	.LASF57:
- 3734 03a4 6368 6172 		.string	"char"
+ 3734 03b0 6368 6172 		.string	"char"
  3734      00
  3735               	.LASF21:
- 3736 03a9 7573 6252 		.string	"usbRequest_t"
+ 3736 03b5 7573 6252 		.string	"usbRequest_t"
  3736      6571 7565 
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 71
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 71
 
 
  3736      7374 5F74 
  3736      00
  3737               	.LASF65:
- 3738 03b6 7573 6254 		.string	"usbTxStatus1"
+ 3738 03c2 7573 6254 		.string	"usbTxStatus1"
  3738      7853 7461 
  3738      7475 7331 
  3738      00
  3739               	.LASF31:
- 3740 03c3 7573 6244 		.string	"usbDeviceRead"
+ 3740 03cf 7573 6244 		.string	"usbDeviceRead"
  3740      6576 6963 
  3740      6552 6561 
  3740      6400 
  3741               	.LASF39:
- 3742 03d1 7573 6250 		.string	"usbProcessRx"
+ 3742 03dd 7573 6250 		.string	"usbProcessRx"
  3742      726F 6365 
  3742      7373 5278 
  3742      00
  3743               	.LASF20:
- 3744 03de 774C 656E 		.string	"wLength"
+ 3744 03ea 774C 656E 		.string	"wLength"
  3744      6774 6800 
  3745               	.LASF55:
- 3746 03e6 7573 6252 		.string	"usbRxToken"
+ 3746 03f2 7573 6252 		.string	"usbRxToken"
  3746      7854 6F6B 
  3746      656E 00
  3747               	.LASF67:
- 3748 03f1 7573 6252 		.string	"usbRxBuf"
+ 3748 03fd 7573 6252 		.string	"usbRxBuf"
  3748      7842 7566 
  3748      00
  3749               	.LASF53:
- 3750 03fa 7573 624D 		.string	"usbMsgFlags"
+ 3750 0406 7573 624D 		.string	"usbMsgFlags"
  3750      7367 466C 
  3750      6167 7300 
  3751               	.LASF19:
- 3752 0406 7749 6E64 		.string	"wIndex"
+ 3752 0412 7749 6E64 		.string	"wIndex"
  3752      6578 00
  3753               	.LASF43:
- 3754 040d 6E6F 7452 		.string	"notResetState"
+ 3754 0419 6E6F 7452 		.string	"notResetState"
  3754      6573 6574 
  3754      5374 6174 
  3754      6500 
  3755               	.global __do_copy_data
  3756               	.global __do_clear_bss
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s 			page 72
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s 			page 72
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 usbdrv.c
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:2      *ABS*:0000003f __SREG__
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:3      *ABS*:0000003e __SP_H__
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:4      *ABS*:0000003d __SP_L__
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:5      *ABS*:00000034 __CCP__
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:6      *ABS*:00000000 __tmp_reg__
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:7      *ABS*:00000001 __zero_reg__
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:18     .text:00000000 usbInit
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:2      *ABS*:0000003f __SREG__
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:3      *ABS*:0000003e __SP_H__
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:4      *ABS*:0000003d __SP_L__
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:5      *ABS*:00000034 __CCP__
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:6      *ABS*:00000000 __tmp_reg__
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:7      *ABS*:00000001 __zero_reg__
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:18     .text:00000000 usbInit
                             *COM*:0000000c usbTxStatus1
                             *COM*:0000000c usbTxStatus3
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:52     .text:00000022 usbPoll
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:52     .text:00000022 usbPoll
                             *COM*:00000001 usbRxLen
                             *COM*:00000001 usbInputBufOffset
                             *COM*:00000016 usbRxBuf
                             *COM*:00000001 usbRxToken
                             *COM*:0000000b usbTxBuf
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:636    .data:00000000 usbTxLen
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:636    .data:00000000 usbTxLen
                              .bss:00000000 usbMsgFlags
                             *COM*:00000001 usbNewDeviceAddr
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:670    .progmem.data:0000001c usbDescriptorDevice
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:670    .progmem.data:0000001c usbDescriptorDevice
                             *COM*:00000002 usbMsgPtr
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:642    .progmem.data:00000000 usbDescriptorString0
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:650    .progmem.data:00000004 usbDescriptorStringVendor
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:661    .progmem.data:00000012 usbDescriptorStringDevice
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:642    .progmem.data:00000000 usbDescriptorString0
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:650    .progmem.data:00000004 usbDescriptorStringVendor
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:661    .progmem.data:00000012 usbDescriptorStringDevice
                             *COM*:00000001 usbConfiguration
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:692    .data:00000001 usbMsgLen
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:692    .data:00000001 usbMsgLen
                             *COM*:00000001 usbDeviceAddr
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:531    .text:00000244 usbGenericSetInterrupt
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:598    .text:0000028c usbSetInterrupt3
-C:\Users\ADMINI~1\AppData\Local\Temp/cc30aT3k.s:616    .text:00000296 usbSetInterrupt
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:531    .text:00000244 usbGenericSetInterrupt
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:598    .text:0000028c usbSetInterrupt3
+C:\Users\21030\AppData\Local\Temp/ccPl5SxF.s:616    .text:00000296 usbSetInterrupt
                             *COM*:00000001 usbCurrentTok
 
 UNDEFINED SYMBOLS

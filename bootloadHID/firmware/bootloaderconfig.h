@@ -115,53 +115,7 @@ these macros are defined, the boot loader usees them.
 #ifndef __ASSEMBLER__   /* assembler cannot parse function definitions */
 #include <util/delay.h>
 
-#ifdef KBDMOD_M7
-#define DDR_ROW0    DDRC
-#define PORT_ROW0   PORTC
-#define PIN_ROW0    PINC
-#define DDR_COL0    DDRA
-#define PORT_COL0   PORTA
 
-#define DDR_LED0    DDRB
-#define DDR_LED1    DDRB
-#define DDR_LED2    DDRB
-#define DDR_LED3    DDRD
-
-#define PORT_LED0   PORTB
-#define PORT_LED1   PORTB
-#define PORT_LED2   PORTB
-#define PORT_LED3   PORTD
-
-#define PIN_LED0    1 << 0
-#define PIN_LED1    1 << 2
-#define PIN_LED2    1 << 3
-#define PIN_LED3    1 << 2
-#endif
-
-#ifdef KBDMOD_M5
-#define DDR_ROW0    DDRG
-#define PORT_ROW0   PORTG
-#define PIN_ROW0    PING
-#define DDR_COL0    DDRA
-#define PORT_COL0   PORTA
-
-#define DDR_LED0    DDRD
-#define DDR_LED1    DDRD
-#define DDR_LED2    DDRD
-#define DDR_LED3    DDRD
-
-#define PORT_LED0   PORTD
-#define PORT_LED1   PORTD
-#define PORT_LED2   PORTD
-#define PORT_LED3   PORTD
-
-#define PIN_LED0    1 << 2
-#define PIN_LED1    1 << 2
-#define PIN_LED2    1 << 5
-#define PIN_LED3    1 << 3
-#endif
-
-#ifdef KBDMOD_M3
 #define DDR_ROW0    DDRA
 #define PORT_ROW0   PORTA
 #define PIN_ROW0    PINA
@@ -182,7 +136,7 @@ these macros are defined, the boot loader usees them.
 #define PIN_LED1    1 << 5
 #define PIN_LED2    1 << 7
 #define PIN_LED3    1 << 5
-#endif
+
 
 
 uint8_t ledcounter = 0; ///< counter used to set the speed of the running light
@@ -237,18 +191,14 @@ static void ledOn(uint8_t pin)
 
 static inline void  bootLoaderInit(void)
 {
-    #ifdef KBDMOD_M3
+
 	// 5v -> 3.3v for USB	
 	 DDRD |= (1 << PIND0);	
     PORTD |= (1 << PIND0);	
     // PS2 pullup	
     DDRD |= (1 << PIND1);	
     PORTD &= ~(1 << PIND1);
-    #else
-	// 5v -> 3.3v for USB
-	PORTD	= 0x40; // Zener(pull-up), LED_SCR, LED_CAPS, LED_NUM (0ff), D-(pull-up), D+(0)
-    DDRD    = 0xBC; // Zener(OUT), LED_SCR, LED_CAPS, LED_NUM (OUT), D-(INPUT), D+(INPUT)
-    #endif
+  
     // switch on leds
     ledInit();
     ledOff();
@@ -258,8 +208,8 @@ static inline void  bootLoaderInit(void)
 
     DDR_ROW0  &= ~(1 << PINA0);     // PINA0(row0) input
     PORT_ROW0 |= (1 << PINA0);      // PINA0(pullUP)
-    DDR_COL0  |= (1 << PINA0);      // PINB0(column0) output
-    PORT_COL0 &= ~(1 << PINA0);     // drive low
+    DDR_COL0  |= (1 << PINC3);      // PINB0(column0) output
+    PORT_COL0 &= ~(1 << PINC3);     // drive low
 }
 
 //#define bootLoaderCondition()   ((PIND & (1 << 3)) == 0)   /* True if jumper is set */

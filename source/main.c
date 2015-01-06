@@ -175,11 +175,10 @@ int main(void)
    DPpullEn(usbmode);
 //   led_off(LED_PIN_Fx);
    
-   timerInit();
-   timer1PWMInit(8);
-   timer2PWMInit(8);
+//   timerInit();
+//   timer1PWMInit(8);
+//   timer2PWMInit(8);
    keymap_init();
-   initMacroAddr();
 
 
 
@@ -198,9 +197,6 @@ int main(void)
    {
     
     led_on(LED_PIN_Fx);
-#ifndef KBDMOD_M3
-      timer2IntEnable();
-#endif
       led_check(0);
       led_mode_init();
       ps2main();

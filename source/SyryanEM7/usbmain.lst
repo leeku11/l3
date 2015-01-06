@@ -1,4 +1,4 @@
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 1
 
 
    1               		.file	"usbmain.c"
@@ -58,7 +58,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
   55 0030 00C0      		rjmp .L12
   56               	.L13:
   57               	.LM6:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 2
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 2
 
 
   58 0032 80E0      		ldi r24,lo8(usbDescriptorConfiguration+43)
@@ -118,7 +118,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  112               	.LM12:
  113 0074 FC01      		movw r30,r24
  114               	.LVL13:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 3
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 3
 
 
  115               	.LM13:
@@ -178,7 +178,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  169 00c4 8381      		ldd r24,Z+3
  170 00c6 8093 0000 		sts idleRate,r24
  171               	.LM25:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 4
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 4
 
 
  172 00ca 8823      		tst r24
@@ -238,7 +238,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  226 0108 582F      		mov r21,r24
  227 010a DB01      		movw r26,r22
  228 010c 642F      		mov r22,r20
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 5
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 5
 
 
  229               	.LVL21:
@@ -298,7 +298,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  283               	.L38:
  284               	.LBB18:
  285               	.LBB19:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 6
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 6
 
 
  286               	.LM44:
@@ -358,7 +358,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  340 016c 8081      		ld r24,Z
  341 016e 9091 0000 		lds r25,keyboardReport
  342 0172 892B      		or r24,r25
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 7
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 7
 
 
  343 0174 8093 0000 		sts keyboardReport,r24
@@ -418,7 +418,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  397 01ce 00C0      		rjmp .L66
  398               	.L51:
  399 01d0 923B      		cpi r25,lo8(-78)
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 8
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 8
 
 
  400 01d2 01F4      		brne .L52
@@ -478,7 +478,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  454 022c 01F4      		brne .L61
  455 022e 86E2      		ldi r24,lo8(550)
  456 0230 92E0      		ldi r25,hi8(550)
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 9
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 9
 
 
  457 0232 00C0      		rjmp .L66
@@ -538,7 +538,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  511 0284 8091 0000 		lds r24,reportIndex
  512 0288 8830      		cpi r24,lo8(8)
  513 028a 00F0      		brlo .L69
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 10
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 10
 
 
  514               	.LM59:
@@ -598,7 +598,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  568 02ca 1092 0000 		sts (extraReport+1)+1,__zero_reg__
  569 02ce 1092 0000 		sts extraReport+1,__zero_reg__
  570               	.LM67:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 11
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 11
 
 
  571 02d2 80E0      		ldi r24,lo8(0)
@@ -658,7 +658,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  625               	.LFB16:
  626               	.LM74:
  627 02fe EF92      		push r14
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 12
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 12
 
 
  628 0300 FF92      		push r15
@@ -718,7 +718,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  682 032c 0FBE      		out __SREG__,__tmp_reg__
  683 032e 21BD      		out 33,r18
  684               	 ;  0 "" 2
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 13
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 13
 
 
  685               	/* #NOAPP */
@@ -778,7 +778,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  739 037c 9817      		cp r25,r24
  740 037e 01F4      		brne .L85
  741               	.LBE25:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 14
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 14
 
 
  742               	.LBE24:
@@ -838,7 +838,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  796               	.L91:
  797 03c4 0190      		ld r0,Z+
  798 03c6 0D92      		st X+,r0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 15
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 15
 
 
  799 03c8 8150      		subi r24,lo8(-(-1))
@@ -898,7 +898,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  853               	.LM110:
  854 040e 1092 0000 		sts expectReport,__zero_reg__
  855               	.LM111:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 16
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 16
 
 
  856 0412 81E0      		ldi r24,lo8(1)
@@ -958,7 +958,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  910 0019 08        		.byte	8
  911 001a 81        		.byte	-127
  912 001b 03        		.byte	3
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 17
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 17
 
 
  913 001c 95        		.byte	-107
@@ -1018,7 +1018,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  967 004e 01        		.byte	1
  968 004f 29        		.byte	41
  969 0050 05        		.byte	5
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 18
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 18
 
 
  970 0051 15        		.byte	21
@@ -1078,7 +1078,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1024 0087 81        		.byte	-127
  1025 0088 25        		.byte	37
  1026 0089 7F        		.byte	127
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 19
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 19
 
 
  1027 008a 75        		.byte	117
@@ -1138,7 +1138,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1081 00c0 00        		.byte	0
  1082 00c1 C0        		.byte	-64
  1083               	.global	usbDescriptorConfiguration
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 20
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 20
 
 
  1084               		.type	usbDescriptorConfiguration, @object
@@ -1198,7 +1198,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1138 00f5 00        		.byte	0
  1139 00f6 07        		.byte	7
  1140 00f7 05        		.byte	5
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 21
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 21
 
 
  1141 00f8 83        		.byte	-125
@@ -1258,7 +1258,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1195               	.LASFDE0:
  1196 0014 0000 0000 		.long	.Lframe0
  1197 0018 0000 0000 		.long	.LFB7
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 22
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 22
 
 
  1198 001c 7400 0000 		.long	.LFE7-.LFB7
@@ -1318,7 +1318,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1252 0084 0000 0000 		.long	.Lframe0
  1253 0088 0000 0000 		.long	.LFB11
  1254 008c 1400 0000 		.long	.LFE11-.LFB11
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 23
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 23
 
 
  1255               		.p2align	2
@@ -1378,7 +1378,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1309 0046 0100      		.word	0x1
  1310 0048 68        		.byte	0x68
  1311 0049 6E00 0000 		.long	.LVL8-.Ltext0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 24
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 24
 
 
  1312 004d 7000 0000 		.long	.LVL9-.Ltext0
@@ -1438,7 +1438,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1366 00bb 01        		.uleb128 0x1
  1367 00bc 6F        		.byte	0x6f
  1368 00bd 93        		.byte	0x93
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 25
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 25
 
 
  1369 00be 01        		.uleb128 0x1
@@ -1498,7 +1498,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1423 012d 2001 0000 		.long	.LVL25-.Ltext0
  1424 0131 2201 0000 		.long	.LVL26-.Ltext0
  1425 0135 0100      		.word	0x1
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 26
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 26
 
 
  1426 0137 68        		.byte	0x68
@@ -1558,7 +1558,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1480 01b9 0000 0000 		.long	0x0
  1481               	.LLST14:
  1482 01bd 8202 0000 		.long	.LVL44-.Ltext0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 27
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 27
 
 
  1483 01c1 8402 0000 		.long	.LVL45-.Ltext0
@@ -1618,7 +1618,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1537 0255 9E03 0000 		.long	.LVL63-.Ltext0
  1538 0259 0100      		.word	0x1
  1539 025b 5F        		.byte	0x5f
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 28
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 28
 
 
  1540 025c 9E03 0000 		.long	.LVL63-.Ltext0
@@ -1678,7 +1678,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1594 02ce 0E04 0000 		.long	.LVL69-.Ltext0
  1595 02d2 0100      		.word	0x1
  1596 02d4 66        		.byte	0x66
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 29
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 29
 
 
  1597 02d5 0E04 0000 		.long	.LVL69-.Ltext0
@@ -1738,7 +1738,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1651 0060 0000 0000 		.long	.LASF8
  1652 0064 02        		.uleb128 0x2
  1653 0065 01        		.byte	0x1
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 30
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 30
 
 
  1654 0066 06        		.byte	0x6
@@ -1798,7 +1798,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1708 00cf 07        		.uleb128 0x7
  1709 00d0 0000 0000 		.long	.LASF20
  1710 00d4 C000      		.sleb128 64
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 31
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 31
 
 
  1711 00d6 07        		.uleb128 0x7
@@ -1858,7 +1858,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1765 0140 4B5F 4A00 		.string	"K_J"
  1766 0144 0D        		.sleb128 13
  1767 0145 09        		.uleb128 0x9
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 32
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 32
 
 
  1768 0146 4B5F 4B00 		.string	"K_K"
@@ -1918,7 +1918,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1822 01b2 4B5F 3300 		.string	"K_3"
  1823 01b6 20        		.sleb128 32
  1824 01b7 09        		.uleb128 0x9
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 33
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 33
 
 
  1825 01b8 4B5F 3400 		.string	"K_4"
@@ -1978,7 +1978,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1879 0224 0000 0000 		.long	.LASF38
  1880 0228 33        		.sleb128 51
  1881 0229 07        		.uleb128 0x7
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 34
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 34
 
 
  1882 022a 0000 0000 		.long	.LASF39
@@ -2038,7 +2038,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1936 029c 0000 0000 		.long	.LASF57
  1937 02a0 C600      		.sleb128 70
  1938 02a2 07        		.uleb128 0x7
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 35
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 35
 
 
  1939 02a3 0000 0000 		.long	.LASF58
@@ -2098,7 +2098,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  1993 0321 0000 0000 		.long	.LASF76
  1994 0325 D900      		.sleb128 89
  1995 0327 07        		.uleb128 0x7
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 36
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 36
 
 
  1996 0328 0000 0000 		.long	.LASF77
@@ -2158,7 +2158,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2050 03a6 0000 0000 		.long	.LASF95
  2051 03aa EC00      		.sleb128 108
  2052 03ac 07        		.uleb128 0x7
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 37
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 37
 
 
  2053 03ad 0000 0000 		.long	.LASF96
@@ -2218,7 +2218,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2107 042b 0000 0000 		.long	.LASF114
  2108 042f FF00      		.sleb128 127
  2109 0431 07        		.uleb128 0x7
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 38
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 38
 
 
  2110 0432 0000 0000 		.long	.LASF115
@@ -2278,7 +2278,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2164 04b0 0000 0000 		.long	.LASF133
  2165 04b4 9201      		.sleb128 146
  2166 04b6 07        		.uleb128 0x7
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 39
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 39
 
 
  2167 04b7 0000 0000 		.long	.LASF134
@@ -2338,7 +2338,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2221 0535 0000 0000 		.long	.LASF152
  2222 0539 A501      		.sleb128 165
  2223 053b 07        		.uleb128 0x7
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 40
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 40
 
 
  2224 053c 0000 0000 		.long	.LASF153
@@ -2398,7 +2398,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2278 05ba 0000 0000 		.long	.LASF171
  2279 05be B801      		.sleb128 184
  2280 05c0 07        		.uleb128 0x7
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 41
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 41
 
 
  2281 05c1 0000 0000 		.long	.LASF172
@@ -2458,7 +2458,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2335 063f 0000 0000 		.long	.LASF190
  2336 0643 CB01      		.sleb128 203
  2337 0645 07        		.uleb128 0x7
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 42
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 42
 
 
  2338 0646 0000 0000 		.long	.LASF191
@@ -2518,7 +2518,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2392 06c4 0000 0000 		.long	.LASF209
  2393 06c8 DE01      		.sleb128 222
  2394 06ca 07        		.uleb128 0x7
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 43
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 43
 
 
  2395 06cb 0000 0000 		.long	.LASF210
@@ -2578,7 +2578,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2449 0749 0000 0000 		.long	.LASF228
  2450 074d F101      		.sleb128 241
  2451 074f 07        		.uleb128 0x7
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 44
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 44
 
 
  2452 0750 0000 0000 		.long	.LASF229
@@ -2638,7 +2638,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2506 07ca 0C        		.byte	0xc
  2507 07cb 06        		.byte	0x6
  2508 07cc A002      		.word	0x2a0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 45
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 45
 
 
  2509 07ce F107 0000 		.long	0x7f1
@@ -2698,7 +2698,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2563 0840 4B08 0000 		.long	0x84b
  2564 0844 11        		.uleb128 0x11
  2565 0845 0608 0000 		.long	0x806
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 46
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 46
 
 
  2566 0849 01        		.byte	0x1
@@ -2758,7 +2758,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2620 08af 12        		.uleb128 0x12
  2621 08b0 0000 0000 		.long	.LASF256
  2622 08b4 06        		.byte	0x6
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 47
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 47
 
 
  2623 08b5 B702      		.word	0x2b7
@@ -2818,7 +2818,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2677 091f 01        		.byte	0x1
  2678 0920 AE01      		.word	0x1ae
  2679 0922 5409 0000 		.long	0x954
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 48
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 48
 
 
  2680 0926 1A        		.uleb128 0x1a
@@ -2878,7 +2878,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2734 0993 01        		.byte	0x1
  2735 0994 0000 0000 		.long	.LASF310
  2736 0998 01        		.byte	0x1
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 49
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 49
 
 
  2737 0999 A201      		.word	0x1a2
@@ -2938,7 +2938,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2791 0a15 01        		.byte	0x1
  2792 0a16 5A01      		.word	0x15a
  2793 0a18 240A 0000 		.long	0xa24
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 50
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 50
 
 
  2794 0a1c 06        		.byte	0x6
@@ -2998,7 +2998,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2848 0a96 7331 00   		.string	"s1"
  2849 0a99 01        		.byte	0x1
  2850 0a9a C501      		.word	0x1c5
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 51
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 51
 
 
  2851 0a9c 5409 0000 		.long	0x954
@@ -3058,7 +3058,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2905 0b08 0000 0000 		.long	.LFB15
  2906 0b0c 0000 0000 		.long	.LFE15
  2907 0b10 02        		.byte	0x2
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 52
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 52
 
 
  2908 0b11 90        		.byte	0x90
@@ -3118,7 +3118,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  2962 0b88 0000 0000 		.long	.LFB16
  2963 0b8c 0000 0000 		.long	.LFE16
  2964 0b90 02        		.byte	0x2
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 53
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 53
 
 
  2965 0b91 90        		.byte	0x90
@@ -3178,7 +3178,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3019 0c1a 3E0A 0000 		.long	0xa3e
  3020 0c1e 2D        		.uleb128 0x2d
  3021 0c1f 0000 0000 		.long	.LBB25
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 54
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 54
 
 
  3022 0c23 0000 0000 		.long	.LBE25
@@ -3238,7 +3238,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3076 0c9f 880C 0000 		.long	0xc88
  3077 0ca3 05        		.byte	0x5
  3078 0ca4 03        		.byte	0x3
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 55
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 55
 
 
  3079 0ca5 0000 0000 		.long	keyboardReport
@@ -3298,7 +3298,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3133 0d14 0000 0000 		.long	usbDescriptorConfiguration
  3134 0d18 36        		.uleb128 0x36
  3135 0d19 F60C 0000 		.long	0xcf6
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 56
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 56
 
 
  3136 0d1d 37        		.uleb128 0x37
@@ -3358,7 +3358,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3190 0d88 7200 0000 		.long	0x72
  3191 0d8c 01        		.byte	0x1
  3192 0d8d 05        		.byte	0x5
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 57
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 57
 
 
  3193 0d8e 03        		.byte	0x3
@@ -3418,7 +3418,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3247 0e00 10        		.uleb128 0x10
  3248 0e01 DE00 0000 		.long	0xde
  3249 0e05 100E 0000 		.long	0xe10
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 58
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 58
 
 
  3250 0e09 11        		.uleb128 0x11
@@ -3478,7 +3478,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3304 001e 03        		.uleb128 0x3
  3305 001f 24        		.uleb128 0x24
  3306 0020 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 59
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 59
 
 
  3307 0021 0B        		.uleb128 0xb
@@ -3538,7 +3538,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3361 0057 08        		.uleb128 0x8
  3362 0058 04        		.uleb128 0x4
  3363 0059 01        		.byte	0x1
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 60
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 60
 
 
  3364 005a 0B        		.uleb128 0xb
@@ -3598,7 +3598,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3418 0090 08        		.uleb128 0x8
  3419 0091 3A        		.uleb128 0x3a
  3420 0092 0B        		.uleb128 0xb
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 61
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 61
 
 
  3421 0093 3B        		.uleb128 0x3b
@@ -3658,7 +3658,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3475 00c9 0B        		.uleb128 0xb
  3476 00ca 3B        		.uleb128 0x3b
  3477 00cb 05        		.uleb128 0x5
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 62
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 62
 
 
  3478 00cc 49        		.uleb128 0x49
@@ -3718,7 +3718,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3532 0102 3B        		.uleb128 0x3b
  3533 0103 0B        		.uleb128 0xb
  3534 0104 49        		.uleb128 0x49
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 63
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 63
 
 
  3535 0105 13        		.uleb128 0x13
@@ -3778,7 +3778,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3589 013b 00        		.byte	0x0
  3590 013c 00        		.byte	0x0
  3591 013d 1A        		.uleb128 0x1a
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 64
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 64
 
 
  3592 013e 05        		.uleb128 0x5
@@ -3838,7 +3838,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3646 0174 03        		.uleb128 0x3
  3647 0175 0E        		.uleb128 0xe
  3648 0176 3A        		.uleb128 0x3a
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 65
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 65
 
 
  3649 0177 0B        		.uleb128 0xb
@@ -3898,7 +3898,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3703 01ad 00        		.byte	0x0
  3704 01ae 00        		.byte	0x0
  3705 01af 22        		.uleb128 0x22
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 66
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 66
 
 
  3706 01b0 05        		.uleb128 0x5
@@ -3958,7 +3958,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3760 01e6 13        		.uleb128 0x13
  3761 01e7 02        		.uleb128 0x2
  3762 01e8 0A        		.uleb128 0xa
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 67
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 67
 
 
  3763 01e9 00        		.byte	0x0
@@ -4018,7 +4018,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3817 021f 06        		.uleb128 0x6
  3818 0220 00        		.byte	0x0
  3819 0221 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 68
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 68
 
 
  3820 0222 2B        		.uleb128 0x2b
@@ -4078,7 +4078,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3874 0258 2F        		.uleb128 0x2f
  3875 0259 2E        		.uleb128 0x2e
  3876 025a 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 69
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 69
 
 
  3877 025b 31        		.uleb128 0x31
@@ -4138,7 +4138,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3931 0291 05        		.uleb128 0x5
  3932 0292 00        		.byte	0x0
  3933 0293 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 70
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 70
 
 
  3934 0294 33        		.uleb128 0x33
@@ -4198,7 +4198,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  3988 02ca 00        		.byte	0x0
  3989 02cb 00        		.byte	0x0
  3990 02cc 37        		.uleb128 0x37
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 71
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 71
 
 
  3991 02cd 34        		.uleb128 0x34
@@ -4258,7 +4258,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4036 0048 680A 0000 		.long	0xa68
  4037 004c 636D 7052 		.string	"cmpReportBuffer"
  4037      6570 6F72 
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 72
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 72
 
 
  4037      7442 7566 
@@ -4318,7 +4318,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4059 012a 6F6C 6465 		.string	"oldextraReport"
  4059      7874 7261 
  4059      5265 706F 
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 73
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 73
 
 
  4059      7274 00
@@ -4378,7 +4378,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4095 000e 0A        		.byte	0xa
  4096 000f 00        		.byte	0x0
  4097 0010 01        		.byte	0x1
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 74
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 74
 
 
  4098 0011 01        		.byte	0x1
@@ -4438,7 +4438,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4132 00c5 6877 706F 		.string	"hwport.h"
  4132      7274 2E68 
  4132      00
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 75
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 75
 
 
  4133 00ce 00        		.uleb128 0x0
@@ -4498,7 +4498,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4179 012a 0000 0000 		.long	.LM5
  4180 012e 16        		.byte	0x16
  4181 012f 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 76
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 76
 
 
  4182 0130 05        		.uleb128 0x5
@@ -4558,7 +4558,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4236 0187 00        		.byte	0x0
  4237 0188 05        		.uleb128 0x5
  4238 0189 02        		.byte	0x2
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 77
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 77
 
 
  4239 018a 0000 0000 		.long	.LM17
@@ -4618,7 +4618,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4293 01e1 02        		.byte	0x2
  4294 01e2 0000 0000 		.long	.LM28
  4295 01e6 17        		.byte	0x17
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 78
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 78
 
 
  4296 01e7 00        		.byte	0x0
@@ -4678,7 +4678,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4350 023e 15        		.byte	0x15
  4351 023f 00        		.byte	0x0
  4352 0240 05        		.uleb128 0x5
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 79
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 79
 
 
  4353 0241 02        		.byte	0x2
@@ -4738,7 +4738,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4407 0298 17        		.byte	0x17
  4408 0299 00        		.byte	0x0
  4409 029a 05        		.uleb128 0x5
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 80
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 80
 
 
  4410 029b 02        		.byte	0x2
@@ -4798,7 +4798,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4464 02f2 05        		.uleb128 0x5
  4465 02f3 02        		.byte	0x2
  4466 02f4 0000 0000 		.long	.LM62
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 81
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 81
 
 
  4467 02f8 1A        		.byte	0x1a
@@ -4858,7 +4858,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4521 034d 05        		.uleb128 0x5
  4522 034e 02        		.byte	0x2
  4523 034f 0000 0000 		.long	.LM73
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 82
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 82
 
 
  4524 0353 16        		.byte	0x16
@@ -4918,7 +4918,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4578 03a6 00        		.byte	0x0
  4579 03a7 05        		.uleb128 0x5
  4580 03a8 02        		.byte	0x2
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 83
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 83
 
 
  4581 03a9 0000 0000 		.long	.LM83
@@ -4978,7 +4978,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4635 03fe 0000 0000 		.long	.LM93
  4636 0402 95        		.byte	0x95
  4637 0403 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 84
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 84
 
 
  4638 0404 05        		.uleb128 0x5
@@ -5038,7 +5038,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4692 0459 0000 0000 		.long	.LM104
  4693 045d 16        		.byte	0x16
  4694 045e 00        		.byte	0x0
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 85
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 85
 
 
  4695 045f 05        		.uleb128 0x5
@@ -5098,7 +5098,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4743      5348 4946 
  4743      545F 4C45 
  4743      4654 00
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 86
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 86
 
 
  4744               	.LASF256:
@@ -5158,7 +5158,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4772               	.LASF251:
  4773 00a1 626D 5265 		.string	"bmRequestType"
  4773      7175 6573 
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 87
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 87
 
 
  4773      7454 7970 
@@ -5218,7 +5218,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4803 012e 4B5F 4B50 		.string	"K_KP_5"
  4803      5F35 00
  4804               	.LASF81:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 88
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 88
 
 
  4805 0135 4B5F 4B50 		.string	"K_KP_6"
@@ -5278,7 +5278,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4838               	.LASF53:
  4839 01a9 4B5F 4639 		.string	"K_F9"
  4839      00
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 89
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 89
 
 
  4840               	.LASF111:
@@ -5338,7 +5338,7 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4871      7874 7261 
  4871      5F74 00
  4872               	.LASF263:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 90
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 90
 
 
  4873 0232 7265 7375 		.string	"result"
@@ -5378,946 +5378,946 @@ GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 1
  4888               	.LASF115:
  4889 0294 4B5F 564F 		.string	"K_VOLUP"
  4889      4C55 5000 
- 4890               	.LASF306:
- 4891 029c 5A3A 5C44 		.string	"Z:\\Documents\\GitHub\\l3\\source"
- 4891      6F63 756D 
- 4891      656E 7473 
- 4891      5C47 6974 
- 4891      4875 625C 
- 4892               	.LASF180:
- 4893 02ba 4B5F 5757 		.string	"K_WWW_HOME"
- 4893      575F 484F 
- 4893      4D45 00
- 4894               	.LASF301:
- 4895 02c5 6D6F 7573 		.string	"mouse_hid_report"
- 4895      655F 6869 
- 4895      645F 7265 
- 4895      706F 7274 
- 4895      00
- 4896               	.LASF139:
- 4897 02d6 4B5F 4B45 		.string	"K_KEYLOCK"
- 4897      594C 4F43 
- 4897      4B00 
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 91
+ 4890               	.LASF180:
+ 4891 029c 4B5F 5757 		.string	"K_WWW_HOME"
+ 4891      575F 484F 
+ 4891      4D45 00
+ 4892               	.LASF301:
+ 4893 02a7 6D6F 7573 		.string	"mouse_hid_report"
+ 4893      655F 6869 
+ 4893      645F 7265 
+ 4893      706F 7274 
+ 4893      00
+ 4894               	.LASF139:
+ 4895 02b8 4B5F 4B45 		.string	"K_KEYLOCK"
+ 4895      594C 4F43 
+ 4895      4B00 
+ 4896               	.LASF181:
+ 4897 02c2 4B5F 5757 		.string	"K_WWW_BACK"
+ 4897      575F 4241 
+ 4897      434B 00
+ 4898               	.LASF24:
+ 4899 02cd 4572 726F 		.string	"ErrorRollOver"
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 91
 
 
- 4898               	.LASF181:
- 4899 02e0 4B5F 5757 		.string	"K_WWW_BACK"
- 4899      575F 4241 
- 4899      434B 00
- 4900               	.LASF24:
- 4901 02eb 4572 726F 		.string	"ErrorRollOver"
- 4901      7252 6F6C 
- 4901      6C4F 7665 
- 4901      7200 
- 4902               	.LASF164:
- 4903 02f9 4B5F 5354 		.string	"K_STOP"
- 4903      4F50 00
- 4904               	.LASF72:
- 4905 0300 4B5F 4B50 		.string	"K_KP_AST"
- 4905      5F41 5354 
+ 4899      7252 6F6C 
+ 4899      6C4F 7665 
+ 4899      7200 
+ 4900               	.LASF164:
+ 4901 02db 4B5F 5354 		.string	"K_STOP"
+ 4901      4F50 00
+ 4902               	.LASF72:
+ 4903 02e2 4B5F 4B50 		.string	"K_KP_AST"
+ 4903      5F41 5354 
+ 4903      00
+ 4904               	.LASF283:
+ 4905 02eb 7573 6246 		.string	"usbFunctionWrite"
+ 4905      756E 6374 
+ 4905      696F 6E57 
+ 4905      7269 7465 
  4905      00
- 4906               	.LASF283:
- 4907 0309 7573 6246 		.string	"usbFunctionWrite"
- 4907      756E 6374 
- 4907      696F 6E57 
- 4907      7269 7465 
+ 4906               	.LASF117:
+ 4907 02fc 4B5F 4B4C 		.string	"K_KL_CAP"
+ 4907      5F43 4150 
  4907      00
- 4908               	.LASF117:
- 4909 031a 4B5F 4B4C 		.string	"K_KL_CAP"
- 4909      5F43 4150 
+ 4908               	.LASF266:
+ 4909 0305 5F5F 6D73 		.string	"__ms"
  4909      00
- 4910               	.LASF266:
- 4911 0323 5F5F 6D73 		.string	"__ms"
+ 4910               	.LASF14:
+ 4911 030a 4D4F 445F 		.string	"MOD_CONTROL_LEFT"
+ 4911      434F 4E54 
+ 4911      524F 4C5F 
+ 4911      4C45 4654 
  4911      00
- 4912               	.LASF14:
- 4913 0328 4D4F 445F 		.string	"MOD_CONTROL_LEFT"
- 4913      434F 4E54 
- 4913      524F 4C5F 
- 4913      4C45 4654 
+ 4912               	.LASF121:
+ 4913 031b 4B5F 4551 		.string	"K_EQUAL_SIGN"
+ 4913      5541 4C5F 
+ 4913      5349 474E 
  4913      00
- 4914               	.LASF121:
- 4915 0339 4B5F 4551 		.string	"K_EQUAL_SIGN"
- 4915      5541 4C5F 
- 4915      5349 474E 
- 4915      00
- 4916               	.LASF177:
- 4917 0346 4B5F 4341 		.string	"K_CALC"
- 4917      4C43 00
- 4918               	.LASF282:
- 4919 034d 696E 7465 		.string	"interfaceCount"
- 4919      7266 6163 
- 4919      6543 6F75 
- 4919      6E74 00
- 4920               	.LASF258:
- 4921 035c 7265 706F 		.string	"report_id"
- 4921      7274 5F69 
- 4921      6400 
- 4922               	.LASF31:
- 4923 0366 4B5F 5350 		.string	"K_SPACE"
- 4923      4143 4500 
- 4924               	.LASF284:
- 4925 036e 6B65 7962 		.string	"keyboardReport"
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 92
+ 4914               	.LASF177:
+ 4915 0328 4B5F 4341 		.string	"K_CALC"
+ 4915      4C43 00
+ 4916               	.LASF282:
+ 4917 032f 696E 7465 		.string	"interfaceCount"
+ 4917      7266 6163 
+ 4917      6543 6F75 
+ 4917      6E74 00
+ 4918               	.LASF258:
+ 4919 033e 7265 706F 		.string	"report_id"
+ 4919      7274 5F69 
+ 4919      6400 
+ 4920               	.LASF31:
+ 4921 0348 4B5F 5350 		.string	"K_SPACE"
+ 4921      4143 4500 
+ 4922               	.LASF284:
+ 4923 0350 6B65 7962 		.string	"keyboardReport"
+ 4923      6F61 7264 
+ 4923      5265 706F 
+ 4923      7274 00
+ 4924               	.LASF150:
+ 4925 035f 4B5F 4352 		.string	"K_CRSEL"
+ 4925      5345 4C00 
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 92
 
 
- 4925      6F61 7264 
- 4925      5265 706F 
- 4925      7274 00
- 4926               	.LASF150:
- 4927 037d 4B5F 4352 		.string	"K_CRSEL"
- 4927      5345 4C00 
- 4928               	.LASF167:
- 4929 0385 4B5F 4241 		.string	"K_BASS_BST"
- 4929      5353 5F42 
- 4929      5354 00
- 4930               	.LASF247:
- 4931 0390 6279 7465 		.string	"bytes"
- 4931      7300 
- 4932               	.LASF289:
- 4933 0396 7573 624D 		.string	"usbMsgPtr"
- 4933      7367 5074 
- 4933      7200 
- 4934               	.LASF109:
- 4935 03a0 4B5F 554E 		.string	"K_UNDO"
- 4935      444F 00
- 4936               	.LASF191:
- 4937 03a7 4B5F 4D30 		.string	"K_M01"
- 4937      3100 
- 4938               	.LASF192:
- 4939 03ad 4B5F 4D30 		.string	"K_M02"
- 4939      3200 
- 4940               	.LASF193:
- 4941 03b3 4B5F 4D30 		.string	"K_M03"
- 4941      3300 
- 4942               	.LASF194:
- 4943 03b9 4B5F 4D30 		.string	"K_M04"
- 4943      3400 
- 4944               	.LASF23:
- 4945 03bf 4B5F 4E4F 		.string	"K_NONE"
- 4945      4E45 00
- 4946               	.LASF196:
- 4947 03c6 4B5F 4D30 		.string	"K_M06"
- 4947      3600 
- 4948               	.LASF197:
- 4949 03cc 4B5F 4D30 		.string	"K_M07"
- 4949      3700 
- 4950               	.LASF198:
- 4951 03d2 4B5F 4D30 		.string	"K_M08"
- 4951      3800 
- 4952               	.LASF113:
- 4953 03d8 4B5F 4649 		.string	"K_FIND"
- 4953      4E44 00
- 4954               	.LASF66:
- 4955 03df 4B5F 5249 		.string	"K_RIGHT"
- 4955      4748 5400 
- 4956               	.LASF195:
- 4957 03e7 4B5F 4D30 		.string	"K_M05"
- 4957      3500 
- 4958               	.LASF146:
- 4959 03ed 4B5F 5350 		.string	"K_SPERATOR"
- 4959      4552 4154 
- 4959      4F52 00
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 93
+ 4926               	.LASF167:
+ 4927 0367 4B5F 4241 		.string	"K_BASS_BST"
+ 4927      5353 5F42 
+ 4927      5354 00
+ 4928               	.LASF247:
+ 4929 0372 6279 7465 		.string	"bytes"
+ 4929      7300 
+ 4930               	.LASF289:
+ 4931 0378 7573 624D 		.string	"usbMsgPtr"
+ 4931      7367 5074 
+ 4931      7200 
+ 4932               	.LASF109:
+ 4933 0382 4B5F 554E 		.string	"K_UNDO"
+ 4933      444F 00
+ 4934               	.LASF191:
+ 4935 0389 4B5F 4D30 		.string	"K_M01"
+ 4935      3100 
+ 4936               	.LASF192:
+ 4937 038f 4B5F 4D30 		.string	"K_M02"
+ 4937      3200 
+ 4938               	.LASF193:
+ 4939 0395 4B5F 4D30 		.string	"K_M03"
+ 4939      3300 
+ 4940               	.LASF194:
+ 4941 039b 4B5F 4D30 		.string	"K_M04"
+ 4941      3400 
+ 4942               	.LASF23:
+ 4943 03a1 4B5F 4E4F 		.string	"K_NONE"
+ 4943      4E45 00
+ 4944               	.LASF196:
+ 4945 03a8 4B5F 4D30 		.string	"K_M06"
+ 4945      3600 
+ 4946               	.LASF197:
+ 4947 03ae 4B5F 4D30 		.string	"K_M07"
+ 4947      3700 
+ 4948               	.LASF198:
+ 4949 03b4 4B5F 4D30 		.string	"K_M08"
+ 4949      3800 
+ 4950               	.LASF113:
+ 4951 03ba 4B5F 4649 		.string	"K_FIND"
+ 4951      4E44 00
+ 4952               	.LASF66:
+ 4953 03c1 4B5F 5249 		.string	"K_RIGHT"
+ 4953      4748 5400 
+ 4954               	.LASF195:
+ 4955 03c9 4B5F 4D30 		.string	"K_M05"
+ 4955      3500 
+ 4956               	.LASF146:
+ 4957 03cf 4B5F 5350 		.string	"K_SPERATOR"
+ 4957      4552 4154 
+ 4957      4F52 00
+ 4958               	.LASF199:
+ 4959 03da 4B5F 4D30 		.string	"K_M09"
+ 4959      3900 
+ 4960               	.LASF300:
+ 4961 03e0 6B65 7962 		.string	"keyboard_hid_report"
+ 4961      6F61 7264 
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 93
 
 
- 4960               	.LASF199:
- 4961 03f8 4B5F 4D30 		.string	"K_M09"
- 4961      3900 
- 4962               	.LASF300:
- 4963 03fe 6B65 7962 		.string	"keyboard_hid_report"
- 4963      6F61 7264 
- 4963      5F68 6964 
- 4963      5F72 6570 
- 4963      6F72 7400 
- 4964               	.LASF309:
- 4965 0412 6275 6663 		.string	"bufcmp"
- 4965      6D70 00
- 4966               	.LASF25:
- 4967 0419 504F 5354 		.string	"POSTFail"
- 4967      4661 696C 
- 4967      00
- 4968               	.LASF275:
- 4969 0422 6B65 7969 		.string	"keyidx"
- 4969      6478 00
- 4970               	.LASF88:
- 4971 0429 4B5F 4150 		.string	"K_APPS"
- 4971      5053 00
- 4972               	.LASF9:
- 4973 0430 6368 6172 		.string	"char"
- 4973      00
- 4974               	.LASF175:
- 4975 0435 4B5F 4D45 		.string	"K_MEDIA_SEL"
- 4975      4449 415F 
- 4975      5345 4C00 
- 4976               	.LASF172:
- 4977 0441 4B5F 4241 		.string	"K_BASS_DN"
- 4977      5353 5F44 
- 4977      4E00 
- 4978               	.LASF200:
- 4979 044b 4B5F 4D31 		.string	"K_M10"
- 4979      3000 
- 4980               	.LASF201:
- 4981 0451 4B5F 4D31 		.string	"K_M11"
- 4981      3100 
- 4982               	.LASF202:
- 4983 0457 4B5F 4D31 		.string	"K_M12"
- 4983      3200 
- 4984               	.LASF203:
- 4985 045d 4B5F 4D31 		.string	"K_M13"
- 4985      3300 
- 4986               	.LASF204:
- 4987 0463 4B5F 4D31 		.string	"K_M14"
- 4987      3400 
- 4988               	.LASF205:
- 4989 0469 4B5F 4D31 		.string	"K_M15"
- 4989      3500 
- 4990               	.LASF206:
- 4991 046f 4B5F 4D31 		.string	"K_M16"
- 4991      3600 
- 4992               	.LASF207:
- 4993 0475 4B5F 4D31 		.string	"K_M17"
- 4993      3700 
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 94
+ 4961      5F68 6964 
+ 4961      5F72 6570 
+ 4961      6F72 7400 
+ 4962               	.LASF309:
+ 4963 03f4 6275 6663 		.string	"bufcmp"
+ 4963      6D70 00
+ 4964               	.LASF25:
+ 4965 03fb 504F 5354 		.string	"POSTFail"
+ 4965      4661 696C 
+ 4965      00
+ 4966               	.LASF275:
+ 4967 0404 6B65 7969 		.string	"keyidx"
+ 4967      6478 00
+ 4968               	.LASF88:
+ 4969 040b 4B5F 4150 		.string	"K_APPS"
+ 4969      5053 00
+ 4970               	.LASF9:
+ 4971 0412 6368 6172 		.string	"char"
+ 4971      00
+ 4972               	.LASF175:
+ 4973 0417 4B5F 4D45 		.string	"K_MEDIA_SEL"
+ 4973      4449 415F 
+ 4973      5345 4C00 
+ 4974               	.LASF172:
+ 4975 0423 4B5F 4241 		.string	"K_BASS_DN"
+ 4975      5353 5F44 
+ 4975      4E00 
+ 4976               	.LASF200:
+ 4977 042d 4B5F 4D31 		.string	"K_M10"
+ 4977      3000 
+ 4978               	.LASF201:
+ 4979 0433 4B5F 4D31 		.string	"K_M11"
+ 4979      3100 
+ 4980               	.LASF202:
+ 4981 0439 4B5F 4D31 		.string	"K_M12"
+ 4981      3200 
+ 4982               	.LASF203:
+ 4983 043f 4B5F 4D31 		.string	"K_M13"
+ 4983      3300 
+ 4984               	.LASF204:
+ 4985 0445 4B5F 4D31 		.string	"K_M14"
+ 4985      3400 
+ 4986               	.LASF205:
+ 4987 044b 4B5F 4D31 		.string	"K_M15"
+ 4987      3500 
+ 4988               	.LASF206:
+ 4989 0451 4B5F 4D31 		.string	"K_M16"
+ 4989      3600 
+ 4990               	.LASF207:
+ 4991 0457 4B5F 4D31 		.string	"K_M17"
+ 4991      3700 
+ 4992               	.LASF169:
+ 4993 045d 4B5F 564F 		.string	"K_VOL_UP"
+ 4993      4C5F 5550 
+ 4993      00
+ 4994               	.LASF209:
+ 4995 0466 4B5F 4D31 		.string	"K_M19"
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 94
 
 
- 4994               	.LASF169:
- 4995 047b 4B5F 564F 		.string	"K_VOL_UP"
- 4995      4C5F 5550 
- 4995      00
- 4996               	.LASF209:
- 4997 0484 4B5F 4D31 		.string	"K_M19"
- 4997      3900 
- 4998               	.LASF60:
- 4999 048a 4B5F 494E 		.string	"K_INSERT"
- 4999      5345 5254 
- 4999      00
- 5000               	.LASF107:
- 5001 0493 4B5F 5354 		.string	"K_STOP_HID"
- 5001      4F50 5F48 
- 5001      4944 00
- 5002               	.LASF272:
- 5003 049e 6461 7461 		.string	"data"
- 5003      00
- 5004               	.LASF104:
- 5005 04a3 4B5F 4845 		.string	"K_HELP"
- 5005      4C50 00
- 5006               	.LASF185:
- 5007 04aa 4B5F 5757 		.string	"K_WWW_FAVORITE"
- 5007      575F 4641 
- 5007      564F 5249 
- 5007      5445 00
- 5008               	.LASF95:
- 5009 04b9 4B5F 4C46 		.string	"K_LFX"
- 5009      5800 
- 5010               	.LASF10:
- 5011 04bf 7569 6E74 		.string	"uint8_t"
- 5011      385F 7400 
- 5012               	.LASF245:
- 5013 04c7 7573 6254 		.string	"usbTxStatus_t"
- 5013      7853 7461 
- 5013      7475 735F 
- 5013      7400 
- 5014               	.LASF133:
- 5015 04d5 4B5F 4B41 		.string	"K_KATA"
- 5015      5441 00
- 5016               	.LASF90:
- 5017 04dc 4B5F 4B50 		.string	"K_KP_EQUAL"
- 5017      5F45 5155 
- 5017      414C 00
- 5018               	.LASF276:
- 5019 04e7 7265 7476 		.string	"retval"
- 5019      616C 00
- 5020               	.LASF267:
- 5021 04ee 5F5F 7469 		.string	"__ticks"
- 5021      636B 7300 
- 5022               	.LASF163:
- 5023 04f6 4B5F 5052 		.string	"K_PREV_TRK"
- 5023      4556 5F54 
- 5023      524B 00
- 5024               	.LASF280:
- 5025 0501 7570 6461 		.string	"updateNeeded"
- 5025      7465 4E65 
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 95
+ 4995      3900 
+ 4996               	.LASF60:
+ 4997 046c 4B5F 494E 		.string	"K_INSERT"
+ 4997      5345 5254 
+ 4997      00
+ 4998               	.LASF107:
+ 4999 0475 4B5F 5354 		.string	"K_STOP_HID"
+ 4999      4F50 5F48 
+ 4999      4944 00
+ 5000               	.LASF272:
+ 5001 0480 6461 7461 		.string	"data"
+ 5001      00
+ 5002               	.LASF104:
+ 5003 0485 4B5F 4845 		.string	"K_HELP"
+ 5003      4C50 00
+ 5004               	.LASF185:
+ 5005 048c 4B5F 5757 		.string	"K_WWW_FAVORITE"
+ 5005      575F 4641 
+ 5005      564F 5249 
+ 5005      5445 00
+ 5006               	.LASF95:
+ 5007 049b 4B5F 4C46 		.string	"K_LFX"
+ 5007      5800 
+ 5008               	.LASF10:
+ 5009 04a1 7569 6E74 		.string	"uint8_t"
+ 5009      385F 7400 
+ 5010               	.LASF245:
+ 5011 04a9 7573 6254 		.string	"usbTxStatus_t"
+ 5011      7853 7461 
+ 5011      7475 735F 
+ 5011      7400 
+ 5012               	.LASF133:
+ 5013 04b7 4B5F 4B41 		.string	"K_KATA"
+ 5013      5441 00
+ 5014               	.LASF90:
+ 5015 04be 4B5F 4B50 		.string	"K_KP_EQUAL"
+ 5015      5F45 5155 
+ 5015      414C 00
+ 5016               	.LASF276:
+ 5017 04c9 7265 7476 		.string	"retval"
+ 5017      616C 00
+ 5018               	.LASF267:
+ 5019 04d0 5F5F 7469 		.string	"__ticks"
+ 5019      636B 7300 
+ 5020               	.LASF163:
+ 5021 04d8 4B5F 5052 		.string	"K_PREV_TRK"
+ 5021      4556 5F54 
+ 5021      524B 00
+ 5022               	.LASF280:
+ 5023 04e3 7570 6461 		.string	"updateNeeded"
+ 5023      7465 4E65 
+ 5023      6564 6564 
+ 5023      00
+ 5024               	.LASF298:
+ 5025 04f0 426F 6F74 		.string	"Bootloader"
+ 5025      6C6F 6164 
+ 5025      6572 00
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 95
 
 
- 5025      6564 6564 
- 5025      00
- 5026               	.LASF298:
- 5027 050e 426F 6F74 		.string	"Bootloader"
- 5027      6C6F 6164 
- 5027      6572 00
- 5028               	.LASF7:
- 5029 0519 6C6F 6E67 		.string	"long long int"
- 5029      206C 6F6E 
- 5029      6720 696E 
- 5029      7400 
- 5030               	.LASF211:
- 5031 0527 4B5F 4D32 		.string	"K_M21"
- 5031      3100 
- 5032               	.LASF212:
- 5033 052d 4B5F 4D32 		.string	"K_M22"
- 5033      3200 
- 5034               	.LASF213:
- 5035 0533 4B5F 4D32 		.string	"K_M23"
- 5035      3300 
- 5036               	.LASF165:
- 5037 0539 4B5F 504C 		.string	"K_PLAY"
- 5037      4159 00
- 5038               	.LASF215:
- 5039 0540 4B5F 4D32 		.string	"K_M25"
- 5039      3500 
- 5040               	.LASF216:
- 5041 0546 4B5F 4D32 		.string	"K_M26"
- 5041      3600 
- 5042               	.LASF22:
- 5043 054c 4D4F 4449 		.string	"MODIFIERS"
- 5043      4649 4552 
- 5043      5300 
- 5044               	.LASF218:
- 5045 0556 4B5F 4D32 		.string	"K_M28"
- 5045      3800 
- 5046               	.LASF38:
- 5047 055c 4B5F 434F 		.string	"K_COLON"
- 5047      4C4F 4E00 
- 5048               	.LASF156:
- 5049 0564 4B5F 4C47 		.string	"K_LGUI"
- 5049      5549 00
- 5050               	.LASF28:
- 5051 056b 4B5F 4553 		.string	"K_ESC"
- 5051      4300 
- 5052               	.LASF131:
- 5053 0571 4B5F 4841 		.string	"K_HANJA"
- 5053      4E4A 4100 
- 5054               	.LASF144:
- 5055 0579 4B5F 5052 		.string	"K_PRIOR"
- 5055      494F 5200 
- 5056               	.LASF310:
- 5057 0581 7361 7665 		.string	"saveReportBuffer"
- 5057      5265 706F 
- 5057      7274 4275 
- 5057      6666 6572 
- 5057      00
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 96
+ 5026               	.LASF7:
+ 5027 04fb 6C6F 6E67 		.string	"long long int"
+ 5027      206C 6F6E 
+ 5027      6720 696E 
+ 5027      7400 
+ 5028               	.LASF211:
+ 5029 0509 4B5F 4D32 		.string	"K_M21"
+ 5029      3100 
+ 5030               	.LASF212:
+ 5031 050f 4B5F 4D32 		.string	"K_M22"
+ 5031      3200 
+ 5032               	.LASF213:
+ 5033 0515 4B5F 4D32 		.string	"K_M23"
+ 5033      3300 
+ 5034               	.LASF165:
+ 5035 051b 4B5F 504C 		.string	"K_PLAY"
+ 5035      4159 00
+ 5036               	.LASF215:
+ 5037 0522 4B5F 4D32 		.string	"K_M25"
+ 5037      3500 
+ 5038               	.LASF216:
+ 5039 0528 4B5F 4D32 		.string	"K_M26"
+ 5039      3600 
+ 5040               	.LASF22:
+ 5041 052e 4D4F 4449 		.string	"MODIFIERS"
+ 5041      4649 4552 
+ 5041      5300 
+ 5042               	.LASF218:
+ 5043 0538 4B5F 4D32 		.string	"K_M28"
+ 5043      3800 
+ 5044               	.LASF38:
+ 5045 053e 4B5F 434F 		.string	"K_COLON"
+ 5045      4C4F 4E00 
+ 5046               	.LASF156:
+ 5047 0546 4B5F 4C47 		.string	"K_LGUI"
+ 5047      5549 00
+ 5048               	.LASF28:
+ 5049 054d 4B5F 4553 		.string	"K_ESC"
+ 5049      4300 
+ 5050               	.LASF131:
+ 5051 0553 4B5F 4841 		.string	"K_HANJA"
+ 5051      4E4A 4100 
+ 5052               	.LASF144:
+ 5053 055b 4B5F 5052 		.string	"K_PRIOR"
+ 5053      494F 5200 
+ 5054               	.LASF310:
+ 5055 0563 7361 7665 		.string	"saveReportBuffer"
+ 5055      5265 706F 
+ 5055      7274 4275 
+ 5055      6666 6572 
+ 5055      00
+ 5056               	.LASF270:
+ 5057 0574 7573 6246 		.string	"usbFunctionDescriptor"
+ 5057      756E 6374 
+ 5057      696F 6E44 
+ 5057      6573 6372 
+ 5057      6970 746F 
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 96
 
 
- 5058               	.LASF270:
- 5059 0592 7573 6246 		.string	"usbFunctionDescriptor"
- 5059      756E 6374 
- 5059      696F 6E44 
- 5059      6573 6372 
- 5059      6970 746F 
- 5060               	.LASF36:
- 5061 05a8 4B5F 424B 		.string	"K_BKSLASH"
- 5061      534C 4153 
- 5061      4800 
- 5062               	.LASF171:
- 5063 05b2 4B5F 4241 		.string	"K_BASS_UP"
- 5063      5353 5F55 
- 5063      5000 
- 5064               	.LASF97:
- 5065 05bc 4B5F 4C46 		.string	"K_LFULL"
- 5065      554C 4C00 
- 5066               	.LASF58:
- 5067 05c4 4B5F 5343 		.string	"K_SCRLCK"
- 5067      524C 434B 
+ 5058               	.LASF36:
+ 5059 058a 4B5F 424B 		.string	"K_BKSLASH"
+ 5059      534C 4153 
+ 5059      4800 
+ 5060               	.LASF171:
+ 5061 0594 4B5F 4241 		.string	"K_BASS_UP"
+ 5061      5353 5F55 
+ 5061      5000 
+ 5062               	.LASF97:
+ 5063 059e 4B5F 4C46 		.string	"K_LFULL"
+ 5063      554C 4C00 
+ 5064               	.LASF58:
+ 5065 05a6 4B5F 5343 		.string	"K_SCRLCK"
+ 5065      524C 434B 
+ 5065      00
+ 5066               	.LASF118:
+ 5067 05af 4B5F 4B4C 		.string	"K_KL_NUM"
+ 5067      5F4E 554D 
  5067      00
- 5068               	.LASF118:
- 5069 05cd 4B5F 4B4C 		.string	"K_KL_NUM"
- 5069      5F4E 554D 
+ 5068               	.LASF122:
+ 5069 05b8 4B5F 4C30 		.string	"K_L0"
  5069      00
- 5070               	.LASF122:
- 5071 05d6 4B5F 4C30 		.string	"K_L0"
+ 5070               	.LASF123:
+ 5071 05bd 4B5F 4C31 		.string	"K_L1"
  5071      00
- 5072               	.LASF123:
- 5073 05db 4B5F 4C31 		.string	"K_L1"
+ 5072               	.LASF124:
+ 5073 05c2 4B5F 4C32 		.string	"K_L2"
  5073      00
- 5074               	.LASF124:
- 5075 05e0 4B5F 4C32 		.string	"K_L2"
+ 5074               	.LASF125:
+ 5075 05c7 4B5F 4C33 		.string	"K_L3"
  5075      00
- 5076               	.LASF125:
- 5077 05e5 4B5F 4C33 		.string	"K_L3"
+ 5076               	.LASF126:
+ 5077 05cc 4B5F 4C34 		.string	"K_L4"
  5077      00
- 5078               	.LASF126:
- 5079 05ea 4B5F 4C34 		.string	"K_L4"
+ 5078               	.LASF127:
+ 5079 05d1 4B5F 4C35 		.string	"K_L5"
  5079      00
- 5080               	.LASF127:
- 5081 05ef 4B5F 4C35 		.string	"K_L5"
+ 5080               	.LASF128:
+ 5081 05d6 4B5F 4C36 		.string	"K_L6"
  5081      00
- 5082               	.LASF128:
- 5083 05f4 4B5F 4C36 		.string	"K_L6"
- 5083      00
- 5084               	.LASF220:
- 5085 05f9 4B5F 4D33 		.string	"K_M30"
- 5085      3000 
- 5086               	.LASF35:
- 5087 05ff 4B5F 5242 		.string	"K_RBR"
- 5087      5200 
- 5088               	.LASF222:
- 5089 0605 4B5F 4D33 		.string	"K_M32"
- 5089      3200 
- 5090               	.LASF305:
- 5091 060b 7573 626D 		.string	"usbmain.c"
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 97
+ 5082               	.LASF220:
+ 5083 05db 4B5F 4D33 		.string	"K_M30"
+ 5083      3000 
+ 5084               	.LASF35:
+ 5085 05e1 4B5F 5242 		.string	"K_RBR"
+ 5085      5200 
+ 5086               	.LASF222:
+ 5087 05e7 4B5F 4D33 		.string	"K_M32"
+ 5087      3200 
+ 5088               	.LASF305:
+ 5089 05ed 7573 626D 		.string	"usbmain.c"
+ 5089      6169 6E2E 
+ 5089      6300 
+ 5090               	.LASF224:
+ 5091 05f7 4B5F 4D33 		.string	"K_M34"
+ 5091      3400 
+ 5092               	.LASF166:
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 97
 
 
- 5091      6169 6E2E 
- 5091      6300 
- 5092               	.LASF224:
- 5093 0615 4B5F 4D33 		.string	"K_M34"
- 5093      3400 
- 5094               	.LASF166:
- 5095 061b 4B5F 4D55 		.string	"K_MUTE"
- 5095      5445 00
- 5096               	.LASF226:
- 5097 0622 4B5F 4D33 		.string	"K_M36"
- 5097      3600 
- 5098               	.LASF227:
- 5099 0628 4B5F 4D33 		.string	"K_M37"
- 5099      3700 
- 5100               	.LASF228:
- 5101 062e 4B5F 4D33 		.string	"K_M38"
- 5101      3800 
- 5102               	.LASF229:
- 5103 0634 4B5F 4D33 		.string	"K_M39"
- 5103      3900 
- 5104               	.LASF290:
- 5105 063a 7573 6244 		.string	"usbDescriptorConfiguration"
- 5105      6573 6372 
- 5105      6970 746F 
- 5105      7243 6F6E 
- 5105      6669 6775 
- 5106               	.LASF91:
- 5107 0655 4B5F 4C45 		.string	"K_LED0"
- 5107      4430 00
- 5108               	.LASF92:
- 5109 065c 4B5F 4C45 		.string	"K_LED1"
- 5109      4431 00
- 5110               	.LASF93:
- 5111 0663 4B5F 4C45 		.string	"K_LED2"
- 5111      4432 00
- 5112               	.LASF94:
- 5113 066a 4B5F 4C45 		.string	"K_LED3"
- 5113      4433 00
- 5114               	.LASF158:
- 5115 0671 4B5F 5253 		.string	"K_RSHIFT"
- 5115      4849 4654 
- 5115      00
- 5116               	.LASF279:
- 5117 067a 7573 626D 		.string	"usbmain"
- 5117      6169 6E00 
- 5118               	.LASF16:
- 5119 0682 4D4F 445F 		.string	"MOD_ALT_LEFT"
- 5119      414C 545F 
- 5119      4C45 4654 
- 5119      00
- 5120               	.LASF39:
- 5121 068f 4B5F 5155 		.string	"K_QUOTE"
- 5121      4F54 4500 
- 5122               	.LASF182:
- 5123 0697 4B5F 5757 		.string	"K_WWW_FORWARD"
- 5123      575F 464F 
- 5123      5257 4152 
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 98
+ 5093 05fd 4B5F 4D55 		.string	"K_MUTE"
+ 5093      5445 00
+ 5094               	.LASF226:
+ 5095 0604 4B5F 4D33 		.string	"K_M36"
+ 5095      3600 
+ 5096               	.LASF227:
+ 5097 060a 4B5F 4D33 		.string	"K_M37"
+ 5097      3700 
+ 5098               	.LASF228:
+ 5099 0610 4B5F 4D33 		.string	"K_M38"
+ 5099      3800 
+ 5100               	.LASF229:
+ 5101 0616 4B5F 4D33 		.string	"K_M39"
+ 5101      3900 
+ 5102               	.LASF290:
+ 5103 061c 7573 6244 		.string	"usbDescriptorConfiguration"
+ 5103      6573 6372 
+ 5103      6970 746F 
+ 5103      7243 6F6E 
+ 5103      6669 6775 
+ 5104               	.LASF91:
+ 5105 0637 4B5F 4C45 		.string	"K_LED0"
+ 5105      4430 00
+ 5106               	.LASF92:
+ 5107 063e 4B5F 4C45 		.string	"K_LED1"
+ 5107      4431 00
+ 5108               	.LASF93:
+ 5109 0645 4B5F 4C45 		.string	"K_LED2"
+ 5109      4432 00
+ 5110               	.LASF94:
+ 5111 064c 4B5F 4C45 		.string	"K_LED3"
+ 5111      4433 00
+ 5112               	.LASF158:
+ 5113 0653 4B5F 5253 		.string	"K_RSHIFT"
+ 5113      4849 4654 
+ 5113      00
+ 5114               	.LASF279:
+ 5115 065c 7573 626D 		.string	"usbmain"
+ 5115      6169 6E00 
+ 5116               	.LASF16:
+ 5117 0664 4D4F 445F 		.string	"MOD_ALT_LEFT"
+ 5117      414C 545F 
+ 5117      4C45 4654 
+ 5117      00
+ 5118               	.LASF39:
+ 5119 0671 4B5F 5155 		.string	"K_QUOTE"
+ 5119      4F54 4500 
+ 5120               	.LASF182:
+ 5121 0679 4B5F 5757 		.string	"K_WWW_FORWARD"
+ 5121      575F 464F 
+ 5121      5257 4152 
+ 5121      4400 
+ 5122               	.LASF33:
+ 5123 0687 4B5F 4551 		.string	"K_EQUAL"
+ 5123      5541 4C00 
+ 5124               	.LASF307:
+ 5125 068f 6D6F 6469 		.string	"modifiers"
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 98
 
 
- 5123      4400 
- 5124               	.LASF33:
- 5125 06a5 4B5F 4551 		.string	"K_EQUAL"
- 5125      5541 4C00 
- 5126               	.LASF307:
- 5127 06ad 6D6F 6469 		.string	"modifiers"
- 5127      6669 6572 
- 5127      7300 
- 5128               	.LASF44:
- 5129 06b7 4B5F 4341 		.string	"K_CAPS"
- 5129      5053 00
- 5130               	.LASF73:
- 5131 06be 4B5F 4B50 		.string	"K_KP_MINUS"
- 5131      5F4D 494E 
- 5131      5553 00
- 5132               	.LASF147:
- 5133 06c9 4B5F 4F55 		.string	"K_OUT"
- 5133      5400 
- 5134               	.LASF75:
- 5135 06cf 4B5F 4B50 		.string	"K_KP_ENTER"
- 5135      5F45 4E54 
- 5135      4552 00
- 5136               	.LASF189:
- 5137 06da 4B5F 5245 		.string	"K_REWIND"
- 5137      5749 4E44 
- 5137      00
- 5138               	.LASF304:
- 5139 06e3 474E 5520 		.string	"GNU C 4.3.3"
- 5139      4320 342E 
- 5139      332E 3300 
- 5140               	.LASF230:
- 5141 06ef 4B5F 4D34 		.string	"K_M40"
- 5141      3000 
- 5142               	.LASF231:
- 5143 06f5 4B5F 4D34 		.string	"K_M41"
- 5143      3100 
- 5144               	.LASF120:
- 5145 06fb 4B5F 4B50 		.string	"K_KP_COMMA"
- 5145      5F43 4F4D 
- 5145      4D41 00
- 5146               	.LASF233:
- 5147 0706 4B5F 4D34 		.string	"K_M43"
- 5147      3300 
- 5148               	.LASF11:
- 5149 070c 7569 6E74 		.string	"uint16_t"
- 5149      3136 5F74 
- 5149      00
- 5150               	.LASF102:
- 5151 0715 4B5F 5245 		.string	"K_RESET"
- 5151      5345 5400 
- 5152               	.LASF236:
- 5153 071d 4B5F 4D34 		.string	"K_M46"
- 5153      3600 
- 5154               	.LASF237:
- 5155 0723 4B5F 4D34 		.string	"K_M47"
- 5155      3700 
- 5156               	.LASF238:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 99
+ 5125      6669 6572 
+ 5125      7300 
+ 5126               	.LASF44:
+ 5127 0699 4B5F 4341 		.string	"K_CAPS"
+ 5127      5053 00
+ 5128               	.LASF73:
+ 5129 06a0 4B5F 4B50 		.string	"K_KP_MINUS"
+ 5129      5F4D 494E 
+ 5129      5553 00
+ 5130               	.LASF147:
+ 5131 06ab 4B5F 4F55 		.string	"K_OUT"
+ 5131      5400 
+ 5132               	.LASF75:
+ 5133 06b1 4B5F 4B50 		.string	"K_KP_ENTER"
+ 5133      5F45 4E54 
+ 5133      4552 00
+ 5134               	.LASF189:
+ 5135 06bc 4B5F 5245 		.string	"K_REWIND"
+ 5135      5749 4E44 
+ 5135      00
+ 5136               	.LASF304:
+ 5137 06c5 474E 5520 		.string	"GNU C 4.3.3"
+ 5137      4320 342E 
+ 5137      332E 3300 
+ 5138               	.LASF230:
+ 5139 06d1 4B5F 4D34 		.string	"K_M40"
+ 5139      3000 
+ 5140               	.LASF231:
+ 5141 06d7 4B5F 4D34 		.string	"K_M41"
+ 5141      3100 
+ 5142               	.LASF120:
+ 5143 06dd 4B5F 4B50 		.string	"K_KP_COMMA"
+ 5143      5F43 4F4D 
+ 5143      4D41 00
+ 5144               	.LASF233:
+ 5145 06e8 4B5F 4D34 		.string	"K_M43"
+ 5145      3300 
+ 5146               	.LASF11:
+ 5147 06ee 7569 6E74 		.string	"uint16_t"
+ 5147      3136 5F74 
+ 5147      00
+ 5148               	.LASF102:
+ 5149 06f7 4B5F 5245 		.string	"K_RESET"
+ 5149      5345 5400 
+ 5150               	.LASF236:
+ 5151 06ff 4B5F 4D34 		.string	"K_M46"
+ 5151      3600 
+ 5152               	.LASF237:
+ 5153 0705 4B5F 4D34 		.string	"K_M47"
+ 5153      3700 
+ 5154               	.LASF238:
+ 5155 070b 4B5F 4D34 		.string	"K_M48"
+ 5155      3800 
+ 5156               	.LASF239:
+ 5157 0711 4B5F 4D34 		.string	"K_M49"
+ 5157      3900 
+ 5158               	.LASF214:
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 99
 
 
- 5157 0729 4B5F 4D34 		.string	"K_M48"
- 5157      3800 
- 5158               	.LASF239:
- 5159 072f 4B5F 4D34 		.string	"K_M49"
- 5159      3900 
- 5160               	.LASF214:
- 5161 0735 4B5F 4D32 		.string	"K_M24"
- 5161      3400 
- 5162               	.LASF217:
- 5163 073b 4B5F 4D32 		.string	"K_M27"
- 5163      3700 
- 5164               	.LASF219:
- 5165 0741 4B5F 4D32 		.string	"K_M29"
- 5165      3900 
- 5166               	.LASF271:
- 5167 0747 7573 6246 		.string	"usbFunctionSetup"
- 5167      756E 6374 
- 5167      696F 6E53 
- 5167      6574 7570 
- 5167      00
- 5168               	.LASF54:
- 5169 0758 4B5F 4631 		.string	"K_F10"
- 5169      3000 
- 5170               	.LASF55:
- 5171 075e 4B5F 4631 		.string	"K_F11"
- 5171      3100 
- 5172               	.LASF56:
- 5173 0764 4B5F 4631 		.string	"K_F12"
+ 5159 0717 4B5F 4D32 		.string	"K_M24"
+ 5159      3400 
+ 5160               	.LASF217:
+ 5161 071d 4B5F 4D32 		.string	"K_M27"
+ 5161      3700 
+ 5162               	.LASF219:
+ 5163 0723 4B5F 4D32 		.string	"K_M29"
+ 5163      3900 
+ 5164               	.LASF271:
+ 5165 0729 7573 6246 		.string	"usbFunctionSetup"
+ 5165      756E 6374 
+ 5165      696F 6E53 
+ 5165      6574 7570 
+ 5165      00
+ 5166               	.LASF54:
+ 5167 073a 4B5F 4631 		.string	"K_F10"
+ 5167      3000 
+ 5168               	.LASF55:
+ 5169 0740 4B5F 4631 		.string	"K_F11"
+ 5169      3100 
+ 5170               	.LASF56:
+ 5171 0746 4B5F 4631 		.string	"K_F12"
+ 5171      3200 
+ 5172               	.LASF264:
+ 5173 074c 5F64 656C 		.string	"_delay_loop_2"
+ 5173      6179 5F6C 
+ 5173      6F6F 705F 
  5173      3200 
- 5174               	.LASF264:
- 5175 076a 5F64 656C 		.string	"_delay_loop_2"
- 5175      6179 5F6C 
- 5175      6F6F 705F 
- 5175      3200 
- 5176               	.LASF297:
- 5177 0778 6578 7065 		.string	"expectReport"
- 5177      6374 5265 
- 5177      706F 7274 
- 5177      00
- 5178               	.LASF302:
- 5179 0785 6D6F 6469 		.string	"modifierBitmap"
- 5179      6669 6572 
- 5179      4269 746D 
- 5179      6170 00
- 5180               	.LASF68:
- 5181 0794 4B5F 444F 		.string	"K_DOWN"
- 5181      574E 00
- 5182               	.LASF208:
- 5183 079b 4B5F 4D31 		.string	"K_M18"
- 5183      3800 
- 5184               	.LASF3:
- 5185 07a1 7368 6F72 		.string	"short int"
- 5185      7420 696E 
- 5185      7400 
- 5186               	.LASF254:
- 5187 07ab 7749 6E64 		.string	"wIndex"
- 5187      6578 00
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 100
+ 5174               	.LASF297:
+ 5175 075a 6578 7065 		.string	"expectReport"
+ 5175      6374 5265 
+ 5175      706F 7274 
+ 5175      00
+ 5176               	.LASF302:
+ 5177 0767 6D6F 6469 		.string	"modifierBitmap"
+ 5177      6669 6572 
+ 5177      4269 746D 
+ 5177      6170 00
+ 5178               	.LASF68:
+ 5179 0776 4B5F 444F 		.string	"K_DOWN"
+ 5179      574E 00
+ 5180               	.LASF208:
+ 5181 077d 4B5F 4D31 		.string	"K_M18"
+ 5181      3800 
+ 5182               	.LASF3:
+ 5183 0783 7368 6F72 		.string	"short int"
+ 5183      7420 696E 
+ 5183      7400 
+ 5184               	.LASF254:
+ 5185 078d 7749 6E64 		.string	"wIndex"
+ 5185      6578 00
+ 5186               	.LASF136:
+ 5187 0794 4B5F 504F 		.string	"K_POWER"
+ 5187      5745 5200 
+ 5188               	.LASF168:
+ 5189 079c 4B5F 4C4F 		.string	"K_LOUDNESS"
+ 5189      5544 4E45 
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 100
 
 
- 5188               	.LASF136:
- 5189 07b2 4B5F 504F 		.string	"K_POWER"
- 5189      5745 5200 
- 5190               	.LASF168:
- 5191 07ba 4B5F 4C4F 		.string	"K_LOUDNESS"
- 5191      5544 4E45 
- 5191      5353 00
- 5192               	.LASF5:
- 5193 07c5 6C6F 6E67 		.string	"long int"
- 5193      2069 6E74 
- 5193      00
- 5194               	.LASF240:
- 5195 07ce 4B5F 4D35 		.string	"K_M50"
- 5195      3000 
- 5196               	.LASF173:
- 5197 07d4 4B5F 5452 		.string	"K_TRE_UP"
- 5197      455F 5550 
- 5197      00
- 5198               	.LASF242:
- 5199 07dd 4B5F 4D35 		.string	"K_M52"
- 5199      3200 
- 5200               	.LASF287:
- 5201 07e3 7072 6F74 		.string	"protocolVer"
- 5201      6F63 6F6C 
- 5201      5665 7200 
- 5202               	.LASF65:
- 5203 07ef 4B5F 5047 		.string	"K_PGDN"
- 5203      444E 00
- 5204               	.LASF255:
- 5205 07f6 774C 656E 		.string	"wLength"
- 5205      6774 6800 
- 5206               	.LASF154:
- 5207 07fe 4B5F 4C53 		.string	"K_LSHIFT"
- 5207      4849 4654 
- 5207      00
- 5208               	.LASF162:
- 5209 0807 4B5F 4E45 		.string	"K_NEXT_TRK"
- 5209      5854 5F54 
- 5209      524B 00
- 5210               	.LASF273:
- 5211 0812 636D 7052 		.string	"cmpReportBuffer"
- 5211      6570 6F72 
- 5211      7442 7566 
- 5211      6665 7200 
- 5212               	.LASF59:
- 5213 0822 4B5F 5041 		.string	"K_PAUSE"
- 5213      5553 4500 
- 5214               	.LASF157:
- 5215 082a 4B5F 5243 		.string	"K_RCTRL"
- 5215      5452 4C00 
- 5216               	.LASF246:
- 5217 0832 776F 7264 		.string	"word"
- 5217      00
- 5218               	.LASF248:
- 5219 0837 7573 6257 		.string	"usbWord_t"
- 5219      6F72 645F 
- 5219      7400 
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 101
+ 5189      5353 00
+ 5190               	.LASF5:
+ 5191 07a7 6C6F 6E67 		.string	"long int"
+ 5191      2069 6E74 
+ 5191      00
+ 5192               	.LASF240:
+ 5193 07b0 4B5F 4D35 		.string	"K_M50"
+ 5193      3000 
+ 5194               	.LASF173:
+ 5195 07b6 4B5F 5452 		.string	"K_TRE_UP"
+ 5195      455F 5550 
+ 5195      00
+ 5196               	.LASF242:
+ 5197 07bf 4B5F 4D35 		.string	"K_M52"
+ 5197      3200 
+ 5198               	.LASF287:
+ 5199 07c5 7072 6F74 		.string	"protocolVer"
+ 5199      6F63 6F6C 
+ 5199      5665 7200 
+ 5200               	.LASF65:
+ 5201 07d1 4B5F 5047 		.string	"K_PGDN"
+ 5201      444E 00
+ 5202               	.LASF255:
+ 5203 07d8 774C 656E 		.string	"wLength"
+ 5203      6774 6800 
+ 5204               	.LASF154:
+ 5205 07e0 4B5F 4C53 		.string	"K_LSHIFT"
+ 5205      4849 4654 
+ 5205      00
+ 5206               	.LASF162:
+ 5207 07e9 4B5F 4E45 		.string	"K_NEXT_TRK"
+ 5207      5854 5F54 
+ 5207      524B 00
+ 5208               	.LASF273:
+ 5209 07f4 636D 7052 		.string	"cmpReportBuffer"
+ 5209      6570 6F72 
+ 5209      7442 7566 
+ 5209      6665 7200 
+ 5210               	.LASF59:
+ 5211 0804 4B5F 5041 		.string	"K_PAUSE"
+ 5211      5553 4500 
+ 5212               	.LASF157:
+ 5213 080c 4B5F 5243 		.string	"K_RCTRL"
+ 5213      5452 4C00 
+ 5214               	.LASF246:
+ 5215 0814 776F 7264 		.string	"word"
+ 5215      00
+ 5216               	.LASF248:
+ 5217 0819 7573 6257 		.string	"usbWord_t"
+ 5217      6F72 645F 
+ 5217      7400 
+ 5218               	.LASF306:
+ 5219 0823 433A 5C55 		.string	"C:\\Users\\21030\\Documents\\GitHub\\l3\\source"
+ 5219      7365 7273 
+ 5219      5C32 3130 
+ 5219      3330 5C44 
+ 5219      6F63 756D 
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 101
 
 
  5220               	.LASF67:
- 5221 0841 4B5F 4C45 		.string	"K_LEFT"
+ 5221 084d 4B5F 4C45 		.string	"K_LEFT"
  5221      4654 00
  5222               	.LASF188:
- 5223 0848 4B5F 5245 		.string	"K_REC"
+ 5223 0854 4B5F 5245 		.string	"K_REC"
  5223      4300 
  5224               	.LASF259:
- 5225 084e 7573 6167 		.string	"usage"
+ 5225 085a 7573 6167 		.string	"usage"
  5225      6500 
  5226               	.LASF32:
- 5227 0854 4B5F 4D49 		.string	"K_MINUS"
+ 5227 0860 4B5F 4D49 		.string	"K_MINUS"
  5227      4E55 5300 
  5228               	.LASF138:
- 5229 085c 4B5F 5741 		.string	"K_WAKE"
+ 5229 0868 4B5F 5741 		.string	"K_WAKE"
  5229      4B45 00
  5230               	.LASF37:
- 5231 0863 4B5F 4575 		.string	"K_Europe1"
+ 5231 086f 4B5F 4575 		.string	"K_Europe1"
  5231      726F 7065 
  5231      3100 
  5232               	.LASF27:
- 5233 086d 4B5F 454E 		.string	"K_ENTER"
+ 5233 0879 4B5F 454E 		.string	"K_ENTER"
  5233      5445 5200 
  5234               	.LASF278:
- 5235 0875 7265 7374 		.string	"restoreReportBuffer"
+ 5235 0881 7265 7374 		.string	"restoreReportBuffer"
  5235      6F72 6552 
  5235      6570 6F72 
  5235      7442 7566 
  5235      6665 7200 
  5236               	.LASF293:
- 5237 0889 696E 7465 		.string	"interfaceReady"
+ 5237 0895 696E 7465 		.string	"interfaceReady"
  5237      7266 6163 
  5237      6552 6561 
  5237      6479 00
  5238               	.LASF152:
- 5239 0898 4B5F 4D6F 		.string	"K_Modifiers"
+ 5239 08a4 4B5F 4D6F 		.string	"K_Modifiers"
  5239      6469 6669 
  5239      6572 7300 
  5240               	.LASF41:
- 5241 08a4 4B5F 434F 		.string	"K_COMMA"
+ 5241 08b0 4B5F 434F 		.string	"K_COMMA"
  5241      4D4D 4100 
  5242               	.LASF96:
- 5243 08ac 4B5F 4C50 		.string	"K_LPAD"
+ 5243 08b8 4B5F 4C50 		.string	"K_LPAD"
  5243      4144 00
  5244               	.LASF288:
- 5245 08b3 4C45 4473 		.string	"LEDstate"
+ 5245 08bf 4C45 4473 		.string	"LEDstate"
  5245      7461 7465 
  5245      00
  5246               	.LASF26:
- 5247 08bc 4572 726F 		.string	"ErrorUndefined"
+ 5247 08c8 4572 726F 		.string	"ErrorUndefined"
  5247      7255 6E64 
  5247      6566 696E 
  5247      6564 00
  5248               	.LASF137:
- 5249 08cb 4B5F 534C 		.string	"K_SLEEP"
+ 5249 08d7 4B5F 534C 		.string	"K_SLEEP"
  5249      4545 5000 
  5250               	.LASF148:
- 5251 08d3 4B5F 4F50 		.string	"K_OPER"
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 102
+ 5251 08df 4B5F 4F50 		.string	"K_OPER"
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 102
 
 
  5251      4552 00
  5252               	.LASF210:
- 5253 08da 4B5F 4D32 		.string	"K_M20"
+ 5253 08e6 4B5F 4D32 		.string	"K_M20"
  5253      3000 
  5254               	.LASF223:
- 5255 08e0 4B5F 4D33 		.string	"K_M33"
+ 5255 08ec 4B5F 4D33 		.string	"K_M33"
  5255      3300 
  5256               	.LASF151:
- 5257 08e6 4B5F 4558 		.string	"K_EXCEL"
+ 5257 08f2 4B5F 4558 		.string	"K_EXCEL"
  5257      4345 4C00 
  5258               	.LASF62:
- 5259 08ee 4B5F 5047 		.string	"K_PGUP"
+ 5259 08fa 4B5F 5047 		.string	"K_PGUP"
  5259      5550 00
  5260               	.LASF114:
- 5261 08f5 4B5F 4D55 		.string	"K_MUTE_HID"
+ 5261 0901 4B5F 4D55 		.string	"K_MUTE_HID"
  5261      5445 5F48 
  5261      4944 00
  5262               	.LASF134:
- 5263 0900 4B5F 4849 		.string	"K_HIRA"
+ 5263 090c 4B5F 4849 		.string	"K_HIRA"
  5263      5241 00
  5264               	.LASF4:
- 5265 0907 6C6F 6E67 		.string	"long unsigned int"
+ 5265 0913 6C6F 6E67 		.string	"long unsigned int"
  5265      2075 6E73 
  5265      6967 6E65 
  5265      6420 696E 
  5265      7400 
  5266               	.LASF0:
- 5267 0919 756E 7369 		.string	"unsigned char"
+ 5267 0925 756E 7369 		.string	"unsigned char"
  5267      676E 6564 
  5267      2063 6861 
  5267      7200 
  5268               	.LASF132:
- 5269 0927 4B5F 4841 		.string	"K_HANGLE"
+ 5269 0933 4B5F 4841 		.string	"K_HANGLE"
  5269      4E47 4C45 
  5269      00
  5270               	.LASF105:
- 5271 0930 4B5F 4D45 		.string	"K_MENU"
+ 5271 093c 4B5F 4D45 		.string	"K_MENU"
  5271      4E55 00
  5272               	.LASF61:
- 5273 0937 4B5F 484F 		.string	"K_HOME"
+ 5273 0943 4B5F 484F 		.string	"K_HOME"
  5273      4D45 00
  5274               	.LASF153:
- 5275 093e 4B5F 4C43 		.string	"K_LCTRL"
+ 5275 094a 4B5F 4C43 		.string	"K_LCTRL"
  5275      5452 4C00 
  5276               	.LASF155:
- 5277 0946 4B5F 4C41 		.string	"K_LALT"
+ 5277 0952 4B5F 4C41 		.string	"K_LALT"
  5277      4C54 00
  5278               	.LASF110:
- 5279 094d 4B5F 4355 		.string	"K_CUT"
+ 5279 0959 4B5F 4355 		.string	"K_CUT"
  5279      5400 
  5280               	.LASF303:
- 5281 0953 7573 6252 		.string	"usbRollOver"
+ 5281 095f 7573 6252 		.string	"usbRollOver"
  5281      6F6C 6C4F 
  5281      7665 7200 
  5282               	.LASF42:
- 5283 095f 4B5F 444F 		.string	"K_DOT"
+ 5283 096b 4B5F 444F 		.string	"K_DOT"
  5283      5400 
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 103
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 103
 
 
  5284               	.LASF18:
- 5285 0965 4D4F 445F 		.string	"MOD_CONTROL_RIGHT"
+ 5285 0971 4D4F 445F 		.string	"MOD_CONTROL_RIGHT"
  5285      434F 4E54 
  5285      524F 4C5F 
  5285      5249 4748 
  5285      5400 
  5286               	.LASF87:
- 5287 0977 4B5F 4575 		.string	"K_Europe2"
+ 5287 0983 4B5F 4575 		.string	"K_Europe2"
  5287      726F 7065 
  5287      3200 
  5288               	.LASF291:
- 5289 0981 7573 6254 		.string	"usbTxStatus1"
+ 5289 098d 7573 6254 		.string	"usbTxStatus1"
  5289      7853 7461 
  5289      7475 7331 
  5289      00
  5290               	.LASF19:
- 5291 098e 4D4F 445F 		.string	"MOD_SHIFT_RIGHT"
+ 5291 099a 4D4F 445F 		.string	"MOD_SHIFT_RIGHT"
  5291      5348 4946 
  5291      545F 5249 
  5291      4748 5400 
  5292               	.LASF292:
- 5293 099e 7573 6254 		.string	"usbTxStatus3"
+ 5293 09aa 7573 6254 		.string	"usbTxStatus3"
  5293      7853 7461 
  5293      7475 7333 
  5293      00
  5294               	.LASF135:
- 5295 09ab 4B5F 5379 		.string	"K_System"
+ 5295 09b7 4B5F 5379 		.string	"K_System"
  5295      7374 656D 
  5295      00
  5296               	.LASF277:
- 5297 09b4 636C 6561 		.string	"clearReportBuffer"
+ 5297 09c0 636C 6561 		.string	"clearReportBuffer"
  5297      7252 6570 
  5297      6F72 7442 
  5297      7566 6665 
  5297      7200 
  5298               	.LASF232:
- 5299 09c6 4B5F 4D34 		.string	"K_M42"
+ 5299 09d2 4B5F 4D34 		.string	"K_M42"
  5299      3200 
  5300               	.LASF295:
- 5301 09cc 6578 7472 		.string	"extraReport"
+ 5301 09d8 6578 7472 		.string	"extraReport"
  5301      6152 6570 
  5301      6F72 7400 
  5302               	.LASF234:
- 5303 09d8 4B5F 4D34 		.string	"K_M44"
+ 5303 09e4 4B5F 4D34 		.string	"K_M44"
  5303      3400 
  5304               	.LASF235:
- 5305 09de 4B5F 4D34 		.string	"K_M45"
+ 5305 09ea 4B5F 4D34 		.string	"K_M45"
  5305      3500 
  5306               	.LASF21:
- 5307 09e4 4D4F 445F 		.string	"MOD_GUI_RIGHT"
+ 5307 09f0 4D4F 445F 		.string	"MOD_GUI_RIGHT"
  5307      4755 495F 
  5307      5249 4748 
  5307      5400 
  5308               	.LASF108:
- 5309 09f2 4B5F 4147 		.string	"K_AGAIN"
+ 5309 09fe 4B5F 4147 		.string	"K_AGAIN"
  5309      4149 4E00 
  5310               	.LASF1:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 104
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 104
 
 
- 5311 09fa 7369 676E 		.string	"signed char"
+ 5311 0a06 7369 676E 		.string	"signed char"
  5311      6564 2063 
  5311      6861 7200 
  5312               	.LASF176:
- 5313 0a06 4B5F 4D41 		.string	"K_MAIL"
+ 5313 0a12 4B5F 4D41 		.string	"K_MAIL"
  5313      494C 00
  5314               	.LASF2:
- 5315 0a0d 7368 6F72 		.string	"short unsigned int"
+ 5315 0a19 7368 6F72 		.string	"short unsigned int"
  5315      7420 756E 
  5315      7369 676E 
  5315      6564 2069 
  5315      6E74 00
  5316               	.LASF145:
- 5317 0a20 4B5F 5245 		.string	"K_RETURN"
+ 5317 0a2c 4B5F 5245 		.string	"K_RETURN"
  5317      5455 524E 
  5317      00
  5318               	.LASF268:
- 5319 0a29 5F5F 746D 		.string	"__tmp"
+ 5319 0a35 5F5F 746D 		.string	"__tmp"
  5319      7000 
  5320               	.LASF299:
- 5321 0a2f 7377 6170 		.string	"swapAltGui"
+ 5321 0a3b 7377 6170 		.string	"swapAltGui"
  5321      416C 7447 
  5321      7569 00
  5322               	.LASF99:
- 5323 0a3a 4B5F 4C41 		.string	"K_LARR"
+ 5323 0a46 4B5F 4C41 		.string	"K_LARR"
  5323      5252 00
  5324               	.LASF129:
- 5325 0a41 4B5F 494E 		.string	"K_INTL8"
+ 5325 0a4d 4B5F 494E 		.string	"K_INTL8"
  5325      544C 3800 
  5326               	.LASF130:
- 5327 0a49 4B5F 494E 		.string	"K_INTL9"
+ 5327 0a55 4B5F 494E 		.string	"K_INTL9"
  5327      544C 3900 
  5328               	.LASF269:
- 5329 0a51 646F 7562 		.string	"double"
+ 5329 0a5d 646F 7562 		.string	"double"
  5329      6C65 00
  5330               	.LASF89:
- 5331 0a58 4B5F 504F 		.string	"K_POWER_HID"
+ 5331 0a64 4B5F 504F 		.string	"K_POWER_HID"
  5331      5745 525F 
  5331      4849 4400 
  5332               	.LASF249:
- 5333 0a64 7573 6254 		.string	"usbTxStatus"
+ 5333 0a70 7573 6254 		.string	"usbTxStatus"
  5333      7853 7461 
  5333      7475 7300 
  5334               	.LASF179:
- 5335 0a70 4B5F 5757 		.string	"K_WWW_SEARCH"
+ 5335 0a7c 4B5F 5757 		.string	"K_WWW_SEARCH"
  5335      575F 5345 
  5335      4152 4348 
  5335      00
  5336               	.LASF174:
- 5337 0a7d 4B5F 5452 		.string	"K_TRE_DN"
+ 5337 0a89 4B5F 5452 		.string	"K_TRE_DN"
  5337      455F 444E 
  5337      00
  5338               	.LASF71:
- 5339 0a86 4B5F 4B50 		.string	"K_KP_SLASH"
+ 5339 0a92 4B5F 4B50 		.string	"K_KP_SLASH"
  5339      5F53 4C41 
  5339      5348 00
  5340               	.LASF160:
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 105
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 105
 
 
- 5341 0a91 4B5F 5247 		.string	"K_RGUI"
+ 5341 0a9d 4B5F 5247 		.string	"K_RGUI"
  5341      5549 00
  5342               	.LASF221:
- 5343 0a98 4B5F 4D33 		.string	"K_M31"
+ 5343 0aa4 4B5F 4D33 		.string	"K_M31"
  5343      3100 
  5344               	.LASF40:
- 5345 0a9e 4B5F 4841 		.string	"K_HASH"
+ 5345 0aaa 4B5F 4841 		.string	"K_HASH"
  5345      5348 00
  5346               	.LASF141:
- 5347 0aa5 4B5F 5359 		.string	"K_SYSREQ"
+ 5347 0ab1 4B5F 5359 		.string	"K_SYSREQ"
  5347      5352 4551 
  5347      00
  5348               	.LASF265:
- 5349 0aae 5F64 656C 		.string	"_delay_ms"
+ 5349 0aba 5F64 656C 		.string	"_delay_ms"
  5349      6179 5F6D 
  5349      7300 
  5350               	.LASF285:
- 5351 0ab8 6F6C 6452 		.string	"oldReportBuffer"
+ 5351 0ac4 6F6C 6452 		.string	"oldReportBuffer"
  5351      6570 6F72 
  5351      7442 7566 
  5351      6665 7200 
  5352               	.LASF225:
- 5353 0ac8 4B5F 4D33 		.string	"K_M35"
+ 5353 0ad4 4B5F 4D33 		.string	"K_M35"
  5353      3500 
  5354               	.LASF57:
- 5355 0ace 4B5F 5052 		.string	"K_PRNSCR"
+ 5355 0ada 4B5F 5052 		.string	"K_PRNSCR"
  5355      4E53 4352 
  5355      00
  5356               	.LASF98:
- 5357 0ad7 4B5F 4C41 		.string	"K_LASD"
+ 5357 0ae3 4B5F 4C41 		.string	"K_LASD"
  5357      5344 00
  5358               	.LASF112:
- 5359 0ade 4B5F 5041 		.string	"K_PASTE"
+ 5359 0aea 4B5F 5041 		.string	"K_PASTE"
  5359      5354 4500 
  5360               	.LASF257:
- 5361 0ae6 7265 706F 		.string	"report_extra"
+ 5361 0af2 7265 706F 		.string	"report_extra"
  5361      7274 5F65 
  5361      7874 7261 
  5361      00
  5362               	.global __do_copy_data
  5363               	.global __do_clear_bss
-GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s 			page 106
+GAS LISTING C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s 			page 106
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 usbmain.c
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:2      *ABS*:0000003f __SREG__
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:3      *ABS*:0000003e __SP_H__
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:4      *ABS*:0000003d __SP_L__
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:5      *ABS*:00000034 __CCP__
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:6      *ABS*:00000000 __tmp_reg__
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:7      *ABS*:00000001 __zero_reg__
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:18     .text:00000000 usbFunctionDescriptor
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:1086   .progmem.data:000000c2 usbDescriptorConfiguration
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:884    .progmem.data:00000000 keyboard_hid_report
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:951    .progmem.data:0000003f mouse_hid_report
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:106    .text:00000074 usbFunctionSetup
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:866    .bss:00000000 interfaceReady
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:1167   .bss:00000004 keyboardReport
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:872    .bss:00000001 expectReport
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:2      *ABS*:0000003f __SREG__
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:3      *ABS*:0000003e __SP_H__
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:4      *ABS*:0000003d __SP_L__
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:5      *ABS*:00000034 __CCP__
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:6      *ABS*:00000000 __tmp_reg__
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:7      *ABS*:00000001 __zero_reg__
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:18     .text:00000000 usbFunctionDescriptor
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:1086   .progmem.data:000000c2 usbDescriptorConfiguration
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:884    .progmem.data:00000000 keyboard_hid_report
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:951    .progmem.data:0000003f mouse_hid_report
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:106    .text:00000074 usbFunctionSetup
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:866    .bss:00000000 interfaceReady
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:1167   .bss:00000004 keyboardReport
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:872    .bss:00000001 expectReport
                              .bss:00000003 idleRate
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:1171   .data:00000014 protocolVer
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:220    .text:00000108 bufcmp
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:271    .text:00000132 cmpReportBuffer
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:1173   .bss:0000000c oldReportBuffer
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:318    .text:00000158 buildHIDreports
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:1150   .data:00000002 modifierBitmap
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:1171   .data:00000014 protocolVer
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:220    .text:00000108 bufcmp
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:271    .text:00000132 cmpReportBuffer
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:1173   .bss:0000000c oldReportBuffer
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:318    .text:00000158 buildHIDreports
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:1150   .data:00000002 modifierBitmap
                             *COM*:00000003 extraReport
                             *COM*:00000001 reportIndex
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:551    .text:000002b6 clearReportBuffer
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:578    .text:000002d6 restoreReportBuffer
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:601    .text:000002ea saveReportBuffer
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:624    .text:000002fe usbmain
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:551    .text:000002b6 clearReportBuffer
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:578    .text:000002d6 restoreReportBuffer
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:601    .text:000002ea saveReportBuffer
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:624    .text:000002fe usbmain
                             *COM*:00000003 oldextraReport
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:831    .text:000003f6 usbFunctionWrite
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:878    .data:00000000 Bootloader
-C:\Users\ADMINI~1\AppData\Local\Temp/ccfUN77j.s:1165   .bss:00000002 usbRollOver
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:831    .text:000003f6 usbFunctionWrite
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:878    .data:00000000 Bootloader
+C:\Users\21030\AppData\Local\Temp/ccqeYDqI.s:1165   .bss:00000002 usbRollOver
 
 UNDEFINED SYMBOLS
 usbMsgPtr

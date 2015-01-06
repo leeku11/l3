@@ -26,7 +26,6 @@
 
 
 uint8_t macrobuffer[256] = {};
-long MacroAddr[MAX_MACRO_INDEX] = {};
 
 const char PROGMEM macrostart[20] = "MACRO record mode@";
 const char PROGMEM macroend[20] = "@record done@";
@@ -328,20 +327,6 @@ void sendString(char* string) {
 }
 
 
-uint8_t initMacroAddr(void)
-{
-    uint8_t i;
-    long address;
-    address = MACRO_ADDR_START;
-    
-    for (i = 0; i < MAX_MACRO_INDEX; i++)
-    {
-        MacroAddr[i] = address;
-        address += 0x100;           // 1024
-    }
-    return 0;
-}
-
 uint8_t getkey(uint8_t key, uint16_t index)
 {
 
@@ -363,7 +348,7 @@ void playMacroUSB(uint8_t macrokey)
     key.key = 0;
 
     mIndex = macrokey - K_M01;
-    address = MacroAddr[mIndex];
+    address = MACRO_ADDR_START + (0x100 * mIndex);
 
     macroSET = eeprom_read_byte(EEPADDR_MACRO_SET+mIndex);
     if (macroSET != 1)      // MACRO not recorded
@@ -444,7 +429,7 @@ void playMacroPS2(uint8_t macrokey)
     uint8_t esctoggle =0;
 
     mIndex = macrokey - K_M01;
-    address = MacroAddr[mIndex];
+    address = MACRO_ADDR_START + (0x100 * mIndex);
     
 
     macroSET = eeprom_read_byte(EEPADDR_MACRO_SET+mIndex);
@@ -526,7 +511,6 @@ int8_t flash_writeinpage (uint8_t *data, unsigned long addr)
       wdt_disable();
       while(1)
       {
-         led_ESCIndicater(5);
          _delay_ms(1);
       }
       return -1;
@@ -618,7 +602,7 @@ void recordMacro(uint8_t macrokey)
    Key key;
    uint16_t address;
    mIndex = macrokey - K_M01;
-   address = MacroAddr[mIndex];
+   address = MACRO_ADDR_START + (0x100 * mIndex);
     
    index = 0;
    page = 0;
@@ -691,13 +675,12 @@ void recordMacro(uint8_t macrokey)
                   {
                      macrobuffer[index] = K_NONE;
 
-                     sendString(macroend);
                      wdt_reset();
                      flash_writeinpage(macrobuffer, address+(page*128));
                      wdt_reset();
                      eeprom_write_byte(EEPADDR_MACRO_SET+mIndex, 1);
                      wdt_reset();
-
+                     sendString(macroend);
                      return;
                   }
                   else

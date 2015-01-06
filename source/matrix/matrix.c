@@ -487,11 +487,6 @@ uint8_t scankey(void)
       isFNpushed--;
    }
 
-   if(!kbdsleepmode)
-   {
-      led_PRTIndicater(keylock);
-      led_ESCIndicater(layer);
-   }
    //static int pushedLevel_prev = 0;
 
     /* LED Blinker */
