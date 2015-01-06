@@ -1,0 +1,2241 @@
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 1
+
+
+   1               		.file	"keysta.c"
+   2               	__SREG__ = 0x3f
+   3               	__SP_H__ = 0x3e
+   4               	__SP_L__ = 0x3d
+   5               	__CCP__  = 0x34
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.section	.debug_abbrev,"",@progbits
+   9               	.Ldebug_abbrev0:
+  10               		.section	.debug_info,"",@progbits
+  11               	.Ldebug_info0:
+  12               		.section	.debug_line,"",@progbits
+  13               	.Ldebug_line0:
+  14               		.text
+  15               	.Ltext0:
+  16               	.global	kbd_set_tx
+  17               		.type	kbd_set_tx, @function
+  18               	kbd_set_tx:
+  19               	.LFB7:
+  20               	.LM1:
+  21               	.LVL0:
+  22               	/* prologue: function */
+  23               	/* frame size = 0 */
+  24               	.LM2:
+  25 0000 8093 0000 		sts tx_byte,r24
+  26               	.LM3:
+  27               	/* #APP */
+  28               	 ;  108 "keysta.c" 1
+  29 0004 F894      		cli
+  30               	 ;  0 "" 2
+  31               	.LM4:
+  32               	/* #NOAPP */
+  33 0006 8091 0000 		lds r24,kbd_flags
+  34               	.LVL1:
+  35 000a 8F7E      		andi r24,lo8(-17)
+  36 000c 8093 0000 		sts kbd_flags,r24
+  37               	.LM5:
+  38 0010 8091 0000 		lds r24,kbd_flags
+  39 0014 8860      		ori r24,lo8(8)
+  40 0016 8093 0000 		sts kbd_flags,r24
+  41               	.LM6:
+  42               	/* #APP */
+  43               	 ;  111 "keysta.c" 1
+  44 001a 7894      		sei
+  45               	 ;  0 "" 2
+  46               	/* epilogue start */
+  47               	.LM7:
+  48               	/* #NOAPP */
+  49 001c 0895      		ret
+  50               	.LFE7:
+  51               		.size	kbd_set_tx, .-kbd_set_tx
+  52               	.global	kbd_get_rx_char
+  53               		.type	kbd_get_rx_char, @function
+  54               	kbd_get_rx_char:
+  55               	.LFB8:
+  56               	.LM8:
+  57               	/* prologue: function */
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 2
+
+
+  58               	/* frame size = 0 */
+  59               	.LM9:
+  60               	/* #APP */
+  61               	 ;  117 "keysta.c" 1
+  62 001e F894      		cli
+  63               	 ;  0 "" 2
+  64               	.LM10:
+  65               	/* #NOAPP */
+  66 0020 8091 0000 		lds r24,kbd_flags
+  67 0024 8B7F      		andi r24,lo8(-5)
+  68 0026 8093 0000 		sts kbd_flags,r24
+  69               	.LM11:
+  70               	/* #APP */
+  71               	 ;  119 "keysta.c" 1
+  72 002a 7894      		sei
+  73               	 ;  0 "" 2
+  74               	.LM12:
+  75               	/* #NOAPP */
+  76 002c 8091 0000 		lds r24,rx_byte
+  77               	/* epilogue start */
+  78               	.LM13:
+  79 0030 0895      		ret
+  80               	.LFE8:
+  81               		.size	kbd_get_rx_char, .-kbd_get_rx_char
+  82               		.type	timerAction, @function
+  83               	timerAction:
+  84               	.LFB9:
+  85               	.LM14:
+  86               	/* prologue: function */
+  87               	/* frame size = 0 */
+  88               	.LM15:
+  89 0032 8FEC      		ldi r24,lo8(-49)
+  90 0034 82BF      		out 82-32,r24
+  91               	.LM16:
+  92 0036 8091 0000 		lds r24,kbd_state
+  93 003a 8330      		cpi r24,lo8(3)
+  94 003c 00F4      		brsh .L6
+  95               	.LBB38:
+  96               	.LBB39:
+  97               	.LM17:
+  98 003e 8B98      		cbi 49-32,3
+  99               	.LM18:
+ 100 0040 939A      		sbi 50-32,3
+ 101               	.LBE39:
+ 102               	.LBE38:
+ 103               	.LM19:
+ 104 0042 8091 0000 		lds r24,kbd_flags
+ 105 0046 80FF      		sbrs r24,0
+ 106 0048 00C0      		rjmp .L45
+ 107               	.L7:
+ 108               	.LM20:
+ 109 004a 829B      		sbis 48-32,2
+ 110 004c 00C0      		rjmp .L48
+ 111               	.L9:
+ 112               	.LM21:
+ 113 004e 8091 0000 		lds r24,kbd_state
+ 114 0052 8130      		cpi r24,lo8(1)
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 3
+
+
+ 115 0054 01F0      		breq .L11
+ 116 0056 8130      		cpi r24,lo8(1)
+ 117 0058 00F0      		brlo .L13
+ 118 005a 8230      		cpi r24,lo8(2)
+ 119 005c 01F0      		breq .+2
+ 120 005e 00C0      		rjmp .L41
+ 121 0060 00C0      		rjmp .L49
+ 122               	.L11:
+ 123               	.LM22:
+ 124 0062 8399      		sbic 48-32,3
+ 125 0064 00C0      		rjmp .L13
+ 126               	.LM23:
+ 127 0066 8DE0      		ldi r24,lo8(13)
+ 128 0068 00C0      		rjmp .L44
+ 129               	.L13:
+ 130               	.LM24:
+ 131 006a 82E0      		ldi r24,lo8(2)
+ 132 006c 00C0      		rjmp .L44
+ 133               	.L49:
+ 134               	.LM25:
+ 135 006e 8091 0000 		lds r24,kbd_flags
+ 136 0072 83FF      		sbrs r24,3
+ 137 0074 00C0      		rjmp .L41
+ 138               	.LBB40:
+ 139               	.LBB41:
+ 140               	.LM26:
+ 141 0076 9398      		cbi 50-32,3
+ 142               	.LM27:
+ 143 0078 8B9A      		sbi 49-32,3
+ 144               	.LBE41:
+ 145               	.LBE40:
+ 146               	.LM28:
+ 147 007a 84E2      		ldi r24,lo8(36)
+ 148 007c 00C0      		rjmp .L44
+ 149               	.L6:
+ 150               	.LM29:
+ 151 007e 8091 0000 		lds r24,kbd_state
+ 152 0082 8A31      		cpi r24,lo8(26)
+ 153 0084 00F0      		brlo .+2
+ 154 0086 00C0      		rjmp .L14
+ 155               	.LM30:
+ 156 0088 8091 0000 		lds r24,kbd_flags
+ 157 008c 80FD      		sbrc r24,0
+ 158 008e 00C0      		rjmp .L15
+ 159               	.L45:
+ 160               	.LM31:
+ 161 0090 8091 0000 		lds r24,kbd_flags
+ 162 0094 8160      		ori r24,lo8(1)
+ 163 0096 8093 0000 		sts kbd_flags,r24
+ 164               	.LBB42:
+ 165               	.LBB43:
+ 166               	.LM32:
+ 167 009a 8A98      		cbi 49-32,2
+ 168               	.LM33:
+ 169 009c 929A      		sbi 50-32,2
+ 170 009e 0895      		ret
+ 171               	.L15:
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 4
+
+
+ 172               	.LBE43:
+ 173               	.LBE42:
+ 174               	.LM34:
+ 175 00a0 829B      		sbis 48-32,2
+ 176 00a2 00C0      		rjmp .L47
+ 177               	.L16:
+ 178               	.LM35:
+ 179 00a4 8091 0000 		lds r24,kbd_state
+ 180 00a8 8731      		cpi r24,lo8(23)
+ 181 00aa 00F4      		brsh .L24
+ 182 00ac 8031      		cpi r24,lo8(16)
+ 183 00ae 00F4      		brsh .L20
+ 184 00b0 8D30      		cpi r24,lo8(13)
+ 185 00b2 01F0      		breq .L18
+ 186 00b4 8F30      		cpi r24,lo8(15)
+ 187 00b6 01F0      		breq .+2
+ 188 00b8 00C0      		rjmp .L17
+ 189 00ba 00C0      		rjmp .L50
+ 190               	.L24:
+ 191 00bc 8831      		cpi r24,lo8(24)
+ 192 00be 01F0      		breq .L22
+ 193 00c0 8831      		cpi r24,lo8(24)
+ 194 00c2 00F0      		brlo .L21
+ 195 00c4 8931      		cpi r24,lo8(25)
+ 196 00c6 01F0      		breq .+2
+ 197 00c8 00C0      		rjmp .L17
+ 198 00ca 00C0      		rjmp .L51
+ 199               	.L18:
+ 200               	.LM36:
+ 201 00cc 8091 0000 		lds r24,kbd_flags
+ 202 00d0 8D7F      		andi r24,lo8(-3)
+ 203 00d2 00C0      		rjmp .L46
+ 204               	.L50:
+ 205               	.LM37:
+ 206 00d4 8091 0000 		lds r24,kbd_flags
+ 207 00d8 8B7F      		andi r24,lo8(-5)
+ 208 00da 8093 0000 		sts kbd_flags,r24
+ 209               	.LM38:
+ 210 00de 839B      		sbis 48-32,3
+ 211 00e0 00C0      		rjmp .L25
+ 212               	.LM39:
+ 213 00e2 80E8      		ldi r24,lo8(-128)
+ 214 00e4 8093 0000 		sts rx_byte,r24
+ 215               	.LM40:
+ 216 00e8 81E0      		ldi r24,lo8(1)
+ 217 00ea 00C0      		rjmp .L43
+ 218               	.L25:
+ 219               	.LM41:
+ 220 00ec 1092 0000 		sts parity,__zero_reg__
+ 221               	.LM42:
+ 222 00f0 1092 0000 		sts rx_byte,__zero_reg__
+ 223 00f4 00C0      		rjmp .L17
+ 224               	.L20:
+ 225               	.LM43:
+ 226 00f6 8091 0000 		lds r24,rx_byte
+ 227 00fa 8695      		lsr r24
+ 228 00fc 8093 0000 		sts rx_byte,r24
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 5
+
+
+ 229               	.LM44:
+ 230 0100 839B      		sbis 48-32,3
+ 231 0102 00C0      		rjmp .L17
+ 232               	.LM45:
+ 233 0104 8091 0000 		lds r24,rx_byte
+ 234 0108 8068      		ori r24,lo8(-128)
+ 235 010a 8093 0000 		sts rx_byte,r24
+ 236               	.LM46:
+ 237 010e 8091 0000 		lds r24,parity
+ 238 0112 8F5F      		subi r24,lo8(-(1))
+ 239               	.L43:
+ 240 0114 8093 0000 		sts parity,r24
+ 241 0118 00C0      		rjmp .L17
+ 242               	.L21:
+ 243               	.LM47:
+ 244 011a 839B      		sbis 48-32,3
+ 245 011c 00C0      		rjmp .L26
+ 246               	.LM48:
+ 247 011e 8091 0000 		lds r24,parity
+ 248 0122 8F5F      		subi r24,lo8(-(1))
+ 249 0124 8093 0000 		sts parity,r24
+ 250               	.L26:
+ 251               	.LM49:
+ 252 0128 8091 0000 		lds r24,parity
+ 253 012c 80FD      		sbrc r24,0
+ 254 012e 00C0      		rjmp .L17
+ 255               	.LM50:
+ 256 0130 8091 0000 		lds r24,kbd_flags
+ 257 0134 8260      		ori r24,lo8(2)
+ 258 0136 00C0      		rjmp .L42
+ 259               	.L22:
+ 260               	.LM51:
+ 261 0138 8399      		sbic 48-32,3
+ 262 013a 00C0      		rjmp .L27
+ 263               	.LM52:
+ 264 013c 8091 0000 		lds r24,kbd_flags
+ 265 0140 8260      		ori r24,lo8(2)
+ 266 0142 8093 0000 		sts kbd_flags,r24
+ 267               	.L27:
+ 268               	.LM53:
+ 269 0146 8091 0000 		lds r24,kbd_flags
+ 270 014a 81FD      		sbrc r24,1
+ 271 014c 00C0      		rjmp .L17
+ 272               	.LBB44:
+ 273               	.LBB45:
+ 274               	.LM54:
+ 275 014e 9398      		cbi 50-32,3
+ 276               	.LM55:
+ 277 0150 8B9A      		sbi 49-32,3
+ 278               	.LBE45:
+ 279               	.LBE44:
+ 280               	.LM56:
+ 281 0152 8091 0000 		lds r24,kbd_flags
+ 282 0156 8460      		ori r24,lo8(4)
+ 283               	.L42:
+ 284 0158 8093 0000 		sts kbd_flags,r24
+ 285 015c 00C0      		rjmp .L17
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 6
+
+
+ 286               	.L51:
+ 287               	.LBB46:
+ 288               	.LBB47:
+ 289               	.LM57:
+ 290 015e 8B98      		cbi 49-32,3
+ 291               	.LM58:
+ 292 0160 939A      		sbi 50-32,3
+ 293 0162 00C0      		rjmp .L35
+ 294               	.L17:
+ 295               	.LBE47:
+ 296               	.LBE46:
+ 297               	.LBB48:
+ 298               	.LBB49:
+ 299               	.LM59:
+ 300 0164 9298      		cbi 50-32,2
+ 301               	.LM60:
+ 302 0166 8A9A      		sbi 49-32,2
+ 303               	.LBE49:
+ 304               	.LBE48:
+ 305               	.LM61:
+ 306 0168 8091 0000 		lds r24,kbd_flags
+ 307 016c 8E7F      		andi r24,lo8(-2)
+ 308               	.L46:
+ 309 016e 8093 0000 		sts kbd_flags,r24
+ 310               	.LM62:
+ 311 0172 8091 0000 		lds r24,kbd_state
+ 312 0176 8F5F      		subi r24,lo8(-(1))
+ 313 0178 00C0      		rjmp .L44
+ 314               	.L14:
+ 315               	.LM63:
+ 316 017a 8091 0000 		lds r24,kbd_state
+ 317 017e 8F32      		cpi r24,lo8(47)
+ 318 0180 00F0      		brlo .+2
+ 319 0182 00C0      		rjmp .L41
+ 320               	.LM64:
+ 321 0184 8091 0000 		lds r24,kbd_flags
+ 322 0188 80FF      		sbrs r24,0
+ 323 018a 00C0      		rjmp .L28
+ 324               	.LM65:
+ 325 018c 8299      		sbic 48-32,2
+ 326 018e 00C0      		rjmp .L29
+ 327               	.L47:
+ 328               	.LBB50:
+ 329               	.LBB51:
+ 330               	.LM66:
+ 331 0190 8B98      		cbi 49-32,3
+ 332               	.LM67:
+ 333 0192 939A      		sbi 50-32,3
+ 334               	.L48:
+ 335               	.LBE51:
+ 336               	.LBE50:
+ 337               	.LM68:
+ 338 0194 81E0      		ldi r24,lo8(1)
+ 339               	.L44:
+ 340 0196 8093 0000 		sts kbd_state,r24
+ 341 019a 0895      		ret
+ 342               	.L29:
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 7
+
+
+ 343               	.LM69:
+ 344 019c 8091 0000 		lds r24,kbd_flags
+ 345 01a0 8E7F      		andi r24,lo8(-2)
+ 346 01a2 8093 0000 		sts kbd_flags,r24
+ 347               	.LBB52:
+ 348               	.LBB53:
+ 349               	.LM70:
+ 350 01a6 9298      		cbi 50-32,2
+ 351               	.LM71:
+ 352 01a8 8A9A      		sbi 49-32,2
+ 353 01aa 0895      		ret
+ 354               	.L28:
+ 355               	.LBE53:
+ 356               	.LBE52:
+ 357               	.LM72:
+ 358 01ac 8091 0000 		lds r24,kbd_flags
+ 359 01b0 8160      		ori r24,lo8(1)
+ 360 01b2 8093 0000 		sts kbd_flags,r24
+ 361               	.LBB54:
+ 362               	.LBB55:
+ 363               	.LM73:
+ 364 01b6 8A98      		cbi 49-32,2
+ 365               	.LM74:
+ 366 01b8 929A      		sbi 50-32,2
+ 367               	.LBE55:
+ 368               	.LBE54:
+ 369               	.LM75:
+ 370 01ba 8091 0000 		lds r24,kbd_state
+ 371 01be 8C32      		cpi r24,lo8(44)
+ 372 01c0 00F4      		brsh .L36
+ 373 01c2 8532      		cpi r24,lo8(37)
+ 374 01c4 00F4      		brsh .L32
+ 375 01c6 8432      		cpi r24,lo8(36)
+ 376 01c8 01F4      		brne .L30
+ 377 01ca 00C0      		rjmp .L52
+ 378               	.L36:
+ 379 01cc 8D32      		cpi r24,lo8(45)
+ 380 01ce 01F0      		breq .L34
+ 381 01d0 8D32      		cpi r24,lo8(45)
+ 382 01d2 00F0      		brlo .L33
+ 383 01d4 8E32      		cpi r24,lo8(46)
+ 384 01d6 01F4      		brne .L30
+ 385 01d8 00C0      		rjmp .L35
+ 386               	.L52:
+ 387               	.LM76:
+ 388 01da 8091 0000 		lds r24,tx_byte
+ 389 01de 8093 0000 		sts tx_shift,r24
+ 390               	.LM77:
+ 391 01e2 1092 0000 		sts parity,__zero_reg__
+ 392               	.L32:
+ 393               	.LM78:
+ 394 01e6 8091 0000 		lds r24,tx_shift
+ 395 01ea 80FF      		sbrs r24,0
+ 396 01ec 00C0      		rjmp .L37
+ 397               	.LBB56:
+ 398               	.LBB57:
+ 399               	.LM79:
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 8
+
+
+ 400 01ee 8B98      		cbi 49-32,3
+ 401               	.LM80:
+ 402 01f0 939A      		sbi 50-32,3
+ 403               	.LBE57:
+ 404               	.LBE56:
+ 405               	.LM81:
+ 406 01f2 8091 0000 		lds r24,parity
+ 407 01f6 8F5F      		subi r24,lo8(-(1))
+ 408 01f8 8093 0000 		sts parity,r24
+ 409 01fc 00C0      		rjmp .L38
+ 410               	.L37:
+ 411               	.LBB58:
+ 412               	.LBB59:
+ 413               	.LM82:
+ 414 01fe 9398      		cbi 50-32,3
+ 415               	.LM83:
+ 416 0200 8B9A      		sbi 49-32,3
+ 417               	.L38:
+ 418               	.LBE59:
+ 419               	.LBE58:
+ 420               	.LM84:
+ 421 0202 8091 0000 		lds r24,tx_shift
+ 422 0206 8695      		lsr r24
+ 423 0208 8093 0000 		sts tx_shift,r24
+ 424 020c 00C0      		rjmp .L30
+ 425               	.L33:
+ 426               	.LM85:
+ 427 020e 8091 0000 		lds r24,parity
+ 428 0212 80FF      		sbrs r24,0
+ 429 0214 00C0      		rjmp .L39
+ 430               	.LBB60:
+ 431               	.LBB61:
+ 432               	.LM86:
+ 433 0216 9398      		cbi 50-32,3
+ 434               	.LM87:
+ 435 0218 8B9A      		sbi 49-32,3
+ 436 021a 00C0      		rjmp .L40
+ 437               	.L39:
+ 438               	.LBE61:
+ 439               	.LBE60:
+ 440               	.LBB62:
+ 441               	.LBB63:
+ 442               	.LM88:
+ 443 021c 8B98      		cbi 49-32,3
+ 444               	.LM89:
+ 445 021e 939A      		sbi 50-32,3
+ 446               	.L40:
+ 447               	.LBE63:
+ 448               	.LBE62:
+ 449               	.LM90:
+ 450 0220 8091 0000 		lds r24,kbd_flags
+ 451 0224 877F      		andi r24,lo8(-9)
+ 452 0226 8093 0000 		sts kbd_flags,r24
+ 453               	.LM91:
+ 454 022a 8091 0000 		lds r24,kbd_flags
+ 455 022e 8061      		ori r24,lo8(16)
+ 456 0230 8093 0000 		sts kbd_flags,r24
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 9
+
+
+ 457 0234 00C0      		rjmp .L30
+ 458               	.L34:
+ 459               	.LBB64:
+ 460               	.LBB65:
+ 461               	.LM92:
+ 462 0236 8B98      		cbi 49-32,3
+ 463               	.LM93:
+ 464 0238 939A      		sbi 50-32,3
+ 465 023a 00C0      		rjmp .L30
+ 466               	.L35:
+ 467               	.LBE65:
+ 468               	.LBE64:
+ 469               	.LM94:
+ 470 023c 1092 0000 		sts kbd_state,__zero_reg__
+ 471 0240 0895      		ret
+ 472               	.L30:
+ 473               	.LM95:
+ 474 0242 8091 0000 		lds r24,kbd_state
+ 475 0246 8F5F      		subi r24,lo8(-(1))
+ 476 0248 8093 0000 		sts kbd_state,r24
+ 477               	.L41:
+ 478 024c 0895      		ret
+ 479               	.LFE9:
+ 480               		.size	timerAction, .-timerAction
+ 481               	.global	kbd_init
+ 482               		.type	kbd_init, @function
+ 483               	kbd_init:
+ 484               	.LFB6:
+ 485               	.LM96:
+ 486               	/* prologue: function */
+ 487               	/* frame size = 0 */
+ 488               	.LM97:
+ 489 024e 1092 0000 		sts kbd_state,__zero_reg__
+ 490               	.LM98:
+ 491 0252 81E1      		ldi r24,lo8(17)
+ 492 0254 8093 0000 		sts kbd_flags,r24
+ 493               	.LBB66:
+ 494               	.LBB67:
+ 495               	.LM99:
+ 496 0258 8A98      		cbi 49-32,2
+ 497               	.LM100:
+ 498 025a 929A      		sbi 50-32,2
+ 499               	.LBE67:
+ 500               	.LBE66:
+ 501               	.LBB68:
+ 502               	.LBB69:
+ 503               	.LM101:
+ 504 025c 8B98      		cbi 49-32,3
+ 505               	.LM102:
+ 506 025e 939A      		sbi 50-32,3
+ 507               	.LBE69:
+ 508               	.LBE68:
+ 509               	.LM103:
+ 510 0260 0E94 0000 		call timer0Init
+ 511               	.LM104:
+ 512 0264 82E0      		ldi r24,lo8(2)
+ 513 0266 0E94 0000 		call timer0SetPrescaler
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 10
+
+
+ 514               	.LM105:
+ 515 026a 80E0      		ldi r24,lo8(0)
+ 516 026c 60E0      		ldi r22,lo8(gs(timerAction))
+ 517 026e 70E0      		ldi r23,hi8(gs(timerAction))
+ 518 0270 0E94 0000 		call timerAttach
+ 519               	.LM106:
+ 520 0274 89B7      		in r24,89-32
+ 521 0276 8160      		ori r24,lo8(1)
+ 522 0278 89BF      		out 89-32,r24
+ 523               	.LM107:
+ 524 027a 8FEC      		ldi r24,lo8(-49)
+ 525 027c 82BF      		out 82-32,r24
+ 526               	/* epilogue start */
+ 527               	.LM108:
+ 528 027e 0895      		ret
+ 529               	.LFE6:
+ 530               		.size	kbd_init, .-kbd_init
+ 531               		.lcomm rx_byte,1
+ 532               		.lcomm tx_byte,1
+ 533               		.lcomm tx_shift,1
+ 534               		.lcomm parity,1
+ 535               		.comm kbd_flags,1,1
+ 536               		.comm kbd_state,1,1
+ 537               		.section	.debug_frame,"",@progbits
+ 538               	.Lframe0:
+ 539 0000 0C00 0000 		.long	.LECIE0-.LSCIE0
+ 540               	.LSCIE0:
+ 541 0004 FFFF FFFF 		.long	0xffffffff
+ 542 0008 01        		.byte	0x1
+ 543 0009 00        		.string	""
+ 544 000a 01        		.uleb128 0x1
+ 545 000b 7F        		.sleb128 -1
+ 546 000c 24        		.byte	0x24
+ 547 000d 0C        		.byte	0xc
+ 548 000e 20        		.uleb128 0x20
+ 549 000f 00        		.uleb128 0x0
+ 550               		.p2align	2
+ 551               	.LECIE0:
+ 552               	.LSFDE0:
+ 553 0010 0C00 0000 		.long	.LEFDE0-.LASFDE0
+ 554               	.LASFDE0:
+ 555 0014 0000 0000 		.long	.Lframe0
+ 556 0018 0000 0000 		.long	.LFB7
+ 557 001c 1E00 0000 		.long	.LFE7-.LFB7
+ 558               		.p2align	2
+ 559               	.LEFDE0:
+ 560               	.LSFDE2:
+ 561 0020 0C00 0000 		.long	.LEFDE2-.LASFDE2
+ 562               	.LASFDE2:
+ 563 0024 0000 0000 		.long	.Lframe0
+ 564 0028 0000 0000 		.long	.LFB8
+ 565 002c 1400 0000 		.long	.LFE8-.LFB8
+ 566               		.p2align	2
+ 567               	.LEFDE2:
+ 568               	.LSFDE4:
+ 569 0030 0C00 0000 		.long	.LEFDE4-.LASFDE4
+ 570               	.LASFDE4:
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 11
+
+
+ 571 0034 0000 0000 		.long	.Lframe0
+ 572 0038 0000 0000 		.long	.LFB9
+ 573 003c 1C02 0000 		.long	.LFE9-.LFB9
+ 574               		.p2align	2
+ 575               	.LEFDE4:
+ 576               	.LSFDE6:
+ 577 0040 0C00 0000 		.long	.LEFDE6-.LASFDE6
+ 578               	.LASFDE6:
+ 579 0044 0000 0000 		.long	.Lframe0
+ 580 0048 0000 0000 		.long	.LFB6
+ 581 004c 3200 0000 		.long	.LFE6-.LFB6
+ 582               		.p2align	2
+ 583               	.LEFDE6:
+ 584               		.text
+ 585               	.Letext0:
+ 586               		.section	.debug_loc,"",@progbits
+ 587               	.Ldebug_loc0:
+ 588               	.LLST1:
+ 589 0000 0000 0000 		.long	.LVL0-.Ltext0
+ 590 0004 0A00 0000 		.long	.LVL1-.Ltext0
+ 591 0008 0100      		.word	0x1
+ 592 000a 68        		.byte	0x68
+ 593 000b 0000 0000 		.long	0x0
+ 594 000f 0000 0000 		.long	0x0
+ 595               		.section	.debug_info
+ 596 0000 2703 0000 		.long	0x327
+ 597 0004 0200      		.word	0x2
+ 598 0006 0000 0000 		.long	.Ldebug_abbrev0
+ 599 000a 04        		.byte	0x4
+ 600 000b 01        		.uleb128 0x1
+ 601 000c 0000 0000 		.long	.LASF52
+ 602 0010 01        		.byte	0x1
+ 603 0011 0000 0000 		.long	.LASF53
+ 604 0015 0000 0000 		.long	.LASF54
+ 605 0019 0000 0000 		.long	.Ltext0
+ 606 001d 0000 0000 		.long	.Letext0
+ 607 0021 0000 0000 		.long	.Ldebug_line0
+ 608 0025 02        		.uleb128 0x2
+ 609 0026 01        		.byte	0x1
+ 610 0027 06        		.byte	0x6
+ 611 0028 0000 0000 		.long	.LASF0
+ 612 002c 02        		.uleb128 0x2
+ 613 002d 01        		.byte	0x1
+ 614 002e 08        		.byte	0x8
+ 615 002f 0000 0000 		.long	.LASF1
+ 616 0033 03        		.uleb128 0x3
+ 617 0034 02        		.byte	0x2
+ 618 0035 05        		.byte	0x5
+ 619 0036 696E 7400 		.string	"int"
+ 620 003a 02        		.uleb128 0x2
+ 621 003b 02        		.byte	0x2
+ 622 003c 07        		.byte	0x7
+ 623 003d 0000 0000 		.long	.LASF2
+ 624 0041 02        		.uleb128 0x2
+ 625 0042 04        		.byte	0x4
+ 626 0043 05        		.byte	0x5
+ 627 0044 0000 0000 		.long	.LASF3
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 12
+
+
+ 628 0048 02        		.uleb128 0x2
+ 629 0049 04        		.byte	0x4
+ 630 004a 07        		.byte	0x7
+ 631 004b 0000 0000 		.long	.LASF4
+ 632 004f 02        		.uleb128 0x2
+ 633 0050 08        		.byte	0x8
+ 634 0051 05        		.byte	0x5
+ 635 0052 0000 0000 		.long	.LASF5
+ 636 0056 02        		.uleb128 0x2
+ 637 0057 08        		.byte	0x8
+ 638 0058 07        		.byte	0x7
+ 639 0059 0000 0000 		.long	.LASF6
+ 640 005d 02        		.uleb128 0x2
+ 641 005e 02        		.byte	0x2
+ 642 005f 07        		.byte	0x7
+ 643 0060 0000 0000 		.long	.LASF7
+ 644 0064 02        		.uleb128 0x2
+ 645 0065 02        		.byte	0x2
+ 646 0066 05        		.byte	0x5
+ 647 0067 0000 0000 		.long	.LASF8
+ 648 006b 02        		.uleb128 0x2
+ 649 006c 01        		.byte	0x1
+ 650 006d 06        		.byte	0x6
+ 651 006e 0000 0000 		.long	.LASF9
+ 652 0072 04        		.uleb128 0x4
+ 653 0073 0000 0000 		.long	.LASF55
+ 654 0077 02        		.byte	0x2
+ 655 0078 01        		.byte	0x1
+ 656 0079 43        		.byte	0x43
+ 657 007a 3301 0000 		.long	0x133
+ 658 007e 05        		.uleb128 0x5
+ 659 007f 0000 0000 		.long	.LASF10
+ 660 0083 00        		.sleb128 0
+ 661 0084 05        		.uleb128 0x5
+ 662 0085 0000 0000 		.long	.LASF11
+ 663 0089 01        		.sleb128 1
+ 664 008a 05        		.uleb128 0x5
+ 665 008b 0000 0000 		.long	.LASF12
+ 666 008f 02        		.sleb128 2
+ 667 0090 05        		.uleb128 0x5
+ 668 0091 0000 0000 		.long	.LASF13
+ 669 0095 03        		.sleb128 3
+ 670 0096 05        		.uleb128 0x5
+ 671 0097 0000 0000 		.long	.LASF14
+ 672 009b 0D        		.sleb128 13
+ 673 009c 05        		.uleb128 0x5
+ 674 009d 0000 0000 		.long	.LASF15
+ 675 00a1 0E        		.sleb128 14
+ 676 00a2 05        		.uleb128 0x5
+ 677 00a3 0000 0000 		.long	.LASF16
+ 678 00a7 0F        		.sleb128 15
+ 679 00a8 05        		.uleb128 0x5
+ 680 00a9 0000 0000 		.long	.LASF17
+ 681 00ad 10        		.sleb128 16
+ 682 00ae 05        		.uleb128 0x5
+ 683 00af 0000 0000 		.long	.LASF18
+ 684 00b3 11        		.sleb128 17
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 13
+
+
+ 685 00b4 05        		.uleb128 0x5
+ 686 00b5 0000 0000 		.long	.LASF19
+ 687 00b9 12        		.sleb128 18
+ 688 00ba 05        		.uleb128 0x5
+ 689 00bb 0000 0000 		.long	.LASF20
+ 690 00bf 13        		.sleb128 19
+ 691 00c0 05        		.uleb128 0x5
+ 692 00c1 0000 0000 		.long	.LASF21
+ 693 00c5 14        		.sleb128 20
+ 694 00c6 05        		.uleb128 0x5
+ 695 00c7 0000 0000 		.long	.LASF22
+ 696 00cb 15        		.sleb128 21
+ 697 00cc 05        		.uleb128 0x5
+ 698 00cd 0000 0000 		.long	.LASF23
+ 699 00d1 16        		.sleb128 22
+ 700 00d2 05        		.uleb128 0x5
+ 701 00d3 0000 0000 		.long	.LASF24
+ 702 00d7 17        		.sleb128 23
+ 703 00d8 05        		.uleb128 0x5
+ 704 00d9 0000 0000 		.long	.LASF25
+ 705 00dd 18        		.sleb128 24
+ 706 00de 05        		.uleb128 0x5
+ 707 00df 0000 0000 		.long	.LASF26
+ 708 00e3 19        		.sleb128 25
+ 709 00e4 05        		.uleb128 0x5
+ 710 00e5 0000 0000 		.long	.LASF27
+ 711 00e9 1A        		.sleb128 26
+ 712 00ea 05        		.uleb128 0x5
+ 713 00eb 0000 0000 		.long	.LASF28
+ 714 00ef 24        		.sleb128 36
+ 715 00f0 05        		.uleb128 0x5
+ 716 00f1 0000 0000 		.long	.LASF29
+ 717 00f5 25        		.sleb128 37
+ 718 00f6 05        		.uleb128 0x5
+ 719 00f7 0000 0000 		.long	.LASF30
+ 720 00fb 26        		.sleb128 38
+ 721 00fc 05        		.uleb128 0x5
+ 722 00fd 0000 0000 		.long	.LASF31
+ 723 0101 27        		.sleb128 39
+ 724 0102 05        		.uleb128 0x5
+ 725 0103 0000 0000 		.long	.LASF32
+ 726 0107 28        		.sleb128 40
+ 727 0108 05        		.uleb128 0x5
+ 728 0109 0000 0000 		.long	.LASF33
+ 729 010d 29        		.sleb128 41
+ 730 010e 05        		.uleb128 0x5
+ 731 010f 0000 0000 		.long	.LASF34
+ 732 0113 2A        		.sleb128 42
+ 733 0114 05        		.uleb128 0x5
+ 734 0115 0000 0000 		.long	.LASF35
+ 735 0119 2B        		.sleb128 43
+ 736 011a 05        		.uleb128 0x5
+ 737 011b 0000 0000 		.long	.LASF36
+ 738 011f 2C        		.sleb128 44
+ 739 0120 05        		.uleb128 0x5
+ 740 0121 0000 0000 		.long	.LASF37
+ 741 0125 2D        		.sleb128 45
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 14
+
+
+ 742 0126 05        		.uleb128 0x5
+ 743 0127 0000 0000 		.long	.LASF38
+ 744 012b 2E        		.sleb128 46
+ 745 012c 05        		.uleb128 0x5
+ 746 012d 0000 0000 		.long	.LASF39
+ 747 0131 2F        		.sleb128 47
+ 748 0132 00        		.byte	0x0
+ 749 0133 06        		.uleb128 0x6
+ 750 0134 0000 0000 		.long	.LASF40
+ 751 0138 01        		.byte	0x1
+ 752 0139 33        		.byte	0x33
+ 753 013a 01        		.byte	0x1
+ 754 013b 01        		.byte	0x1
+ 755 013c 06        		.uleb128 0x6
+ 756 013d 0000 0000 		.long	.LASF41
+ 757 0141 01        		.byte	0x1
+ 758 0142 27        		.byte	0x27
+ 759 0143 01        		.byte	0x1
+ 760 0144 01        		.byte	0x1
+ 761 0145 06        		.uleb128 0x6
+ 762 0146 0000 0000 		.long	.LASF42
+ 763 014a 01        		.byte	0x1
+ 764 014b 39        		.byte	0x39
+ 765 014c 01        		.byte	0x1
+ 766 014d 01        		.byte	0x1
+ 767 014e 06        		.uleb128 0x6
+ 768 014f 0000 0000 		.long	.LASF43
+ 769 0153 01        		.byte	0x1
+ 770 0154 2D        		.byte	0x2d
+ 771 0155 01        		.byte	0x1
+ 772 0156 01        		.byte	0x1
+ 773 0157 07        		.uleb128 0x7
+ 774 0158 01        		.byte	0x1
+ 775 0159 0000 0000 		.long	.LASF44
+ 776 015d 01        		.byte	0x1
+ 777 015e 6A        		.byte	0x6a
+ 778 015f 01        		.byte	0x1
+ 779 0160 0000 0000 		.long	.LFB7
+ 780 0164 0000 0000 		.long	.LFE7
+ 781 0168 02        		.byte	0x2
+ 782 0169 90        		.byte	0x90
+ 783 016a 20        		.uleb128 0x20
+ 784 016b 7F01 0000 		.long	0x17f
+ 785 016f 08        		.uleb128 0x8
+ 786 0170 0000 0000 		.long	.LASF56
+ 787 0174 01        		.byte	0x1
+ 788 0175 69        		.byte	0x69
+ 789 0176 2C00 0000 		.long	0x2c
+ 790 017a 0000 0000 		.long	.LLST1
+ 791 017e 00        		.byte	0x0
+ 792 017f 09        		.uleb128 0x9
+ 793 0180 01        		.byte	0x1
+ 794 0181 0000 0000 		.long	.LASF57
+ 795 0185 01        		.byte	0x1
+ 796 0186 74        		.byte	0x74
+ 797 0187 01        		.byte	0x1
+ 798 0188 2C00 0000 		.long	0x2c
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 15
+
+
+ 799 018c 0000 0000 		.long	.LFB8
+ 800 0190 0000 0000 		.long	.LFE8
+ 801 0194 02        		.byte	0x2
+ 802 0195 90        		.byte	0x90
+ 803 0196 20        		.uleb128 0x20
+ 804 0197 0A        		.uleb128 0xa
+ 805 0198 0000 0000 		.long	.LASF58
+ 806 019c 01        		.byte	0x1
+ 807 019d 7C        		.byte	0x7c
+ 808 019e 01        		.byte	0x1
+ 809 019f 0000 0000 		.long	.LFB9
+ 810 01a3 0000 0000 		.long	.LFE9
+ 811 01a7 02        		.byte	0x2
+ 812 01a8 90        		.byte	0x90
+ 813 01a9 20        		.uleb128 0x20
+ 814 01aa 8602 0000 		.long	0x286
+ 815 01ae 0B        		.uleb128 0xb
+ 816 01af 3301 0000 		.long	0x133
+ 817 01b3 0000 0000 		.long	.LBB38
+ 818 01b7 0000 0000 		.long	.LBE38
+ 819 01bb 01        		.byte	0x1
+ 820 01bc 81        		.byte	0x81
+ 821 01bd 0B        		.uleb128 0xb
+ 822 01be 4501 0000 		.long	0x145
+ 823 01c2 0000 0000 		.long	.LBB40
+ 824 01c6 0000 0000 		.long	.LBE40
+ 825 01ca 01        		.byte	0x1
+ 826 01cb 9B        		.byte	0x9b
+ 827 01cc 0B        		.uleb128 0xb
+ 828 01cd 3C01 0000 		.long	0x13c
+ 829 01d1 0000 0000 		.long	.LBB42
+ 830 01d5 0000 0000 		.long	.LBE42
+ 831 01d9 01        		.byte	0x1
+ 832 01da A5        		.byte	0xa5
+ 833 01db 0B        		.uleb128 0xb
+ 834 01dc 4501 0000 		.long	0x145
+ 835 01e0 0000 0000 		.long	.LBB44
+ 836 01e4 0000 0000 		.long	.LBE44
+ 837 01e8 01        		.byte	0x1
+ 838 01e9 DF        		.byte	0xdf
+ 839 01ea 0B        		.uleb128 0xb
+ 840 01eb 3301 0000 		.long	0x133
+ 841 01ef 0000 0000 		.long	.LBB46
+ 842 01f3 0000 0000 		.long	.LBE46
+ 843 01f7 01        		.byte	0x1
+ 844 01f8 E4        		.byte	0xe4
+ 845 01f9 0B        		.uleb128 0xb
+ 846 01fa 4E01 0000 		.long	0x14e
+ 847 01fe 0000 0000 		.long	.LBB48
+ 848 0202 0000 0000 		.long	.LBE48
+ 849 0206 01        		.byte	0x1
+ 850 0207 E9        		.byte	0xe9
+ 851 0208 0B        		.uleb128 0xb
+ 852 0209 3301 0000 		.long	0x133
+ 853 020d 0000 0000 		.long	.LBB50
+ 854 0211 0000 0000 		.long	.LBE50
+ 855 0215 01        		.byte	0x1
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 16
+
+
+ 856 0216 F2        		.byte	0xf2
+ 857 0217 0B        		.uleb128 0xb
+ 858 0218 4E01 0000 		.long	0x14e
+ 859 021c 0000 0000 		.long	.LBB52
+ 860 0220 0000 0000 		.long	.LBE52
+ 861 0224 01        		.byte	0x1
+ 862 0225 F7        		.byte	0xf7
+ 863 0226 0B        		.uleb128 0xb
+ 864 0227 3C01 0000 		.long	0x13c
+ 865 022b 0000 0000 		.long	.LBB54
+ 866 022f 0000 0000 		.long	.LBE54
+ 867 0233 01        		.byte	0x1
+ 868 0234 FD        		.byte	0xfd
+ 869 0235 0C        		.uleb128 0xc
+ 870 0236 3301 0000 		.long	0x133
+ 871 023a 0000 0000 		.long	.LBB56
+ 872 023e 0000 0000 		.long	.LBE56
+ 873 0242 01        		.byte	0x1
+ 874 0243 0A01      		.word	0x10a
+ 875 0245 0C        		.uleb128 0xc
+ 876 0246 4501 0000 		.long	0x145
+ 877 024a 0000 0000 		.long	.LBB58
+ 878 024e 0000 0000 		.long	.LBE58
+ 879 0252 01        		.byte	0x1
+ 880 0253 0D01      		.word	0x10d
+ 881 0255 0C        		.uleb128 0xc
+ 882 0256 4501 0000 		.long	0x145
+ 883 025a 0000 0000 		.long	.LBB60
+ 884 025e 0000 0000 		.long	.LBE60
+ 885 0262 01        		.byte	0x1
+ 886 0263 1401      		.word	0x114
+ 887 0265 0C        		.uleb128 0xc
+ 888 0266 3301 0000 		.long	0x133
+ 889 026a 0000 0000 		.long	.LBB62
+ 890 026e 0000 0000 		.long	.LBE62
+ 891 0272 01        		.byte	0x1
+ 892 0273 1601      		.word	0x116
+ 893 0275 0C        		.uleb128 0xc
+ 894 0276 3301 0000 		.long	0x133
+ 895 027a 0000 0000 		.long	.LBB64
+ 896 027e 0000 0000 		.long	.LBE64
+ 897 0282 01        		.byte	0x1
+ 898 0283 1C01      		.word	0x11c
+ 899 0285 00        		.byte	0x0
+ 900 0286 07        		.uleb128 0x7
+ 901 0287 01        		.byte	0x1
+ 902 0288 0000 0000 		.long	.LASF45
+ 903 028c 01        		.byte	0x1
+ 904 028d 59        		.byte	0x59
+ 905 028e 01        		.byte	0x1
+ 906 028f 0000 0000 		.long	.LFB6
+ 907 0293 0000 0000 		.long	.LFE6
+ 908 0297 02        		.byte	0x2
+ 909 0298 90        		.byte	0x90
+ 910 0299 20        		.uleb128 0x20
+ 911 029a BD02 0000 		.long	0x2bd
+ 912 029e 0B        		.uleb128 0xb
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 17
+
+
+ 913 029f 3C01 0000 		.long	0x13c
+ 914 02a3 0000 0000 		.long	.LBB66
+ 915 02a7 0000 0000 		.long	.LBE66
+ 916 02ab 01        		.byte	0x1
+ 917 02ac 5D        		.byte	0x5d
+ 918 02ad 0B        		.uleb128 0xb
+ 919 02ae 3301 0000 		.long	0x133
+ 920 02b2 0000 0000 		.long	.LBB68
+ 921 02b6 0000 0000 		.long	.LBE68
+ 922 02ba 01        		.byte	0x1
+ 923 02bb 5E        		.byte	0x5e
+ 924 02bc 00        		.byte	0x0
+ 925 02bd 0D        		.uleb128 0xd
+ 926 02be 0000 0000 		.long	.LASF46
+ 927 02c2 01        		.byte	0x1
+ 928 02c3 52        		.byte	0x52
+ 929 02c4 CE02 0000 		.long	0x2ce
+ 930 02c8 05        		.byte	0x5
+ 931 02c9 03        		.byte	0x3
+ 932 02ca 0000 0000 		.long	rx_byte
+ 933 02ce 0E        		.uleb128 0xe
+ 934 02cf 2C00 0000 		.long	0x2c
+ 935 02d3 0D        		.uleb128 0xd
+ 936 02d4 0000 0000 		.long	.LASF47
+ 937 02d8 01        		.byte	0x1
+ 938 02d9 53        		.byte	0x53
+ 939 02da CE02 0000 		.long	0x2ce
+ 940 02de 05        		.byte	0x5
+ 941 02df 03        		.byte	0x3
+ 942 02e0 0000 0000 		.long	tx_byte
+ 943 02e4 0D        		.uleb128 0xd
+ 944 02e5 0000 0000 		.long	.LASF48
+ 945 02e9 01        		.byte	0x1
+ 946 02ea 54        		.byte	0x54
+ 947 02eb CE02 0000 		.long	0x2ce
+ 948 02ef 05        		.byte	0x5
+ 949 02f0 03        		.byte	0x3
+ 950 02f1 0000 0000 		.long	tx_shift
+ 951 02f5 0D        		.uleb128 0xd
+ 952 02f6 0000 0000 		.long	.LASF49
+ 953 02fa 01        		.byte	0x1
+ 954 02fb 55        		.byte	0x55
+ 955 02fc CE02 0000 		.long	0x2ce
+ 956 0300 05        		.byte	0x5
+ 957 0301 03        		.byte	0x3
+ 958 0302 0000 0000 		.long	parity
+ 959 0306 0F        		.uleb128 0xf
+ 960 0307 0000 0000 		.long	.LASF50
+ 961 030b 01        		.byte	0x1
+ 962 030c 41        		.byte	0x41
+ 963 030d CE02 0000 		.long	0x2ce
+ 964 0311 01        		.byte	0x1
+ 965 0312 05        		.byte	0x5
+ 966 0313 03        		.byte	0x3
+ 967 0314 0000 0000 		.long	kbd_flags
+ 968 0318 0F        		.uleb128 0xf
+ 969 0319 0000 0000 		.long	.LASF51
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 18
+
+
+ 970 031d 01        		.byte	0x1
+ 971 031e 50        		.byte	0x50
+ 972 031f CE02 0000 		.long	0x2ce
+ 973 0323 01        		.byte	0x1
+ 974 0324 05        		.byte	0x5
+ 975 0325 03        		.byte	0x3
+ 976 0326 0000 0000 		.long	kbd_state
+ 977 032a 00        		.byte	0x0
+ 978               		.section	.debug_abbrev
+ 979 0000 01        		.uleb128 0x1
+ 980 0001 11        		.uleb128 0x11
+ 981 0002 01        		.byte	0x1
+ 982 0003 25        		.uleb128 0x25
+ 983 0004 0E        		.uleb128 0xe
+ 984 0005 13        		.uleb128 0x13
+ 985 0006 0B        		.uleb128 0xb
+ 986 0007 03        		.uleb128 0x3
+ 987 0008 0E        		.uleb128 0xe
+ 988 0009 1B        		.uleb128 0x1b
+ 989 000a 0E        		.uleb128 0xe
+ 990 000b 11        		.uleb128 0x11
+ 991 000c 01        		.uleb128 0x1
+ 992 000d 12        		.uleb128 0x12
+ 993 000e 01        		.uleb128 0x1
+ 994 000f 10        		.uleb128 0x10
+ 995 0010 06        		.uleb128 0x6
+ 996 0011 00        		.byte	0x0
+ 997 0012 00        		.byte	0x0
+ 998 0013 02        		.uleb128 0x2
+ 999 0014 24        		.uleb128 0x24
+ 1000 0015 00        		.byte	0x0
+ 1001 0016 0B        		.uleb128 0xb
+ 1002 0017 0B        		.uleb128 0xb
+ 1003 0018 3E        		.uleb128 0x3e
+ 1004 0019 0B        		.uleb128 0xb
+ 1005 001a 03        		.uleb128 0x3
+ 1006 001b 0E        		.uleb128 0xe
+ 1007 001c 00        		.byte	0x0
+ 1008 001d 00        		.byte	0x0
+ 1009 001e 03        		.uleb128 0x3
+ 1010 001f 24        		.uleb128 0x24
+ 1011 0020 00        		.byte	0x0
+ 1012 0021 0B        		.uleb128 0xb
+ 1013 0022 0B        		.uleb128 0xb
+ 1014 0023 3E        		.uleb128 0x3e
+ 1015 0024 0B        		.uleb128 0xb
+ 1016 0025 03        		.uleb128 0x3
+ 1017 0026 08        		.uleb128 0x8
+ 1018 0027 00        		.byte	0x0
+ 1019 0028 00        		.byte	0x0
+ 1020 0029 04        		.uleb128 0x4
+ 1021 002a 04        		.uleb128 0x4
+ 1022 002b 01        		.byte	0x1
+ 1023 002c 03        		.uleb128 0x3
+ 1024 002d 0E        		.uleb128 0xe
+ 1025 002e 0B        		.uleb128 0xb
+ 1026 002f 0B        		.uleb128 0xb
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 19
+
+
+ 1027 0030 3A        		.uleb128 0x3a
+ 1028 0031 0B        		.uleb128 0xb
+ 1029 0032 3B        		.uleb128 0x3b
+ 1030 0033 0B        		.uleb128 0xb
+ 1031 0034 01        		.uleb128 0x1
+ 1032 0035 13        		.uleb128 0x13
+ 1033 0036 00        		.byte	0x0
+ 1034 0037 00        		.byte	0x0
+ 1035 0038 05        		.uleb128 0x5
+ 1036 0039 28        		.uleb128 0x28
+ 1037 003a 00        		.byte	0x0
+ 1038 003b 03        		.uleb128 0x3
+ 1039 003c 0E        		.uleb128 0xe
+ 1040 003d 1C        		.uleb128 0x1c
+ 1041 003e 0D        		.uleb128 0xd
+ 1042 003f 00        		.byte	0x0
+ 1043 0040 00        		.byte	0x0
+ 1044 0041 06        		.uleb128 0x6
+ 1045 0042 2E        		.uleb128 0x2e
+ 1046 0043 00        		.byte	0x0
+ 1047 0044 03        		.uleb128 0x3
+ 1048 0045 0E        		.uleb128 0xe
+ 1049 0046 3A        		.uleb128 0x3a
+ 1050 0047 0B        		.uleb128 0xb
+ 1051 0048 3B        		.uleb128 0x3b
+ 1052 0049 0B        		.uleb128 0xb
+ 1053 004a 27        		.uleb128 0x27
+ 1054 004b 0C        		.uleb128 0xc
+ 1055 004c 20        		.uleb128 0x20
+ 1056 004d 0B        		.uleb128 0xb
+ 1057 004e 00        		.byte	0x0
+ 1058 004f 00        		.byte	0x0
+ 1059 0050 07        		.uleb128 0x7
+ 1060 0051 2E        		.uleb128 0x2e
+ 1061 0052 01        		.byte	0x1
+ 1062 0053 3F        		.uleb128 0x3f
+ 1063 0054 0C        		.uleb128 0xc
+ 1064 0055 03        		.uleb128 0x3
+ 1065 0056 0E        		.uleb128 0xe
+ 1066 0057 3A        		.uleb128 0x3a
+ 1067 0058 0B        		.uleb128 0xb
+ 1068 0059 3B        		.uleb128 0x3b
+ 1069 005a 0B        		.uleb128 0xb
+ 1070 005b 27        		.uleb128 0x27
+ 1071 005c 0C        		.uleb128 0xc
+ 1072 005d 11        		.uleb128 0x11
+ 1073 005e 01        		.uleb128 0x1
+ 1074 005f 12        		.uleb128 0x12
+ 1075 0060 01        		.uleb128 0x1
+ 1076 0061 40        		.uleb128 0x40
+ 1077 0062 0A        		.uleb128 0xa
+ 1078 0063 01        		.uleb128 0x1
+ 1079 0064 13        		.uleb128 0x13
+ 1080 0065 00        		.byte	0x0
+ 1081 0066 00        		.byte	0x0
+ 1082 0067 08        		.uleb128 0x8
+ 1083 0068 05        		.uleb128 0x5
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 20
+
+
+ 1084 0069 00        		.byte	0x0
+ 1085 006a 03        		.uleb128 0x3
+ 1086 006b 0E        		.uleb128 0xe
+ 1087 006c 3A        		.uleb128 0x3a
+ 1088 006d 0B        		.uleb128 0xb
+ 1089 006e 3B        		.uleb128 0x3b
+ 1090 006f 0B        		.uleb128 0xb
+ 1091 0070 49        		.uleb128 0x49
+ 1092 0071 13        		.uleb128 0x13
+ 1093 0072 02        		.uleb128 0x2
+ 1094 0073 06        		.uleb128 0x6
+ 1095 0074 00        		.byte	0x0
+ 1096 0075 00        		.byte	0x0
+ 1097 0076 09        		.uleb128 0x9
+ 1098 0077 2E        		.uleb128 0x2e
+ 1099 0078 00        		.byte	0x0
+ 1100 0079 3F        		.uleb128 0x3f
+ 1101 007a 0C        		.uleb128 0xc
+ 1102 007b 03        		.uleb128 0x3
+ 1103 007c 0E        		.uleb128 0xe
+ 1104 007d 3A        		.uleb128 0x3a
+ 1105 007e 0B        		.uleb128 0xb
+ 1106 007f 3B        		.uleb128 0x3b
+ 1107 0080 0B        		.uleb128 0xb
+ 1108 0081 27        		.uleb128 0x27
+ 1109 0082 0C        		.uleb128 0xc
+ 1110 0083 49        		.uleb128 0x49
+ 1111 0084 13        		.uleb128 0x13
+ 1112 0085 11        		.uleb128 0x11
+ 1113 0086 01        		.uleb128 0x1
+ 1114 0087 12        		.uleb128 0x12
+ 1115 0088 01        		.uleb128 0x1
+ 1116 0089 40        		.uleb128 0x40
+ 1117 008a 0A        		.uleb128 0xa
+ 1118 008b 00        		.byte	0x0
+ 1119 008c 00        		.byte	0x0
+ 1120 008d 0A        		.uleb128 0xa
+ 1121 008e 2E        		.uleb128 0x2e
+ 1122 008f 01        		.byte	0x1
+ 1123 0090 03        		.uleb128 0x3
+ 1124 0091 0E        		.uleb128 0xe
+ 1125 0092 3A        		.uleb128 0x3a
+ 1126 0093 0B        		.uleb128 0xb
+ 1127 0094 3B        		.uleb128 0x3b
+ 1128 0095 0B        		.uleb128 0xb
+ 1129 0096 27        		.uleb128 0x27
+ 1130 0097 0C        		.uleb128 0xc
+ 1131 0098 11        		.uleb128 0x11
+ 1132 0099 01        		.uleb128 0x1
+ 1133 009a 12        		.uleb128 0x12
+ 1134 009b 01        		.uleb128 0x1
+ 1135 009c 40        		.uleb128 0x40
+ 1136 009d 0A        		.uleb128 0xa
+ 1137 009e 01        		.uleb128 0x1
+ 1138 009f 13        		.uleb128 0x13
+ 1139 00a0 00        		.byte	0x0
+ 1140 00a1 00        		.byte	0x0
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 21
+
+
+ 1141 00a2 0B        		.uleb128 0xb
+ 1142 00a3 1D        		.uleb128 0x1d
+ 1143 00a4 00        		.byte	0x0
+ 1144 00a5 31        		.uleb128 0x31
+ 1145 00a6 13        		.uleb128 0x13
+ 1146 00a7 11        		.uleb128 0x11
+ 1147 00a8 01        		.uleb128 0x1
+ 1148 00a9 12        		.uleb128 0x12
+ 1149 00aa 01        		.uleb128 0x1
+ 1150 00ab 58        		.uleb128 0x58
+ 1151 00ac 0B        		.uleb128 0xb
+ 1152 00ad 59        		.uleb128 0x59
+ 1153 00ae 0B        		.uleb128 0xb
+ 1154 00af 00        		.byte	0x0
+ 1155 00b0 00        		.byte	0x0
+ 1156 00b1 0C        		.uleb128 0xc
+ 1157 00b2 1D        		.uleb128 0x1d
+ 1158 00b3 00        		.byte	0x0
+ 1159 00b4 31        		.uleb128 0x31
+ 1160 00b5 13        		.uleb128 0x13
+ 1161 00b6 11        		.uleb128 0x11
+ 1162 00b7 01        		.uleb128 0x1
+ 1163 00b8 12        		.uleb128 0x12
+ 1164 00b9 01        		.uleb128 0x1
+ 1165 00ba 58        		.uleb128 0x58
+ 1166 00bb 0B        		.uleb128 0xb
+ 1167 00bc 59        		.uleb128 0x59
+ 1168 00bd 05        		.uleb128 0x5
+ 1169 00be 00        		.byte	0x0
+ 1170 00bf 00        		.byte	0x0
+ 1171 00c0 0D        		.uleb128 0xd
+ 1172 00c1 34        		.uleb128 0x34
+ 1173 00c2 00        		.byte	0x0
+ 1174 00c3 03        		.uleb128 0x3
+ 1175 00c4 0E        		.uleb128 0xe
+ 1176 00c5 3A        		.uleb128 0x3a
+ 1177 00c6 0B        		.uleb128 0xb
+ 1178 00c7 3B        		.uleb128 0x3b
+ 1179 00c8 0B        		.uleb128 0xb
+ 1180 00c9 49        		.uleb128 0x49
+ 1181 00ca 13        		.uleb128 0x13
+ 1182 00cb 02        		.uleb128 0x2
+ 1183 00cc 0A        		.uleb128 0xa
+ 1184 00cd 00        		.byte	0x0
+ 1185 00ce 00        		.byte	0x0
+ 1186 00cf 0E        		.uleb128 0xe
+ 1187 00d0 35        		.uleb128 0x35
+ 1188 00d1 00        		.byte	0x0
+ 1189 00d2 49        		.uleb128 0x49
+ 1190 00d3 13        		.uleb128 0x13
+ 1191 00d4 00        		.byte	0x0
+ 1192 00d5 00        		.byte	0x0
+ 1193 00d6 0F        		.uleb128 0xf
+ 1194 00d7 34        		.uleb128 0x34
+ 1195 00d8 00        		.byte	0x0
+ 1196 00d9 03        		.uleb128 0x3
+ 1197 00da 0E        		.uleb128 0xe
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 22
+
+
+ 1198 00db 3A        		.uleb128 0x3a
+ 1199 00dc 0B        		.uleb128 0xb
+ 1200 00dd 3B        		.uleb128 0x3b
+ 1201 00de 0B        		.uleb128 0xb
+ 1202 00df 49        		.uleb128 0x49
+ 1203 00e0 13        		.uleb128 0x13
+ 1204 00e1 3F        		.uleb128 0x3f
+ 1205 00e2 0C        		.uleb128 0xc
+ 1206 00e3 02        		.uleb128 0x2
+ 1207 00e4 0A        		.uleb128 0xa
+ 1208 00e5 00        		.byte	0x0
+ 1209 00e6 00        		.byte	0x0
+ 1210 00e7 00        		.byte	0x0
+ 1211               		.section	.debug_pubnames,"",@progbits
+ 1212 0000 5A00 0000 		.long	0x5a
+ 1213 0004 0200      		.word	0x2
+ 1214 0006 0000 0000 		.long	.Ldebug_info0
+ 1215 000a 2B03 0000 		.long	0x32b
+ 1216 000e 5701 0000 		.long	0x157
+ 1217 0012 6B62 645F 		.string	"kbd_set_tx"
+ 1217      7365 745F 
+ 1217      7478 00
+ 1218 001d 7F01 0000 		.long	0x17f
+ 1219 0021 6B62 645F 		.string	"kbd_get_rx_char"
+ 1219      6765 745F 
+ 1219      7278 5F63 
+ 1219      6861 7200 
+ 1220 0031 8602 0000 		.long	0x286
+ 1221 0035 6B62 645F 		.string	"kbd_init"
+ 1221      696E 6974 
+ 1221      00
+ 1222 003e 0603 0000 		.long	0x306
+ 1223 0042 6B62 645F 		.string	"kbd_flags"
+ 1223      666C 6167 
+ 1223      7300 
+ 1224 004c 1803 0000 		.long	0x318
+ 1225 0050 6B62 645F 		.string	"kbd_state"
+ 1225      7374 6174 
+ 1225      6500 
+ 1226 005a 0000 0000 		.long	0x0
+ 1227               		.section	.debug_aranges,"",@progbits
+ 1228 0000 1C00 0000 		.long	0x1c
+ 1229 0004 0200      		.word	0x2
+ 1230 0006 0000 0000 		.long	.Ldebug_info0
+ 1231 000a 04        		.byte	0x4
+ 1232 000b 00        		.byte	0x0
+ 1233 000c 0000      		.word	0x0
+ 1234 000e 0000      		.word	0x0
+ 1235 0010 0000 0000 		.long	.Ltext0
+ 1236 0014 8002 0000 		.long	.Letext0-.Ltext0
+ 1237 0018 0000 0000 		.long	0x0
+ 1238 001c 0000 0000 		.long	0x0
+ 1239               		.section	.debug_line
+ 1240 0000 B803 0000 		.long	.LELT0-.LSLT0
+ 1241               	.LSLT0:
+ 1242 0004 0200      		.word	0x2
+ 1243 0006 1C00 0000 		.long	.LELTP0-.LASLTP0
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 23
+
+
+ 1244               	.LASLTP0:
+ 1245 000a 01        		.byte	0x1
+ 1246 000b 01        		.byte	0x1
+ 1247 000c F6        		.byte	0xf6
+ 1248 000d F5        		.byte	0xf5
+ 1249 000e 0A        		.byte	0xa
+ 1250 000f 00        		.byte	0x0
+ 1251 0010 01        		.byte	0x1
+ 1252 0011 01        		.byte	0x1
+ 1253 0012 01        		.byte	0x1
+ 1254 0013 01        		.byte	0x1
+ 1255 0014 00        		.byte	0x0
+ 1256 0015 00        		.byte	0x0
+ 1257 0016 00        		.byte	0x0
+ 1258 0017 01        		.byte	0x1
+ 1259 0018 00        		.byte	0x0
+ 1260 0019 6B65 7973 		.string	"keysta.c"
+ 1260      7461 2E63 
+ 1260      00
+ 1261 0022 00        		.uleb128 0x0
+ 1262 0023 00        		.uleb128 0x0
+ 1263 0024 00        		.uleb128 0x0
+ 1264 0025 00        		.byte	0x0
+ 1265               	.LELTP0:
+ 1266 0026 00        		.byte	0x0
+ 1267 0027 05        		.uleb128 0x5
+ 1268 0028 02        		.byte	0x2
+ 1269 0029 0000 0000 		.long	.LM1
+ 1270 002d 7D        		.byte	0x7d
+ 1271 002e 00        		.byte	0x0
+ 1272 002f 05        		.uleb128 0x5
+ 1273 0030 02        		.byte	0x2
+ 1274 0031 0000 0000 		.long	.LM2
+ 1275 0035 15        		.byte	0x15
+ 1276 0036 00        		.byte	0x0
+ 1277 0037 05        		.uleb128 0x5
+ 1278 0038 02        		.byte	0x2
+ 1279 0039 0000 0000 		.long	.LM3
+ 1280 003d 15        		.byte	0x15
+ 1281 003e 00        		.byte	0x0
+ 1282 003f 05        		.uleb128 0x5
+ 1283 0040 02        		.byte	0x2
+ 1284 0041 0000 0000 		.long	.LM4
+ 1285 0045 15        		.byte	0x15
+ 1286 0046 00        		.byte	0x0
+ 1287 0047 05        		.uleb128 0x5
+ 1288 0048 02        		.byte	0x2
+ 1289 0049 0000 0000 		.long	.LM5
+ 1290 004d 15        		.byte	0x15
+ 1291 004e 00        		.byte	0x0
+ 1292 004f 05        		.uleb128 0x5
+ 1293 0050 02        		.byte	0x2
+ 1294 0051 0000 0000 		.long	.LM6
+ 1295 0055 15        		.byte	0x15
+ 1296 0056 00        		.byte	0x0
+ 1297 0057 05        		.uleb128 0x5
+ 1298 0058 02        		.byte	0x2
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 24
+
+
+ 1299 0059 0000 0000 		.long	.LM7
+ 1300 005d 15        		.byte	0x15
+ 1301 005e 00        		.byte	0x0
+ 1302 005f 05        		.uleb128 0x5
+ 1303 0060 02        		.byte	0x2
+ 1304 0061 0000 0000 		.long	.LM8
+ 1305 0065 18        		.byte	0x18
+ 1306 0066 00        		.byte	0x0
+ 1307 0067 05        		.uleb128 0x5
+ 1308 0068 02        		.byte	0x2
+ 1309 0069 0000 0000 		.long	.LM9
+ 1310 006d 15        		.byte	0x15
+ 1311 006e 00        		.byte	0x0
+ 1312 006f 05        		.uleb128 0x5
+ 1313 0070 02        		.byte	0x2
+ 1314 0071 0000 0000 		.long	.LM10
+ 1315 0075 15        		.byte	0x15
+ 1316 0076 00        		.byte	0x0
+ 1317 0077 05        		.uleb128 0x5
+ 1318 0078 02        		.byte	0x2
+ 1319 0079 0000 0000 		.long	.LM11
+ 1320 007d 15        		.byte	0x15
+ 1321 007e 00        		.byte	0x0
+ 1322 007f 05        		.uleb128 0x5
+ 1323 0080 02        		.byte	0x2
+ 1324 0081 0000 0000 		.long	.LM12
+ 1325 0085 15        		.byte	0x15
+ 1326 0086 00        		.byte	0x0
+ 1327 0087 05        		.uleb128 0x5
+ 1328 0088 02        		.byte	0x2
+ 1329 0089 0000 0000 		.long	.LM13
+ 1330 008d 15        		.byte	0x15
+ 1331 008e 00        		.byte	0x0
+ 1332 008f 05        		.uleb128 0x5
+ 1333 0090 02        		.byte	0x2
+ 1334 0091 0000 0000 		.long	.LM14
+ 1335 0095 17        		.byte	0x17
+ 1336 0096 00        		.byte	0x0
+ 1337 0097 05        		.uleb128 0x5
+ 1338 0098 02        		.byte	0x2
+ 1339 0099 0000 0000 		.long	.LM15
+ 1340 009d 16        		.byte	0x16
+ 1341 009e 00        		.byte	0x0
+ 1342 009f 05        		.uleb128 0x5
+ 1343 00a0 02        		.byte	0x2
+ 1344 00a1 0000 0000 		.long	.LM16
+ 1345 00a5 16        		.byte	0x16
+ 1346 00a6 00        		.byte	0x0
+ 1347 00a7 05        		.uleb128 0x5
+ 1348 00a8 02        		.byte	0x2
+ 1349 00a9 0000 0000 		.long	.LM17
+ 1350 00ad 03        		.byte	0x3
+ 1351 00ae B47F      		.sleb128 -76
+ 1352 00b0 01        		.byte	0x1
+ 1353 00b1 00        		.byte	0x0
+ 1354 00b2 05        		.uleb128 0x5
+ 1355 00b3 02        		.byte	0x2
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 25
+
+
+ 1356 00b4 0000 0000 		.long	.LM18
+ 1357 00b8 15        		.byte	0x15
+ 1358 00b9 00        		.byte	0x0
+ 1359 00ba 05        		.uleb128 0x5
+ 1360 00bb 02        		.byte	0x2
+ 1361 00bc 0000 0000 		.long	.LM19
+ 1362 00c0 61        		.byte	0x61
+ 1363 00c1 00        		.byte	0x0
+ 1364 00c2 05        		.uleb128 0x5
+ 1365 00c3 02        		.byte	0x2
+ 1366 00c4 0000 0000 		.long	.LM20
+ 1367 00c8 1A        		.byte	0x1a
+ 1368 00c9 00        		.byte	0x0
+ 1369 00ca 05        		.uleb128 0x5
+ 1370 00cb 02        		.byte	0x2
+ 1371 00cc 0000 0000 		.long	.LM21
+ 1372 00d0 18        		.byte	0x18
+ 1373 00d1 00        		.byte	0x0
+ 1374 00d2 05        		.uleb128 0x5
+ 1375 00d3 02        		.byte	0x2
+ 1376 00d4 0000 0000 		.long	.LM22
+ 1377 00d8 19        		.byte	0x19
+ 1378 00d9 00        		.byte	0x0
+ 1379 00da 05        		.uleb128 0x5
+ 1380 00db 02        		.byte	0x2
+ 1381 00dc 0000 0000 		.long	.LM23
+ 1382 00e0 16        		.byte	0x16
+ 1383 00e1 00        		.byte	0x0
+ 1384 00e2 05        		.uleb128 0x5
+ 1385 00e3 02        		.byte	0x2
+ 1386 00e4 0000 0000 		.long	.LM24
+ 1387 00e8 18        		.byte	0x18
+ 1388 00e9 00        		.byte	0x0
+ 1389 00ea 05        		.uleb128 0x5
+ 1390 00eb 02        		.byte	0x2
+ 1391 00ec 0000 0000 		.long	.LM25
+ 1392 00f0 17        		.byte	0x17
+ 1393 00f1 00        		.byte	0x0
+ 1394 00f2 05        		.uleb128 0x5
+ 1395 00f3 02        		.byte	0x2
+ 1396 00f4 0000 0000 		.long	.LM26
+ 1397 00f8 03        		.byte	0x3
+ 1398 00f9 A07F      		.sleb128 -96
+ 1399 00fb 01        		.byte	0x1
+ 1400 00fc 00        		.byte	0x0
+ 1401 00fd 05        		.uleb128 0x5
+ 1402 00fe 02        		.byte	0x2
+ 1403 00ff 0000 0000 		.long	.LM27
+ 1404 0103 15        		.byte	0x15
+ 1405 0104 00        		.byte	0x0
+ 1406 0105 05        		.uleb128 0x5
+ 1407 0106 02        		.byte	0x2
+ 1408 0107 0000 0000 		.long	.LM28
+ 1409 010b 75        		.byte	0x75
+ 1410 010c 00        		.byte	0x0
+ 1411 010d 05        		.uleb128 0x5
+ 1412 010e 02        		.byte	0x2
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 26
+
+
+ 1413 010f 0000 0000 		.long	.LM29
+ 1414 0113 1A        		.byte	0x1a
+ 1415 0114 00        		.byte	0x0
+ 1416 0115 05        		.uleb128 0x5
+ 1417 0116 02        		.byte	0x2
+ 1418 0117 0000 0000 		.long	.LM30
+ 1419 011b 15        		.byte	0x15
+ 1420 011c 00        		.byte	0x0
+ 1421 011d 05        		.uleb128 0x5
+ 1422 011e 02        		.byte	0x2
+ 1423 011f 0000 0000 		.long	.LM31
+ 1424 0123 15        		.byte	0x15
+ 1425 0124 00        		.byte	0x0
+ 1426 0125 05        		.uleb128 0x5
+ 1427 0126 02        		.byte	0x2
+ 1428 0127 0000 0000 		.long	.LM32
+ 1429 012b 03        		.byte	0x3
+ 1430 012c 847F      		.sleb128 -124
+ 1431 012e 01        		.byte	0x1
+ 1432 012f 00        		.byte	0x0
+ 1433 0130 05        		.uleb128 0x5
+ 1434 0131 02        		.byte	0x2
+ 1435 0132 0000 0000 		.long	.LM33
+ 1436 0136 15        		.byte	0x15
+ 1437 0137 00        		.byte	0x0
+ 1438 0138 05        		.uleb128 0x5
+ 1439 0139 02        		.byte	0x2
+ 1440 013a 0000 0000 		.long	.LM34
+ 1441 013e 94        		.byte	0x94
+ 1442 013f 00        		.byte	0x0
+ 1443 0140 05        		.uleb128 0x5
+ 1444 0141 02        		.byte	0x2
+ 1445 0142 0000 0000 		.long	.LM35
+ 1446 0146 1A        		.byte	0x1a
+ 1447 0147 00        		.byte	0x0
+ 1448 0148 05        		.uleb128 0x5
+ 1449 0149 02        		.byte	0x2
+ 1450 014a 0000 0000 		.long	.LM36
+ 1451 014e 18        		.byte	0x18
+ 1452 014f 00        		.byte	0x0
+ 1453 0150 05        		.uleb128 0x5
+ 1454 0151 02        		.byte	0x2
+ 1455 0152 0000 0000 		.long	.LM37
+ 1456 0156 1B        		.byte	0x1b
+ 1457 0157 00        		.byte	0x0
+ 1458 0158 05        		.uleb128 0x5
+ 1459 0159 02        		.byte	0x2
+ 1460 015a 0000 0000 		.long	.LM38
+ 1461 015e 15        		.byte	0x15
+ 1462 015f 00        		.byte	0x0
+ 1463 0160 05        		.uleb128 0x5
+ 1464 0161 02        		.byte	0x2
+ 1465 0162 0000 0000 		.long	.LM39
+ 1466 0166 15        		.byte	0x15
+ 1467 0167 00        		.byte	0x0
+ 1468 0168 05        		.uleb128 0x5
+ 1469 0169 02        		.byte	0x2
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 27
+
+
+ 1470 016a 0000 0000 		.long	.LM40
+ 1471 016e 15        		.byte	0x15
+ 1472 016f 00        		.byte	0x0
+ 1473 0170 05        		.uleb128 0x5
+ 1474 0171 02        		.byte	0x2
+ 1475 0172 0000 0000 		.long	.LM41
+ 1476 0176 16        		.byte	0x16
+ 1477 0177 00        		.byte	0x0
+ 1478 0178 05        		.uleb128 0x5
+ 1479 0179 02        		.byte	0x2
+ 1480 017a 0000 0000 		.long	.LM42
+ 1481 017e 15        		.byte	0x15
+ 1482 017f 00        		.byte	0x0
+ 1483 0180 05        		.uleb128 0x5
+ 1484 0181 02        		.byte	0x2
+ 1485 0182 0000 0000 		.long	.LM43
+ 1486 0186 1E        		.byte	0x1e
+ 1487 0187 00        		.byte	0x0
+ 1488 0188 05        		.uleb128 0x5
+ 1489 0189 02        		.byte	0x2
+ 1490 018a 0000 0000 		.long	.LM44
+ 1491 018e 15        		.byte	0x15
+ 1492 018f 00        		.byte	0x0
+ 1493 0190 05        		.uleb128 0x5
+ 1494 0191 02        		.byte	0x2
+ 1495 0192 0000 0000 		.long	.LM45
+ 1496 0196 15        		.byte	0x15
+ 1497 0197 00        		.byte	0x0
+ 1498 0198 05        		.uleb128 0x5
+ 1499 0199 02        		.byte	0x2
+ 1500 019a 0000 0000 		.long	.LM46
+ 1501 019e 15        		.byte	0x15
+ 1502 019f 00        		.byte	0x0
+ 1503 01a0 05        		.uleb128 0x5
+ 1504 01a1 02        		.byte	0x2
+ 1505 01a2 0000 0000 		.long	.LM47
+ 1506 01a6 18        		.byte	0x18
+ 1507 01a7 00        		.byte	0x0
+ 1508 01a8 05        		.uleb128 0x5
+ 1509 01a9 02        		.byte	0x2
+ 1510 01aa 0000 0000 		.long	.LM48
+ 1511 01ae 15        		.byte	0x15
+ 1512 01af 00        		.byte	0x0
+ 1513 01b0 05        		.uleb128 0x5
+ 1514 01b1 02        		.byte	0x2
+ 1515 01b2 0000 0000 		.long	.LM49
+ 1516 01b6 16        		.byte	0x16
+ 1517 01b7 00        		.byte	0x0
+ 1518 01b8 05        		.uleb128 0x5
+ 1519 01b9 02        		.byte	0x2
+ 1520 01ba 0000 0000 		.long	.LM50
+ 1521 01be 16        		.byte	0x16
+ 1522 01bf 00        		.byte	0x0
+ 1523 01c0 05        		.uleb128 0x5
+ 1524 01c1 02        		.byte	0x2
+ 1525 01c2 0000 0000 		.long	.LM51
+ 1526 01c6 18        		.byte	0x18
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 28
+
+
+ 1527 01c7 00        		.byte	0x0
+ 1528 01c8 05        		.uleb128 0x5
+ 1529 01c9 02        		.byte	0x2
+ 1530 01ca 0000 0000 		.long	.LM52
+ 1531 01ce 16        		.byte	0x16
+ 1532 01cf 00        		.byte	0x0
+ 1533 01d0 05        		.uleb128 0x5
+ 1534 01d1 02        		.byte	0x2
+ 1535 01d2 0000 0000 		.long	.LM53
+ 1536 01d6 16        		.byte	0x16
+ 1537 01d7 00        		.byte	0x0
+ 1538 01d8 05        		.uleb128 0x5
+ 1539 01d9 02        		.byte	0x2
+ 1540 01da 0000 0000 		.long	.LM54
+ 1541 01de 03        		.byte	0x3
+ 1542 01df DC7E      		.sleb128 -164
+ 1543 01e1 01        		.byte	0x1
+ 1544 01e2 00        		.byte	0x0
+ 1545 01e3 05        		.uleb128 0x5
+ 1546 01e4 02        		.byte	0x2
+ 1547 01e5 0000 0000 		.long	.LM55
+ 1548 01e9 15        		.byte	0x15
+ 1549 01ea 00        		.byte	0x0
+ 1550 01eb 05        		.uleb128 0x5
+ 1551 01ec 02        		.byte	0x2
+ 1552 01ed 0000 0000 		.long	.LM56
+ 1553 01f1 B9        		.byte	0xb9
+ 1554 01f2 00        		.byte	0x0
+ 1555 01f3 05        		.uleb128 0x5
+ 1556 01f4 02        		.byte	0x2
+ 1557 01f5 0000 0000 		.long	.LM57
+ 1558 01f9 03        		.byte	0x3
+ 1559 01fa D47E      		.sleb128 -172
+ 1560 01fc 01        		.byte	0x1
+ 1561 01fd 00        		.byte	0x0
+ 1562 01fe 05        		.uleb128 0x5
+ 1563 01ff 02        		.byte	0x2
+ 1564 0200 0000 0000 		.long	.LM58
+ 1565 0204 15        		.byte	0x15
+ 1566 0205 00        		.byte	0x0
+ 1567 0206 05        		.uleb128 0x5
+ 1568 0207 02        		.byte	0x2
+ 1569 0208 0000 0000 		.long	.LM59
+ 1570 020c 0D        		.byte	0xd
+ 1571 020d 00        		.byte	0x0
+ 1572 020e 05        		.uleb128 0x5
+ 1573 020f 02        		.byte	0x2
+ 1574 0210 0000 0000 		.long	.LM60
+ 1575 0214 15        		.byte	0x15
+ 1576 0215 00        		.byte	0x0
+ 1577 0216 05        		.uleb128 0x5
+ 1578 0217 02        		.byte	0x2
+ 1579 0218 0000 0000 		.long	.LM61
+ 1580 021c CF        		.byte	0xcf
+ 1581 021d 00        		.byte	0x0
+ 1582 021e 05        		.uleb128 0x5
+ 1583 021f 02        		.byte	0x2
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 29
+
+
+ 1584 0220 0000 0000 		.long	.LM62
+ 1585 0224 15        		.byte	0x15
+ 1586 0225 00        		.byte	0x0
+ 1587 0226 05        		.uleb128 0x5
+ 1588 0227 02        		.byte	0x2
+ 1589 0228 0000 0000 		.long	.LM63
+ 1590 022c 17        		.byte	0x17
+ 1591 022d 00        		.byte	0x0
+ 1592 022e 05        		.uleb128 0x5
+ 1593 022f 02        		.byte	0x2
+ 1594 0230 0000 0000 		.long	.LM64
+ 1595 0234 15        		.byte	0x15
+ 1596 0235 00        		.byte	0x0
+ 1597 0236 05        		.uleb128 0x5
+ 1598 0237 02        		.byte	0x2
+ 1599 0238 0000 0000 		.long	.LM65
+ 1600 023c 15        		.byte	0x15
+ 1601 023d 00        		.byte	0x0
+ 1602 023e 05        		.uleb128 0x5
+ 1603 023f 02        		.byte	0x2
+ 1604 0240 0000 0000 		.long	.LM66
+ 1605 0244 03        		.byte	0x3
+ 1606 0245 C47E      		.sleb128 -188
+ 1607 0247 01        		.byte	0x1
+ 1608 0248 00        		.byte	0x0
+ 1609 0249 05        		.uleb128 0x5
+ 1610 024a 02        		.byte	0x2
+ 1611 024b 0000 0000 		.long	.LM67
+ 1612 024f 15        		.byte	0x15
+ 1613 0250 00        		.byte	0x0
+ 1614 0251 05        		.uleb128 0x5
+ 1615 0252 02        		.byte	0x2
+ 1616 0253 0000 0000 		.long	.LM68
+ 1617 0257 D2        		.byte	0xd2
+ 1618 0258 00        		.byte	0x0
+ 1619 0259 05        		.uleb128 0x5
+ 1620 025a 02        		.byte	0x2
+ 1621 025b 0000 0000 		.long	.LM69
+ 1622 025f 17        		.byte	0x17
+ 1623 0260 00        		.byte	0x0
+ 1624 0261 05        		.uleb128 0x5
+ 1625 0262 02        		.byte	0x2
+ 1626 0263 0000 0000 		.long	.LM70
+ 1627 0267 03        		.byte	0x3
+ 1628 0268 B87E      		.sleb128 -200
+ 1629 026a 01        		.byte	0x1
+ 1630 026b 00        		.byte	0x0
+ 1631 026c 05        		.uleb128 0x5
+ 1632 026d 02        		.byte	0x2
+ 1633 026e 0000 0000 		.long	.LM71
+ 1634 0272 15        		.byte	0x15
+ 1635 0273 00        		.byte	0x0
+ 1636 0274 05        		.uleb128 0x5
+ 1637 0275 02        		.byte	0x2
+ 1638 0276 0000 0000 		.long	.LM72
+ 1639 027a E1        		.byte	0xe1
+ 1640 027b 00        		.byte	0x0
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 30
+
+
+ 1641 027c 05        		.uleb128 0x5
+ 1642 027d 02        		.byte	0x2
+ 1643 027e 0000 0000 		.long	.LM73
+ 1644 0282 03        		.byte	0x3
+ 1645 0283 AC7E      		.sleb128 -212
+ 1646 0285 01        		.byte	0x1
+ 1647 0286 00        		.byte	0x0
+ 1648 0287 05        		.uleb128 0x5
+ 1649 0288 02        		.byte	0x2
+ 1650 0289 0000 0000 		.long	.LM74
+ 1651 028d 15        		.byte	0x15
+ 1652 028e 00        		.byte	0x0
+ 1653 028f 05        		.uleb128 0x5
+ 1654 0290 02        		.byte	0x2
+ 1655 0291 0000 0000 		.long	.LM75
+ 1656 0295 E9        		.byte	0xe9
+ 1657 0296 00        		.byte	0x0
+ 1658 0297 05        		.uleb128 0x5
+ 1659 0298 02        		.byte	0x2
+ 1660 0299 0000 0000 		.long	.LM76
+ 1661 029d 16        		.byte	0x16
+ 1662 029e 00        		.byte	0x0
+ 1663 029f 05        		.uleb128 0x5
+ 1664 02a0 02        		.byte	0x2
+ 1665 02a1 0000 0000 		.long	.LM77
+ 1666 02a5 15        		.byte	0x15
+ 1667 02a6 00        		.byte	0x0
+ 1668 02a7 05        		.uleb128 0x5
+ 1669 02a8 02        		.byte	0x2
+ 1670 02a9 0000 0000 		.long	.LM78
+ 1671 02ad 1C        		.byte	0x1c
+ 1672 02ae 00        		.byte	0x0
+ 1673 02af 05        		.uleb128 0x5
+ 1674 02b0 02        		.byte	0x2
+ 1675 02b1 0000 0000 		.long	.LM79
+ 1676 02b5 03        		.byte	0x3
+ 1677 02b6 AB7E      		.sleb128 -213
+ 1678 02b8 01        		.byte	0x1
+ 1679 02b9 00        		.byte	0x0
+ 1680 02ba 05        		.uleb128 0x5
+ 1681 02bb 02        		.byte	0x2
+ 1682 02bc 0000 0000 		.long	.LM80
+ 1683 02c0 15        		.byte	0x15
+ 1684 02c1 00        		.byte	0x0
+ 1685 02c2 05        		.uleb128 0x5
+ 1686 02c3 02        		.byte	0x2
+ 1687 02c4 0000 0000 		.long	.LM81
+ 1688 02c8 EA        		.byte	0xea
+ 1689 02c9 00        		.byte	0x0
+ 1690 02ca 05        		.uleb128 0x5
+ 1691 02cb 02        		.byte	0x2
+ 1692 02cc 0000 0000 		.long	.LM82
+ 1693 02d0 03        		.byte	0x3
+ 1694 02d1 AF7E      		.sleb128 -209
+ 1695 02d3 01        		.byte	0x1
+ 1696 02d4 00        		.byte	0x0
+ 1697 02d5 05        		.uleb128 0x5
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 31
+
+
+ 1698 02d6 02        		.byte	0x2
+ 1699 02d7 0000 0000 		.long	.LM83
+ 1700 02db 15        		.byte	0x15
+ 1701 02dc 00        		.byte	0x0
+ 1702 02dd 05        		.uleb128 0x5
+ 1703 02de 02        		.byte	0x2
+ 1704 02df 0000 0000 		.long	.LM84
+ 1705 02e3 E8        		.byte	0xe8
+ 1706 02e4 00        		.byte	0x0
+ 1707 02e5 05        		.uleb128 0x5
+ 1708 02e6 02        		.byte	0x2
+ 1709 02e7 0000 0000 		.long	.LM85
+ 1710 02eb 18        		.byte	0x18
+ 1711 02ec 00        		.byte	0x0
+ 1712 02ed 05        		.uleb128 0x5
+ 1713 02ee 02        		.byte	0x2
+ 1714 02ef 0000 0000 		.long	.LM86
+ 1715 02f3 03        		.byte	0x3
+ 1716 02f4 A77E      		.sleb128 -217
+ 1717 02f6 01        		.byte	0x1
+ 1718 02f7 00        		.byte	0x0
+ 1719 02f8 05        		.uleb128 0x5
+ 1720 02f9 02        		.byte	0x2
+ 1721 02fa 0000 0000 		.long	.LM87
+ 1722 02fe 15        		.byte	0x15
+ 1723 02ff 00        		.byte	0x0
+ 1724 0300 05        		.uleb128 0x5
+ 1725 0301 02        		.byte	0x2
+ 1726 0302 0000 0000 		.long	.LM88
+ 1727 0306 0D        		.byte	0xd
+ 1728 0307 00        		.byte	0x0
+ 1729 0308 05        		.uleb128 0x5
+ 1730 0309 02        		.byte	0x2
+ 1731 030a 0000 0000 		.long	.LM89
+ 1732 030e 15        		.byte	0x15
+ 1733 030f 00        		.byte	0x0
+ 1734 0310 05        		.uleb128 0x5
+ 1735 0311 02        		.byte	0x2
+ 1736 0312 0000 0000 		.long	.LM90
+ 1737 0316 F7        		.byte	0xf7
+ 1738 0317 00        		.byte	0x0
+ 1739 0318 05        		.uleb128 0x5
+ 1740 0319 02        		.byte	0x2
+ 1741 031a 0000 0000 		.long	.LM91
+ 1742 031e 15        		.byte	0x15
+ 1743 031f 00        		.byte	0x0
+ 1744 0320 05        		.uleb128 0x5
+ 1745 0321 02        		.byte	0x2
+ 1746 0322 0000 0000 		.long	.LM92
+ 1747 0326 03        		.byte	0x3
+ 1748 0327 9B7E      		.sleb128 -229
+ 1749 0329 01        		.byte	0x1
+ 1750 032a 00        		.byte	0x0
+ 1751 032b 05        		.uleb128 0x5
+ 1752 032c 02        		.byte	0x2
+ 1753 032d 0000 0000 		.long	.LM93
+ 1754 0331 15        		.byte	0x15
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 32
+
+
+ 1755 0332 00        		.byte	0x0
+ 1756 0333 05        		.uleb128 0x5
+ 1757 0334 02        		.byte	0x2
+ 1758 0335 0000 0000 		.long	.LM94
+ 1759 0339 03        		.byte	0x3
+ 1760 033a EA01      		.sleb128 234
+ 1761 033c 01        		.byte	0x1
+ 1762 033d 00        		.byte	0x0
+ 1763 033e 05        		.uleb128 0x5
+ 1764 033f 02        		.byte	0x2
+ 1765 0340 0000 0000 		.long	.LM95
+ 1766 0344 18        		.byte	0x18
+ 1767 0345 00        		.byte	0x0
+ 1768 0346 05        		.uleb128 0x5
+ 1769 0347 02        		.byte	0x2
+ 1770 0348 0000 0000 		.long	.LM96
+ 1771 034c 03        		.byte	0x3
+ 1772 034d B67E      		.sleb128 -202
+ 1773 034f 01        		.byte	0x1
+ 1774 0350 00        		.byte	0x0
+ 1775 0351 05        		.uleb128 0x5
+ 1776 0352 02        		.byte	0x2
+ 1777 0353 0000 0000 		.long	.LM97
+ 1778 0357 15        		.byte	0x15
+ 1779 0358 00        		.byte	0x0
+ 1780 0359 05        		.uleb128 0x5
+ 1781 035a 02        		.byte	0x2
+ 1782 035b 0000 0000 		.long	.LM98
+ 1783 035f 15        		.byte	0x15
+ 1784 0360 00        		.byte	0x0
+ 1785 0361 05        		.uleb128 0x5
+ 1786 0362 02        		.byte	0x2
+ 1787 0363 0000 0000 		.long	.LM99
+ 1788 0367 03        		.byte	0x3
+ 1789 0368 4D        		.sleb128 -51
+ 1790 0369 01        		.byte	0x1
+ 1791 036a 00        		.byte	0x0
+ 1792 036b 05        		.uleb128 0x5
+ 1793 036c 02        		.byte	0x2
+ 1794 036d 0000 0000 		.long	.LM100
+ 1795 0371 15        		.byte	0x15
+ 1796 0372 00        		.byte	0x0
+ 1797 0373 05        		.uleb128 0x5
+ 1798 0374 02        		.byte	0x2
+ 1799 0375 0000 0000 		.long	.LM101
+ 1800 0379 1F        		.byte	0x1f
+ 1801 037a 00        		.byte	0x0
+ 1802 037b 05        		.uleb128 0x5
+ 1803 037c 02        		.byte	0x2
+ 1804 037d 0000 0000 		.long	.LM102
+ 1805 0381 15        		.byte	0x15
+ 1806 0382 00        		.byte	0x0
+ 1807 0383 05        		.uleb128 0x5
+ 1808 0384 02        		.byte	0x2
+ 1809 0385 0000 0000 		.long	.LM103
+ 1810 0389 3F        		.byte	0x3f
+ 1811 038a 00        		.byte	0x0
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 33
+
+
+ 1812 038b 05        		.uleb128 0x5
+ 1813 038c 02        		.byte	0x2
+ 1814 038d 0000 0000 		.long	.LM104
+ 1815 0391 15        		.byte	0x15
+ 1816 0392 00        		.byte	0x0
+ 1817 0393 05        		.uleb128 0x5
+ 1818 0394 02        		.byte	0x2
+ 1819 0395 0000 0000 		.long	.LM105
+ 1820 0399 15        		.byte	0x15
+ 1821 039a 00        		.byte	0x0
+ 1822 039b 05        		.uleb128 0x5
+ 1823 039c 02        		.byte	0x2
+ 1824 039d 0000 0000 		.long	.LM106
+ 1825 03a1 16        		.byte	0x16
+ 1826 03a2 00        		.byte	0x0
+ 1827 03a3 05        		.uleb128 0x5
+ 1828 03a4 02        		.byte	0x2
+ 1829 03a5 0000 0000 		.long	.LM107
+ 1830 03a9 15        		.byte	0x15
+ 1831 03aa 00        		.byte	0x0
+ 1832 03ab 05        		.uleb128 0x5
+ 1833 03ac 02        		.byte	0x2
+ 1834 03ad 0000 0000 		.long	.LM108
+ 1835 03b1 15        		.byte	0x15
+ 1836 03b2 00        		.byte	0x0
+ 1837 03b3 05        		.uleb128 0x5
+ 1838 03b4 02        		.byte	0x2
+ 1839 03b5 0000 0000 		.long	.Letext0
+ 1840 03b9 00        		.byte	0x0
+ 1841 03ba 01        		.uleb128 0x1
+ 1842 03bb 01        		.byte	0x1
+ 1843               	.LELT0:
+ 1844 03bc 1600 0000 		.section	.debug_str,"MS",@progbits,1
+ 1844      0200 1000 
+ 1844      0000 0101 
+ 1844      FB0E 0A00 
+ 1844      0101 0101 
+ 1845               	.LASF37:
+ 1846 0000 5458 5F53 		.string	"TX_STOP"
+ 1846      544F 5000 
+ 1847               	.LASF15:
+ 1848 0008 5258 5F52 		.string	"RX_RELCLK"
+ 1848      454C 434C 
+ 1848      4B00 
+ 1849               	.LASF14:
+ 1850 0012 5258 5F53 		.string	"RX_START"
+ 1850      5441 5254 
+ 1850      00
+ 1851               	.LASF52:
+ 1852 001b 474E 5520 		.string	"GNU C 4.3.3"
+ 1852      4320 342E 
+ 1852      332E 3300 
+ 1853               	.LASF44:
+ 1854 0027 6B62 645F 		.string	"kbd_set_tx"
+ 1854      7365 745F 
+ 1854      7478 00
+ 1855               	.LASF13:
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 34
+
+
+ 1856 0032 4944 4C45 		.string	"IDLE_END"
+ 1856      5F45 4E44 
+ 1856      00
+ 1857               	.LASF56:
+ 1858 003b 7478 6368 		.string	"txchar"
+ 1858      6172 00
+ 1859               	.LASF8:
+ 1860 0042 7368 6F72 		.string	"short int"
+ 1860      7420 696E 
+ 1860      7400 
+ 1861               	.LASF58:
+ 1862 004c 7469 6D65 		.string	"timerAction"
+ 1862      7241 6374 
+ 1862      696F 6E00 
+ 1863               	.LASF29:
+ 1864 0058 5458 5F44 		.string	"TX_DATA1"
+ 1864      4154 4131 
+ 1864      00
+ 1865               	.LASF30:
+ 1866 0061 5458 5F44 		.string	"TX_DATA2"
+ 1866      4154 4132 
+ 1866      00
+ 1867               	.LASF31:
+ 1868 006a 5458 5F44 		.string	"TX_DATA3"
+ 1868      4154 4133 
+ 1868      00
+ 1869               	.LASF32:
+ 1870 0073 5458 5F44 		.string	"TX_DATA4"
+ 1870      4154 4134 
+ 1870      00
+ 1871               	.LASF33:
+ 1872 007c 5458 5F44 		.string	"TX_DATA5"
+ 1872      4154 4135 
+ 1872      00
+ 1873               	.LASF34:
+ 1874 0085 5458 5F44 		.string	"TX_DATA6"
+ 1874      4154 4136 
+ 1874      00
+ 1875               	.LASF35:
+ 1876 008e 5458 5F44 		.string	"TX_DATA7"
+ 1876      4154 4137 
+ 1876      00
+ 1877               	.LASF28:
+ 1878 0097 5458 5F53 		.string	"TX_START"
+ 1878      5441 5254 
+ 1878      00
+ 1879               	.LASF11:
+ 1880 00a0 4944 4C45 		.string	"IDLE_WAIT_REL"
+ 1880      5F57 4149 
+ 1880      545F 5245 
+ 1880      4C00 
+ 1881               	.LASF19:
+ 1882 00ae 5258 5F44 		.string	"RX_DATA3"
+ 1882      4154 4133 
+ 1882      00
+ 1883               	.LASF53:
+ 1884 00b7 6B65 7973 		.string	"keysta.c"
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 35
+
+
+ 1884      7461 2E63 
+ 1884      00
+ 1885               	.LASF51:
+ 1886 00c0 6B62 645F 		.string	"kbd_state"
+ 1886      7374 6174 
+ 1886      6500 
+ 1887               	.LASF41:
+ 1888 00ca 636C 6F63 		.string	"clockHigh"
+ 1888      6B48 6967 
+ 1888      6800 
+ 1889               	.LASF43:
+ 1890 00d4 636C 6F63 		.string	"clockLow"
+ 1890      6B4C 6F77 
+ 1890      00
+ 1891               	.LASF40:
+ 1892 00dd 6461 7461 		.string	"dataHigh"
+ 1892      4869 6768 
+ 1892      00
+ 1893               	.LASF5:
+ 1894 00e6 6C6F 6E67 		.string	"long long int"
+ 1894      206C 6F6E 
+ 1894      6720 696E 
+ 1894      7400 
+ 1895               	.LASF3:
+ 1896 00f4 6C6F 6E67 		.string	"long int"
+ 1896      2069 6E74 
+ 1896      00
+ 1897               	.LASF49:
+ 1898 00fd 7061 7269 		.string	"parity"
+ 1898      7479 00
+ 1899               	.LASF1:
+ 1900 0104 756E 7369 		.string	"unsigned char"
+ 1900      676E 6564 
+ 1900      2063 6861 
+ 1900      7200 
+ 1901               	.LASF0:
+ 1902 0112 7369 676E 		.string	"signed char"
+ 1902      6564 2063 
+ 1902      6861 7200 
+ 1903               	.LASF6:
+ 1904 011e 6C6F 6E67 		.string	"long long unsigned int"
+ 1904      206C 6F6E 
+ 1904      6720 756E 
+ 1904      7369 676E 
+ 1904      6564 2069 
+ 1905               	.LASF2:
+ 1906 0135 756E 7369 		.string	"unsigned int"
+ 1906      676E 6564 
+ 1906      2069 6E74 
+ 1906      00
+ 1907               	.LASF47:
+ 1908 0142 7478 5F62 		.string	"tx_byte"
+ 1908      7974 6500 
+ 1909               	.LASF54:
+ 1910 014a 5A3A 5C44 		.string	"Z:\\Documents\\GitHub\\l3\\source"
+ 1910      6F63 756D 
+ 1910      656E 7473 
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 36
+
+
+ 1910      5C47 6974 
+ 1910      4875 625C 
+ 1911               	.LASF7:
+ 1912 0168 7368 6F72 		.string	"short unsigned int"
+ 1912      7420 756E 
+ 1912      7369 676E 
+ 1912      6564 2069 
+ 1912      6E74 00
+ 1913               	.LASF20:
+ 1914 017b 5258 5F44 		.string	"RX_DATA4"
+ 1914      4154 4134 
+ 1914      00
+ 1915               	.LASF9:
+ 1916 0184 6368 6172 		.string	"char"
+ 1916      00
+ 1917               	.LASF26:
+ 1918 0189 5258 5F53 		.string	"RX_SENT_ACK"
+ 1918      454E 545F 
+ 1918      4143 4B00 
+ 1919               	.LASF12:
+ 1920 0195 4944 4C45 		.string	"IDLE_OK_TO_TX"
+ 1920      5F4F 4B5F 
+ 1920      544F 5F54 
+ 1920      5800 
+ 1921               	.LASF24:
+ 1922 01a3 5258 5F50 		.string	"RX_PARITY"
+ 1922      4152 4954 
+ 1922      5900 
+ 1923               	.LASF46:
+ 1924 01ad 7278 5F62 		.string	"rx_byte"
+ 1924      7974 6500 
+ 1925               	.LASF42:
+ 1926 01b5 6461 7461 		.string	"dataLow"
+ 1926      4C6F 7700 
+ 1927               	.LASF36:
+ 1928 01bd 5458 5F50 		.string	"TX_PARITY"
+ 1928      4152 4954 
+ 1928      5900 
+ 1929               	.LASF4:
+ 1930 01c7 6C6F 6E67 		.string	"long unsigned int"
+ 1930      2075 6E73 
+ 1930      6967 6E65 
+ 1930      6420 696E 
+ 1930      7400 
+ 1931               	.LASF50:
+ 1932 01d9 6B62 645F 		.string	"kbd_flags"
+ 1932      666C 6167 
+ 1932      7300 
+ 1933               	.LASF38:
+ 1934 01e3 5458 5F41 		.string	"TX_AFTER_STOP"
+ 1934      4654 4552 
+ 1934      5F53 544F 
+ 1934      5000 
+ 1935               	.LASF48:
+ 1936 01f1 7478 5F73 		.string	"tx_shift"
+ 1936      6869 6674 
+ 1936      00
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 37
+
+
+ 1937               	.LASF39:
+ 1938 01fa 5458 5F45 		.string	"TX_END"
+ 1938      4E44 00
+ 1939               	.LASF45:
+ 1940 0201 6B62 645F 		.string	"kbd_init"
+ 1940      696E 6974 
+ 1940      00
+ 1941               	.LASF27:
+ 1942 020a 5258 5F45 		.string	"RX_END"
+ 1942      4E44 00
+ 1943               	.LASF25:
+ 1944 0211 5258 5F53 		.string	"RX_STOP"
+ 1944      544F 5000 
+ 1945               	.LASF57:
+ 1946 0219 6B62 645F 		.string	"kbd_get_rx_char"
+ 1946      6765 745F 
+ 1946      7278 5F63 
+ 1946      6861 7200 
+ 1947               	.LASF16:
+ 1948 0229 5258 5F44 		.string	"RX_DATA0"
+ 1948      4154 4130 
+ 1948      00
+ 1949               	.LASF17:
+ 1950 0232 5258 5F44 		.string	"RX_DATA1"
+ 1950      4154 4131 
+ 1950      00
+ 1951               	.LASF18:
+ 1952 023b 5258 5F44 		.string	"RX_DATA2"
+ 1952      4154 4132 
+ 1952      00
+ 1953               	.LASF55:
+ 1954 0244 656E 756D 		.string	"enum_state"
+ 1954      5F73 7461 
+ 1954      7465 00
+ 1955               	.LASF10:
+ 1956 024f 4944 4C45 		.string	"IDLE_START"
+ 1956      5F53 5441 
+ 1956      5254 00
+ 1957               	.LASF21:
+ 1958 025a 5258 5F44 		.string	"RX_DATA5"
+ 1958      4154 4135 
+ 1958      00
+ 1959               	.LASF22:
+ 1960 0263 5258 5F44 		.string	"RX_DATA6"
+ 1960      4154 4136 
+ 1960      00
+ 1961               	.LASF23:
+ 1962 026c 5258 5F44 		.string	"RX_DATA7"
+ 1962      4154 4137 
+ 1962      00
+ 1963               	.global __do_clear_bss
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s 			page 38
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 keysta.c
+C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s:2      *ABS*:0000003f __SREG__
+C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s:3      *ABS*:0000003e __SP_H__
+C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s:4      *ABS*:0000003d __SP_L__
+C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s:5      *ABS*:00000034 __CCP__
+C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s:6      *ABS*:00000000 __tmp_reg__
+C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s:7      *ABS*:00000001 __zero_reg__
+C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s:18     .text:00000000 kbd_set_tx
+C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s:531    .bss:00000001 tx_byte
+                            *COM*:00000001 kbd_flags
+C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s:54     .text:0000001e kbd_get_rx_char
+                             .bss:00000000 rx_byte
+C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s:83     .text:00000032 timerAction
+                            *COM*:00000001 kbd_state
+C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s:533    .bss:00000003 parity
+C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s:532    .bss:00000002 tx_shift
+C:\Users\ADMINI~1\AppData\Local\Temp/ccqvS40i.s:483    .text:0000024e kbd_init
+
+UNDEFINED SYMBOLS
+timer0Init
+timer0SetPrescaler
+timerAttach
+__do_clear_bss

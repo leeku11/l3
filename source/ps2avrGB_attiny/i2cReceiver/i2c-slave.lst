@@ -1,0 +1,2103 @@
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 1
+
+
+   1               		.file	"i2c-slave.c"
+   2               	__SREG__ = 0x3f
+   3               	__SP_H__ = 0x3e
+   4               	__SP_L__ = 0x3d
+   5               	__CCP__  = 0x34
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.section	.debug_abbrev,"",@progbits
+   9               	.Ldebug_abbrev0:
+  10               		.section	.debug_info,"",@progbits
+  11               	.Ldebug_info0:
+  12               		.section	.debug_line,"",@progbits
+  13               	.Ldebug_line0:
+  14               		.text
+  15               	.Ltext0:
+  16               	.global	i2c_initialize
+  17               		.type	i2c_initialize, @function
+  18               	i2c_initialize:
+  19               	.LFB3:
+  20               	.LM1:
+  21               	.LVL0:
+  22               	/* prologue: function */
+  23               	/* frame size = 0 */
+  24               	.LM2:
+  25 0000 8093 0000 		sts i2c_address,r24
+  26               	.LM3:
+  27 0004 C29A      		sbi 56-32,2
+  28               	.LM4:
+  29 0006 C09A      		sbi 56-32,0
+  30               	.LM5:
+  31 0008 BA9A      		sbi 55-32,2
+  32               	.LM6:
+  33 000a 1092 0000 		sts i2c_rdlen,__zero_reg__
+  34               	.LM7:
+  35 000e 1092 0000 		sts i2c_wrlen,__zero_reg__
+  36               	.LBB11:
+  37               	.LBB12:
+  38               	.LM8:
+  39 0012 1092 0000 		sts usi_state,__zero_reg__
+  40               	.LM9:
+  41 0016 B898      		cbi 55-32,0
+  42               	.LM10:
+  43 0018 88EA      		ldi r24,lo8(-88)
+  44               	.LVL1:
+  45 001a 8DB9      		out 45-32,r24
+  46               	.LM11:
+  47 001c 8EEE      		ldi r24,lo8(-18)
+  48 001e 8EB9      		out 46-32,r24
+  49               	/* epilogue start */
+  50               	.LBE12:
+  51               	.LBE11:
+  52               	.LM12:
+  53 0020 0895      		ret
+  54               	.LFE3:
+  55               		.size	i2c_initialize, .-i2c_initialize
+  56               	.global	i2c_idle
+  57               		.type	i2c_idle, @function
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 2
+
+
+  58               	i2c_idle:
+  59               	.LFB4:
+  60               	.LM13:
+  61               	/* prologue: function */
+  62               	/* frame size = 0 */
+  63               	.LM14:
+  64 0022 8091 0000 		lds r24,usi_state
+  65 0026 90E0      		ldi r25,lo8(0)
+  66 0028 8823      		tst r24
+  67 002a 01F4      		brne .L4
+  68 002c 91E0      		ldi r25,lo8(1)
+  69               	.L4:
+  70               	.LM15:
+  71 002e 892F      		mov r24,r25
+  72               	/* epilogue start */
+  73 0030 0895      		ret
+  74               	.LFE4:
+  75               		.size	i2c_idle, .-i2c_idle
+  76               	.global	i2c_message_ready
+  77               		.type	i2c_message_ready, @function
+  78               	i2c_message_ready:
+  79               	.LFB5:
+  80               	.LM16:
+  81               	/* prologue: function */
+  82               	/* frame size = 0 */
+  83               	.LM17:
+  84 0032 9091 0000 		lds r25,i2c_wrlen
+  85               	.LVL2:
+  86               	.LM18:
+  87               	/* #APP */
+  88               	 ;  128 "i2c-slave.c" 1
+  89 0036 F894      		cli
+  90               	 ;  0 "" 2
+  91               	.LM19:
+  92               	/* #NOAPP */
+  93 0038 8091 0000 		lds r24,usi_state
+  94 003c 8823      		tst r24
+  95 003e 01F0      		breq .L7
+  96               	.LM20:
+  97 0040 759B      		sbis 46-32,5
+  98 0042 00C0      		rjmp .L8
+  99               	.LBB13:
+ 100               	.LBB14:
+ 101               	.LM21:
+ 102 0044 1092 0000 		sts usi_state,__zero_reg__
+ 103               	.LM22:
+ 104 0048 B898      		cbi 55-32,0
+ 105               	.LM23:
+ 106 004a 88EA      		ldi r24,lo8(-88)
+ 107 004c 8DB9      		out 45-32,r24
+ 108               	.LM24:
+ 109 004e 8EEE      		ldi r24,lo8(-18)
+ 110 0050 8EB9      		out 46-32,r24
+ 111 0052 00C0      		rjmp .L7
+ 112               	.L8:
+ 113               	.LBE14:
+ 114               	.LBE13:
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 3
+
+
+ 115               	.LM25:
+ 116 0054 8091 0000 		lds r24,usi_state
+ 117 0058 8073      		andi r24,lo8(48)
+ 118 005a 01F0      		breq .L7
+ 119 005c 90E0      		ldi r25,lo8(0)
+ 120               	.L7:
+ 121               	.LM26:
+ 122               	/* #APP */
+ 123               	 ;  136 "i2c-slave.c" 1
+ 124 005e 7894      		sei
+ 125               	 ;  0 "" 2
+ 126               	.LM27:
+ 127               	/* #NOAPP */
+ 128 0060 892F      		mov r24,r25
+ 129               	/* epilogue start */
+ 130 0062 0895      		ret
+ 131               	.LFE5:
+ 132               		.size	i2c_message_ready, .-i2c_message_ready
+ 133               	.global	i2c_message_done
+ 134               		.type	i2c_message_done, @function
+ 135               	i2c_message_done:
+ 136               	.LFB6:
+ 137               	.LM28:
+ 138               	/* prologue: function */
+ 139               	/* frame size = 0 */
+ 140               	.LM29:
+ 141 0064 1092 0000 		sts i2c_wrlen,__zero_reg__
+ 142               	/* epilogue start */
+ 143               	.LM30:
+ 144 0068 0895      		ret
+ 145               	.LFE6:
+ 146               		.size	i2c_message_done, .-i2c_message_done
+ 147               	.global	i2c_reply_ready
+ 148               		.type	i2c_reply_ready, @function
+ 149               	i2c_reply_ready:
+ 150               	.LFB7:
+ 151               	.LM31:
+ 152               	/* prologue: function */
+ 153               	/* frame size = 0 */
+ 154               	.LM32:
+ 155               	/* #APP */
+ 156               	 ;  156 "i2c-slave.c" 1
+ 157 006a F894      		cli
+ 158               	 ;  0 "" 2
+ 159               	.LM33:
+ 160               	/* #NOAPP */
+ 161 006c 8091 0000 		lds r24,usi_state
+ 162 0070 8E70      		andi r24,lo8(14)
+ 163 0072 01F4      		brne .L13
+ 164 0074 81E0      		ldi r24,lo8(1)
+ 165 0076 0895      		ret
+ 166               	.L13:
+ 167               	.LM34:
+ 168               	/* #APP */
+ 169               	 ;  158 "i2c-slave.c" 1
+ 170 0078 7894      		sei
+ 171               	 ;  0 "" 2
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 4
+
+
+ 172               	/* #NOAPP */
+ 173 007a 80E0      		ldi r24,lo8(0)
+ 174               	.LM35:
+ 175 007c 0895      		ret
+ 176               	.LFE7:
+ 177               		.size	i2c_reply_ready, .-i2c_reply_ready
+ 178               	.global	i2c_reply_done
+ 179               		.type	i2c_reply_done, @function
+ 180               	i2c_reply_done:
+ 181               	.LFB8:
+ 182               	.LM36:
+ 183               	.LVL3:
+ 184               	/* prologue: function */
+ 185               	/* frame size = 0 */
+ 186               	.LM37:
+ 187 007e 8093 0000 		sts i2c_rdlen,r24
+ 188               	.LM38:
+ 189               	/* #APP */
+ 190               	 ;  171 "i2c-slave.c" 1
+ 191 0082 7894      		sei
+ 192               	 ;  0 "" 2
+ 193               	/* epilogue start */
+ 194               	.LM39:
+ 195               	/* #NOAPP */
+ 196 0084 0895      		ret
+ 197               	.LFE8:
+ 198               		.size	i2c_reply_done, .-i2c_reply_done
+ 199               	.global	__vector_13
+ 200               		.type	__vector_13, @function
+ 201               	__vector_13:
+ 202               	.LFB9:
+ 203               	.LM40:
+ 204 0086 1F92      		push __zero_reg__
+ 205 0088 0F92      		push r0
+ 206 008a 0FB6      		in r0,__SREG__
+ 207 008c 0F92      		push r0
+ 208 008e 1124      		clr __zero_reg__
+ 209 0090 8F93      		push r24
+ 210               	/* prologue: Signal */
+ 211               	/* frame size = 0 */
+ 212               	.LM41:
+ 213 0092 B898      		cbi 55-32,0
+ 214 0094 00C0      		rjmp .L19
+ 215               	.L21:
+ 216               	.LM42:
+ 217 0096 B09B      		sbis 54-32,0
+ 218 0098 00C0      		rjmp .L19
+ 219               	.LBB15:
+ 220               	.LBB16:
+ 221               	.LM43:
+ 222 009a 1092 0000 		sts usi_state,__zero_reg__
+ 223               	.LM44:
+ 224 009e B898      		cbi 55-32,0
+ 225               	.LM45:
+ 226 00a0 88EA      		ldi r24,lo8(-88)
+ 227 00a2 8DB9      		out 45-32,r24
+ 228               	.LM46:
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 5
+
+
+ 229 00a4 8EEE      		ldi r24,lo8(-18)
+ 230 00a6 8EB9      		out 46-32,r24
+ 231 00a8 00C0      		rjmp .L22
+ 232               	.L19:
+ 233               	.LBE16:
+ 234               	.LBE15:
+ 235               	.LM47:
+ 236 00aa B299      		sbic 54-32,2
+ 237 00ac 00C0      		rjmp .L21
+ 238               	.LM48:
+ 239 00ae 80EE      		ldi r24,lo8(-32)
+ 240 00b0 8EB9      		out 46-32,r24
+ 241               	.LM49:
+ 242 00b2 88EF      		ldi r24,lo8(-8)
+ 243 00b4 8DB9      		out 45-32,r24
+ 244               	.LM50:
+ 245 00b6 81E0      		ldi r24,lo8(1)
+ 246 00b8 8093 0000 		sts usi_state,r24
+ 247               	.L22:
+ 248               	/* epilogue start */
+ 249               	.LM51:
+ 250 00bc 8F91      		pop r24
+ 251 00be 0F90      		pop r0
+ 252 00c0 0FBE      		out __SREG__,r0
+ 253 00c2 0F90      		pop r0
+ 254 00c4 1F90      		pop __zero_reg__
+ 255 00c6 1895      		reti
+ 256               	.LFE9:
+ 257               		.size	__vector_13, .-__vector_13
+ 258               	.global	__vector_14
+ 259               		.type	__vector_14, @function
+ 260               	__vector_14:
+ 261               	.LFB10:
+ 262               	.LM52:
+ 263 00c8 1F92      		push __zero_reg__
+ 264 00ca 0F92      		push r0
+ 265 00cc 0FB6      		in r0,__SREG__
+ 266 00ce 0F92      		push r0
+ 267 00d0 1124      		clr __zero_reg__
+ 268 00d2 2F93      		push r18
+ 269 00d4 3F93      		push r19
+ 270 00d6 4F93      		push r20
+ 271 00d8 8F93      		push r24
+ 272 00da 9F93      		push r25
+ 273 00dc EF93      		push r30
+ 274 00de FF93      		push r31
+ 275               	/* prologue: Signal */
+ 276               	/* frame size = 0 */
+ 277               	.LM53:
+ 278 00e0 8091 0000 		lds r24,usi_state
+ 279 00e4 8130      		cpi r24,lo8(1)
+ 280 00e6 01F4      		brne .L25
+ 281               	.LBB17:
+ 282               	.LM54:
+ 283 00e8 4FB1      		in r20,47-32
+ 284               	.LVL4:
+ 285               	.LM55:
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 6
+
+
+ 286 00ea 4423      		tst r20
+ 287 00ec 01F0      		breq .L26
+ 288 00ee 242F      		mov r18,r20
+ 289 00f0 30E0      		ldi r19,lo8(0)
+ 290               	.LVL5:
+ 291 00f2 2E7F      		andi r18,lo8(-2)
+ 292               	.LVL6:
+ 293 00f4 8091 0000 		lds r24,i2c_address
+ 294 00f8 90E0      		ldi r25,lo8(0)
+ 295 00fa 2817      		cp r18,r24
+ 296 00fc 3907      		cpc r19,r25
+ 297 00fe 01F0      		breq .+2
+ 298 0100 00C0      		rjmp .L27
+ 299               	.LVL7:
+ 300               	.L26:
+ 301               	.LM56:
+ 302 0102 40FF      		sbrs r20,0
+ 303 0104 00C0      		rjmp .L28
+ 304               	.LM57:
+ 305 0106 8091 0000 		lds r24,i2c_rdlen
+ 306 010a 8823      		tst r24
+ 307 010c 01F4      		brne .+2
+ 308 010e 00C0      		rjmp .L27
+ 309               	.LM58:
+ 310 0110 1092 0000 		sts i2c_rdptr,__zero_reg__
+ 311               	.LM59:
+ 312 0114 82E0      		ldi r24,lo8(2)
+ 313 0116 00C0      		rjmp .L38
+ 314               	.L28:
+ 315               	.LM60:
+ 316 0118 8091 0000 		lds r24,i2c_wrlen
+ 317 011c 8823      		tst r24
+ 318 011e 01F0      		breq .+2
+ 319 0120 00C0      		rjmp .L27
+ 320               	.LM61:
+ 321 0122 1092 0000 		sts i2c_rdlen,__zero_reg__
+ 322               	.LM62:
+ 323 0126 80E1      		ldi r24,lo8(16)
+ 324               	.L38:
+ 325 0128 8093 0000 		sts usi_state,r24
+ 326               	.LM63:
+ 327 012c 1FB8      		out 47-32,__zero_reg__
+ 328               	.LM64:
+ 329 012e B89A      		sbi 55-32,0
+ 330 0130 8EE4      		ldi r24,lo8(78)
+ 331 0132 00C0      		rjmp .L40
+ 332               	.LVL8:
+ 333               	.L25:
+ 334               	.LBE17:
+ 335               	.LM65:
+ 336 0134 8091 0000 		lds r24,usi_state
+ 337 0138 8230      		cpi r24,lo8(2)
+ 338 013a 01F4      		brne .L31
+ 339               	.L32:
+ 340               	.LM66:
+ 341 013c E091 0000 		lds r30,i2c_rdptr
+ 342 0140 F0E0      		ldi r31,lo8(0)
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 7
+
+
+ 343 0142 E050      		subi r30,lo8(-(i2c_rdbuf))
+ 344 0144 F040      		sbci r31,hi8(-(i2c_rdbuf))
+ 345 0146 8081      		ld r24,Z
+ 346 0148 8FB9      		out 47-32,r24
+ 347               	.LM67:
+ 348 014a 8091 0000 		lds r24,i2c_rdptr
+ 349 014e 8F5F      		subi r24,lo8(-(1))
+ 350 0150 8093 0000 		sts i2c_rdptr,r24
+ 351 0154 9091 0000 		lds r25,i2c_rdptr
+ 352 0158 8091 0000 		lds r24,i2c_rdlen
+ 353 015c 9817      		cp r25,r24
+ 354 015e 00F0      		brlo .L33
+ 355               	.LM68:
+ 356 0160 1092 0000 		sts i2c_rdptr,__zero_reg__
+ 357               	.L33:
+ 358               	.LM69:
+ 359 0164 B89A      		sbi 55-32,0
+ 360 0166 80E4      		ldi r24,lo8(64)
+ 361 0168 8EB9      		out 46-32,r24
+ 362               	.LM70:
+ 363 016a 84E0      		ldi r24,lo8(4)
+ 364 016c 00C0      		rjmp .L39
+ 365               	.L31:
+ 366               	.LM71:
+ 367 016e 8091 0000 		lds r24,usi_state
+ 368 0172 8430      		cpi r24,lo8(4)
+ 369 0174 01F4      		brne .L34
+ 370               	.LM72:
+ 371 0176 1FB8      		out 47-32,__zero_reg__
+ 372               	.LM73:
+ 373 0178 B898      		cbi 55-32,0
+ 374 017a 8EE4      		ldi r24,lo8(78)
+ 375 017c 8EB9      		out 46-32,r24
+ 376               	.LM74:
+ 377 017e 88E0      		ldi r24,lo8(8)
+ 378 0180 00C0      		rjmp .L39
+ 379               	.L34:
+ 380               	.LM75:
+ 381 0182 8091 0000 		lds r24,usi_state
+ 382 0186 8830      		cpi r24,lo8(8)
+ 383 0188 01F4      		brne .L35
+ 384               	.LM76:
+ 385 018a 8FB1      		in r24,47-32
+ 386 018c 8823      		tst r24
+ 387 018e 01F4      		brne .L27
+ 388 0190 00C0      		rjmp .L32
+ 389               	.L35:
+ 390               	.LM77:
+ 391 0192 8091 0000 		lds r24,usi_state
+ 392 0196 8031      		cpi r24,lo8(16)
+ 393 0198 01F4      		brne .L36
+ 394               	.LM78:
+ 395 019a B898      		cbi 55-32,0
+ 396 019c 80E4      		ldi r24,lo8(64)
+ 397 019e 8EB9      		out 46-32,r24
+ 398               	.LM79:
+ 399 01a0 80E2      		ldi r24,lo8(32)
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 8
+
+
+ 400 01a2 00C0      		rjmp .L39
+ 401               	.L36:
+ 402               	.LM80:
+ 403 01a4 8091 0000 		lds r24,usi_state
+ 404 01a8 8032      		cpi r24,lo8(32)
+ 405 01aa 01F4      		brne .L37
+ 406               	.LM81:
+ 407 01ac 8091 0000 		lds r24,i2c_wrlen
+ 408               	.LM82:
+ 409 01b0 8091 0000 		lds r24,i2c_wrlen
+ 410 01b4 E82F      		mov r30,r24
+ 411 01b6 F0E0      		ldi r31,lo8(0)
+ 412 01b8 9FB1      		in r25,47-32
+ 413 01ba E050      		subi r30,lo8(-(i2c_wrbuf))
+ 414 01bc F040      		sbci r31,hi8(-(i2c_wrbuf))
+ 415 01be 9083      		st Z,r25
+ 416 01c0 8F5F      		subi r24,lo8(-(1))
+ 417 01c2 8093 0000 		sts i2c_wrlen,r24
+ 418               	.LM83:
+ 419 01c6 1FB8      		out 47-32,__zero_reg__
+ 420               	.LM84:
+ 421 01c8 B89A      		sbi 55-32,0
+ 422 01ca 8EE4      		ldi r24,lo8(78)
+ 423 01cc 8EB9      		out 46-32,r24
+ 424               	.LM85:
+ 425 01ce 80E1      		ldi r24,lo8(16)
+ 426               	.L39:
+ 427 01d0 8093 0000 		sts usi_state,r24
+ 428 01d4 00C0      		rjmp .L37
+ 429               	.LVL9:
+ 430               	.L27:
+ 431               	.LBB18:
+ 432               	.LBB19:
+ 433               	.LM86:
+ 434 01d6 1092 0000 		sts usi_state,__zero_reg__
+ 435               	.LM87:
+ 436 01da B898      		cbi 55-32,0
+ 437               	.LM88:
+ 438 01dc 88EA      		ldi r24,lo8(-88)
+ 439 01de 8DB9      		out 45-32,r24
+ 440               	.LM89:
+ 441 01e0 8EEE      		ldi r24,lo8(-18)
+ 442               	.L40:
+ 443 01e2 8EB9      		out 46-32,r24
+ 444               	.L37:
+ 445               	/* epilogue start */
+ 446               	.LBE19:
+ 447               	.LBE18:
+ 448               	.LM90:
+ 449 01e4 FF91      		pop r31
+ 450 01e6 EF91      		pop r30
+ 451 01e8 9F91      		pop r25
+ 452 01ea 8F91      		pop r24
+ 453 01ec 4F91      		pop r20
+ 454 01ee 3F91      		pop r19
+ 455               	.LVL10:
+ 456 01f0 2F91      		pop r18
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 9
+
+
+ 457               	.LVL11:
+ 458 01f2 0F90      		pop r0
+ 459 01f4 0FBE      		out __SREG__,r0
+ 460 01f6 0F90      		pop r0
+ 461 01f8 1F90      		pop __zero_reg__
+ 462 01fa 1895      		reti
+ 463               	.LFE10:
+ 464               		.size	__vector_14, .-__vector_14
+ 465               		.comm i2c_rdbuf,300,1
+ 466               		.comm i2c_rdlen,1,1
+ 467               		.comm i2c_wrbuf,300,1
+ 468               		.comm i2c_wrlen,1,1
+ 469               		.comm i2c_address,1,1
+ 470               		.comm i2c_rdptr,1,1
+ 471               		.comm usi_state,1,1
+ 472               		.section	.debug_frame,"",@progbits
+ 473               	.Lframe0:
+ 474 0000 0C00 0000 		.long	.LECIE0-.LSCIE0
+ 475               	.LSCIE0:
+ 476 0004 FFFF FFFF 		.long	0xffffffff
+ 477 0008 01        		.byte	0x1
+ 478 0009 00        		.string	""
+ 479 000a 01        		.uleb128 0x1
+ 480 000b 7F        		.sleb128 -1
+ 481 000c 24        		.byte	0x24
+ 482 000d 0C        		.byte	0xc
+ 483 000e 20        		.uleb128 0x20
+ 484 000f 00        		.uleb128 0x0
+ 485               		.p2align	2
+ 486               	.LECIE0:
+ 487               	.LSFDE0:
+ 488 0010 0C00 0000 		.long	.LEFDE0-.LASFDE0
+ 489               	.LASFDE0:
+ 490 0014 0000 0000 		.long	.Lframe0
+ 491 0018 0000 0000 		.long	.LFB3
+ 492 001c 2200 0000 		.long	.LFE3-.LFB3
+ 493               		.p2align	2
+ 494               	.LEFDE0:
+ 495               	.LSFDE2:
+ 496 0020 0C00 0000 		.long	.LEFDE2-.LASFDE2
+ 497               	.LASFDE2:
+ 498 0024 0000 0000 		.long	.Lframe0
+ 499 0028 0000 0000 		.long	.LFB4
+ 500 002c 1000 0000 		.long	.LFE4-.LFB4
+ 501               		.p2align	2
+ 502               	.LEFDE2:
+ 503               	.LSFDE4:
+ 504 0030 0C00 0000 		.long	.LEFDE4-.LASFDE4
+ 505               	.LASFDE4:
+ 506 0034 0000 0000 		.long	.Lframe0
+ 507 0038 0000 0000 		.long	.LFB5
+ 508 003c 3200 0000 		.long	.LFE5-.LFB5
+ 509               		.p2align	2
+ 510               	.LEFDE4:
+ 511               	.LSFDE6:
+ 512 0040 0C00 0000 		.long	.LEFDE6-.LASFDE6
+ 513               	.LASFDE6:
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 10
+
+
+ 514 0044 0000 0000 		.long	.Lframe0
+ 515 0048 0000 0000 		.long	.LFB6
+ 516 004c 0600 0000 		.long	.LFE6-.LFB6
+ 517               		.p2align	2
+ 518               	.LEFDE6:
+ 519               	.LSFDE8:
+ 520 0050 0C00 0000 		.long	.LEFDE8-.LASFDE8
+ 521               	.LASFDE8:
+ 522 0054 0000 0000 		.long	.Lframe0
+ 523 0058 0000 0000 		.long	.LFB7
+ 524 005c 1400 0000 		.long	.LFE7-.LFB7
+ 525               		.p2align	2
+ 526               	.LEFDE8:
+ 527               	.LSFDE10:
+ 528 0060 0C00 0000 		.long	.LEFDE10-.LASFDE10
+ 529               	.LASFDE10:
+ 530 0064 0000 0000 		.long	.Lframe0
+ 531 0068 0000 0000 		.long	.LFB8
+ 532 006c 0800 0000 		.long	.LFE8-.LFB8
+ 533               		.p2align	2
+ 534               	.LEFDE10:
+ 535               	.LSFDE12:
+ 536 0070 0C00 0000 		.long	.LEFDE12-.LASFDE12
+ 537               	.LASFDE12:
+ 538 0074 0000 0000 		.long	.Lframe0
+ 539 0078 0000 0000 		.long	.LFB9
+ 540 007c 4200 0000 		.long	.LFE9-.LFB9
+ 541               		.p2align	2
+ 542               	.LEFDE12:
+ 543               	.LSFDE14:
+ 544 0080 0C00 0000 		.long	.LEFDE14-.LASFDE14
+ 545               	.LASFDE14:
+ 546 0084 0000 0000 		.long	.Lframe0
+ 547 0088 0000 0000 		.long	.LFB10
+ 548 008c 3401 0000 		.long	.LFE10-.LFB10
+ 549               		.p2align	2
+ 550               	.LEFDE14:
+ 551               		.text
+ 552               	.Letext0:
+ 553               		.section	.debug_loc,"",@progbits
+ 554               	.Ldebug_loc0:
+ 555               	.LLST1:
+ 556 0000 0000 0000 		.long	.LVL0-.Ltext0
+ 557 0004 1A00 0000 		.long	.LVL1-.Ltext0
+ 558 0008 0100      		.word	0x1
+ 559 000a 68        		.byte	0x68
+ 560 000b 0000 0000 		.long	0x0
+ 561 000f 0000 0000 		.long	0x0
+ 562               	.LLST9:
+ 563 0013 EA00 0000 		.long	.LVL4-.Ltext0
+ 564 0017 F200 0000 		.long	.LVL5-.Ltext0
+ 565 001b 0100      		.word	0x1
+ 566 001d 64        		.byte	0x64
+ 567 001e F200 0000 		.long	.LVL5-.Ltext0
+ 568 0022 0201 0000 		.long	.LVL7-.Ltext0
+ 569 0026 0600      		.word	0x6
+ 570 0028 62        		.byte	0x62
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 11
+
+
+ 571 0029 93        		.byte	0x93
+ 572 002a 01        		.uleb128 0x1
+ 573 002b 63        		.byte	0x63
+ 574 002c 93        		.byte	0x93
+ 575 002d 01        		.uleb128 0x1
+ 576 002e 0201 0000 		.long	.LVL7-.Ltext0
+ 577 0032 3401 0000 		.long	.LVL8-.Ltext0
+ 578 0036 0600      		.word	0x6
+ 579 0038 64        		.byte	0x64
+ 580 0039 93        		.byte	0x93
+ 581 003a 01        		.uleb128 0x1
+ 582 003b 63        		.byte	0x63
+ 583 003c 93        		.byte	0x93
+ 584 003d 01        		.uleb128 0x1
+ 585 003e D601 0000 		.long	.LVL9-.Ltext0
+ 586 0042 F001 0000 		.long	.LVL10-.Ltext0
+ 587 0046 0600      		.word	0x6
+ 588 0048 62        		.byte	0x62
+ 589 0049 93        		.byte	0x93
+ 590 004a 01        		.uleb128 0x1
+ 591 004b 63        		.byte	0x63
+ 592 004c 93        		.byte	0x93
+ 593 004d 01        		.uleb128 0x1
+ 594 004e F001 0000 		.long	.LVL10-.Ltext0
+ 595 0052 F201 0000 		.long	.LVL11-.Ltext0
+ 596 0056 0100      		.word	0x1
+ 597 0058 62        		.byte	0x62
+ 598 0059 0000 0000 		.long	0x0
+ 599 005d 0000 0000 		.long	0x0
+ 600               		.section	.debug_info
+ 601 0000 6702 0000 		.long	0x267
+ 602 0004 0200      		.word	0x2
+ 603 0006 0000 0000 		.long	.Ldebug_abbrev0
+ 604 000a 04        		.byte	0x4
+ 605 000b 01        		.uleb128 0x1
+ 606 000c 0000 0000 		.long	.LASF21
+ 607 0010 01        		.byte	0x1
+ 608 0011 0000 0000 		.long	.LASF22
+ 609 0015 0000 0000 		.long	.LASF23
+ 610 0019 0000 0000 		.long	.Ltext0
+ 611 001d 0000 0000 		.long	.Letext0
+ 612 0021 0000 0000 		.long	.Ldebug_line0
+ 613 0025 02        		.uleb128 0x2
+ 614 0026 01        		.byte	0x1
+ 615 0027 06        		.byte	0x6
+ 616 0028 0000 0000 		.long	.LASF0
+ 617 002c 03        		.uleb128 0x3
+ 618 002d 0000 0000 		.long	.LASF24
+ 619 0031 02        		.byte	0x2
+ 620 0032 7A        		.byte	0x7a
+ 621 0033 3700 0000 		.long	0x37
+ 622 0037 02        		.uleb128 0x2
+ 623 0038 01        		.byte	0x1
+ 624 0039 08        		.byte	0x8
+ 625 003a 0000 0000 		.long	.LASF1
+ 626 003e 04        		.uleb128 0x4
+ 627 003f 02        		.byte	0x2
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 12
+
+
+ 628 0040 05        		.byte	0x5
+ 629 0041 696E 7400 		.string	"int"
+ 630 0045 02        		.uleb128 0x2
+ 631 0046 02        		.byte	0x2
+ 632 0047 07        		.byte	0x7
+ 633 0048 0000 0000 		.long	.LASF2
+ 634 004c 02        		.uleb128 0x2
+ 635 004d 04        		.byte	0x4
+ 636 004e 05        		.byte	0x5
+ 637 004f 0000 0000 		.long	.LASF3
+ 638 0053 02        		.uleb128 0x2
+ 639 0054 04        		.byte	0x4
+ 640 0055 07        		.byte	0x7
+ 641 0056 0000 0000 		.long	.LASF4
+ 642 005a 02        		.uleb128 0x2
+ 643 005b 08        		.byte	0x8
+ 644 005c 05        		.byte	0x5
+ 645 005d 0000 0000 		.long	.LASF5
+ 646 0061 02        		.uleb128 0x2
+ 647 0062 08        		.byte	0x8
+ 648 0063 07        		.byte	0x7
+ 649 0064 0000 0000 		.long	.LASF6
+ 650 0068 05        		.uleb128 0x5
+ 651 0069 0000 0000 		.long	.LASF25
+ 652 006d 01        		.byte	0x1
+ 653 006e 56        		.byte	0x56
+ 654 006f 01        		.byte	0x1
+ 655 0070 01        		.byte	0x1
+ 656 0071 06        		.uleb128 0x6
+ 657 0072 01        		.byte	0x1
+ 658 0073 0000 0000 		.long	.LASF9
+ 659 0077 01        		.byte	0x1
+ 660 0078 62        		.byte	0x62
+ 661 0079 01        		.byte	0x1
+ 662 007a 0000 0000 		.long	.LFB3
+ 663 007e 0000 0000 		.long	.LFE3
+ 664 0082 02        		.byte	0x2
+ 665 0083 90        		.byte	0x90
+ 666 0084 20        		.uleb128 0x20
+ 667 0085 A800 0000 		.long	0xa8
+ 668 0089 07        		.uleb128 0x7
+ 669 008a 0000 0000 		.long	.LASF11
+ 670 008e 01        		.byte	0x1
+ 671 008f 61        		.byte	0x61
+ 672 0090 2C00 0000 		.long	0x2c
+ 673 0094 0000 0000 		.long	.LLST1
+ 674 0098 08        		.uleb128 0x8
+ 675 0099 6800 0000 		.long	0x68
+ 676 009d 0000 0000 		.long	.LBB11
+ 677 00a1 0000 0000 		.long	.LBE11
+ 678 00a5 01        		.byte	0x1
+ 679 00a6 6C        		.byte	0x6c
+ 680 00a7 00        		.byte	0x0
+ 681 00a8 09        		.uleb128 0x9
+ 682 00a9 01        		.byte	0x1
+ 683 00aa 0000 0000 		.long	.LASF7
+ 684 00ae 01        		.byte	0x1
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 13
+
+
+ 685 00af 74        		.byte	0x74
+ 686 00b0 01        		.byte	0x1
+ 687 00b1 2C00 0000 		.long	0x2c
+ 688 00b5 0000 0000 		.long	.LFB4
+ 689 00b9 0000 0000 		.long	.LFE4
+ 690 00bd 02        		.byte	0x2
+ 691 00be 90        		.byte	0x90
+ 692 00bf 20        		.uleb128 0x20
+ 693 00c0 0A        		.uleb128 0xa
+ 694 00c1 01        		.byte	0x1
+ 695 00c2 0000 0000 		.long	.LASF26
+ 696 00c6 01        		.byte	0x1
+ 697 00c7 7E        		.byte	0x7e
+ 698 00c8 01        		.byte	0x1
+ 699 00c9 2C00 0000 		.long	0x2c
+ 700 00cd 0000 0000 		.long	.LFB5
+ 701 00d1 0000 0000 		.long	.LFE5
+ 702 00d5 02        		.byte	0x2
+ 703 00d6 90        		.byte	0x90
+ 704 00d7 20        		.uleb128 0x20
+ 705 00d8 F700 0000 		.long	0xf7
+ 706 00dc 0B        		.uleb128 0xb
+ 707 00dd 7200      		.string	"r"
+ 708 00df 01        		.byte	0x1
+ 709 00e0 7F        		.byte	0x7f
+ 710 00e1 2C00 0000 		.long	0x2c
+ 711 00e5 01        		.byte	0x1
+ 712 00e6 69        		.byte	0x69
+ 713 00e7 08        		.uleb128 0x8
+ 714 00e8 6800 0000 		.long	0x68
+ 715 00ec 0000 0000 		.long	.LBB13
+ 716 00f0 0000 0000 		.long	.LBE13
+ 717 00f4 01        		.byte	0x1
+ 718 00f5 83        		.byte	0x83
+ 719 00f6 00        		.byte	0x0
+ 720 00f7 0C        		.uleb128 0xc
+ 721 00f8 01        		.byte	0x1
+ 722 00f9 0000 0000 		.long	.LASF27
+ 723 00fd 01        		.byte	0x1
+ 724 00fe 91        		.byte	0x91
+ 725 00ff 01        		.byte	0x1
+ 726 0100 0000 0000 		.long	.LFB6
+ 727 0104 0000 0000 		.long	.LFE6
+ 728 0108 02        		.byte	0x2
+ 729 0109 90        		.byte	0x90
+ 730 010a 20        		.uleb128 0x20
+ 731 010b 09        		.uleb128 0x9
+ 732 010c 01        		.byte	0x1
+ 733 010d 0000 0000 		.long	.LASF8
+ 734 0111 01        		.byte	0x1
+ 735 0112 9B        		.byte	0x9b
+ 736 0113 01        		.byte	0x1
+ 737 0114 2C00 0000 		.long	0x2c
+ 738 0118 0000 0000 		.long	.LFB7
+ 739 011c 0000 0000 		.long	.LFE7
+ 740 0120 02        		.byte	0x2
+ 741 0121 90        		.byte	0x90
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 14
+
+
+ 742 0122 20        		.uleb128 0x20
+ 743 0123 06        		.uleb128 0x6
+ 744 0124 01        		.byte	0x1
+ 745 0125 0000 0000 		.long	.LASF10
+ 746 0129 01        		.byte	0x1
+ 747 012a A9        		.byte	0xa9
+ 748 012b 01        		.byte	0x1
+ 749 012c 0000 0000 		.long	.LFB8
+ 750 0130 0000 0000 		.long	.LFE8
+ 751 0134 02        		.byte	0x2
+ 752 0135 90        		.byte	0x90
+ 753 0136 20        		.uleb128 0x20
+ 754 0137 4701 0000 		.long	0x147
+ 755 013b 0D        		.uleb128 0xd
+ 756 013c 6E00      		.string	"n"
+ 757 013e 01        		.byte	0x1
+ 758 013f A8        		.byte	0xa8
+ 759 0140 2C00 0000 		.long	0x2c
+ 760 0144 01        		.byte	0x1
+ 761 0145 68        		.byte	0x68
+ 762 0146 00        		.byte	0x0
+ 763 0147 06        		.uleb128 0x6
+ 764 0148 01        		.byte	0x1
+ 765 0149 0000 0000 		.long	.LASF12
+ 766 014d 01        		.byte	0x1
+ 767 014e B4        		.byte	0xb4
+ 768 014f 01        		.byte	0x1
+ 769 0150 0000 0000 		.long	.LFB9
+ 770 0154 0000 0000 		.long	.LFE9
+ 771 0158 02        		.byte	0x2
+ 772 0159 90        		.byte	0x90
+ 773 015a 20        		.uleb128 0x20
+ 774 015b 6F01 0000 		.long	0x16f
+ 775 015f 08        		.uleb128 0x8
+ 776 0160 6800 0000 		.long	0x68
+ 777 0164 0000 0000 		.long	.LBB15
+ 778 0168 0000 0000 		.long	.LBE15
+ 779 016c 01        		.byte	0x1
+ 780 016d C3        		.byte	0xc3
+ 781 016e 00        		.byte	0x0
+ 782 016f 06        		.uleb128 0x6
+ 783 0170 01        		.byte	0x1
+ 784 0171 0000 0000 		.long	.LASF13
+ 785 0175 01        		.byte	0x1
+ 786 0176 DD        		.byte	0xdd
+ 787 0177 01        		.byte	0x1
+ 788 0178 0000 0000 		.long	.LFB10
+ 789 017c 0000 0000 		.long	.LFE10
+ 790 0180 02        		.byte	0x2
+ 791 0181 90        		.byte	0x90
+ 792 0182 20        		.uleb128 0x20
+ 793 0183 C901 0000 		.long	0x1c9
+ 794 0187 0E        		.uleb128 0xe
+ 795 0188 0000 0000 		.long	.LASF28
+ 796 018c 01        		.byte	0x1
+ 797 018d 2901      		.word	0x129
+ 798 018f 0F        		.uleb128 0xf
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 15
+
+
+ 799 0190 0000 0000 		.long	.LASF29
+ 800 0194 01        		.byte	0x1
+ 801 0195 1001      		.word	0x110
+ 802 0197 0000 0000 		.long	.L32
+ 803 019b 10        		.uleb128 0x10
+ 804 019c 0000 0000 		.long	.LBB17
+ 805 01a0 0000 0000 		.long	.LBE17
+ 806 01a4 B801 0000 		.long	0x1b8
+ 807 01a8 11        		.uleb128 0x11
+ 808 01a9 0000 0000 		.long	.LASF11
+ 809 01ad 01        		.byte	0x1
+ 810 01ae E2        		.byte	0xe2
+ 811 01af 2C00 0000 		.long	0x2c
+ 812 01b3 0000 0000 		.long	.LLST9
+ 813 01b7 00        		.byte	0x0
+ 814 01b8 12        		.uleb128 0x12
+ 815 01b9 6800 0000 		.long	0x68
+ 816 01bd 0000 0000 		.long	.LBB18
+ 817 01c1 0000 0000 		.long	.LBE18
+ 818 01c5 01        		.byte	0x1
+ 819 01c6 2A01      		.word	0x12a
+ 820 01c8 00        		.byte	0x0
+ 821 01c9 13        		.uleb128 0x13
+ 822 01ca 2C00 0000 		.long	0x2c
+ 823 01ce DA01 0000 		.long	0x1da
+ 824 01d2 14        		.uleb128 0x14
+ 825 01d3 DA01 0000 		.long	0x1da
+ 826 01d7 2B01      		.word	0x12b
+ 827 01d9 00        		.byte	0x0
+ 828 01da 15        		.uleb128 0x15
+ 829 01db 02        		.byte	0x2
+ 830 01dc 07        		.byte	0x7
+ 831 01dd 16        		.uleb128 0x16
+ 832 01de 0000 0000 		.long	.LASF14
+ 833 01e2 01        		.byte	0x1
+ 834 01e3 21        		.byte	0x21
+ 835 01e4 EF01 0000 		.long	0x1ef
+ 836 01e8 01        		.byte	0x1
+ 837 01e9 05        		.byte	0x5
+ 838 01ea 03        		.byte	0x3
+ 839 01eb 0000 0000 		.long	i2c_rdbuf
+ 840 01ef 17        		.uleb128 0x17
+ 841 01f0 C901 0000 		.long	0x1c9
+ 842 01f4 16        		.uleb128 0x16
+ 843 01f5 0000 0000 		.long	.LASF15
+ 844 01f9 01        		.byte	0x1
+ 845 01fa 22        		.byte	0x22
+ 846 01fb 0602 0000 		.long	0x206
+ 847 01ff 01        		.byte	0x1
+ 848 0200 05        		.byte	0x5
+ 849 0201 03        		.byte	0x3
+ 850 0202 0000 0000 		.long	i2c_rdlen
+ 851 0206 17        		.uleb128 0x17
+ 852 0207 2C00 0000 		.long	0x2c
+ 853 020b 16        		.uleb128 0x16
+ 854 020c 0000 0000 		.long	.LASF16
+ 855 0210 01        		.byte	0x1
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 16
+
+
+ 856 0211 23        		.byte	0x23
+ 857 0212 1D02 0000 		.long	0x21d
+ 858 0216 01        		.byte	0x1
+ 859 0217 05        		.byte	0x5
+ 860 0218 03        		.byte	0x3
+ 861 0219 0000 0000 		.long	i2c_wrbuf
+ 862 021d 17        		.uleb128 0x17
+ 863 021e C901 0000 		.long	0x1c9
+ 864 0222 16        		.uleb128 0x16
+ 865 0223 0000 0000 		.long	.LASF17
+ 866 0227 01        		.byte	0x1
+ 867 0228 24        		.byte	0x24
+ 868 0229 0602 0000 		.long	0x206
+ 869 022d 01        		.byte	0x1
+ 870 022e 05        		.byte	0x5
+ 871 022f 03        		.byte	0x3
+ 872 0230 0000 0000 		.long	i2c_wrlen
+ 873 0234 16        		.uleb128 0x16
+ 874 0235 0000 0000 		.long	.LASF18
+ 875 0239 01        		.byte	0x1
+ 876 023a 1F        		.byte	0x1f
+ 877 023b 2C00 0000 		.long	0x2c
+ 878 023f 01        		.byte	0x1
+ 879 0240 05        		.byte	0x5
+ 880 0241 03        		.byte	0x3
+ 881 0242 0000 0000 		.long	i2c_address
+ 882 0246 16        		.uleb128 0x16
+ 883 0247 0000 0000 		.long	.LASF19
+ 884 024b 01        		.byte	0x1
+ 885 024c 22        		.byte	0x22
+ 886 024d 0602 0000 		.long	0x206
+ 887 0251 01        		.byte	0x1
+ 888 0252 05        		.byte	0x5
+ 889 0253 03        		.byte	0x3
+ 890 0254 0000 0000 		.long	i2c_rdptr
+ 891 0258 16        		.uleb128 0x16
+ 892 0259 0000 0000 		.long	.LASF20
+ 893 025d 01        		.byte	0x1
+ 894 025e 26        		.byte	0x26
+ 895 025f 0602 0000 		.long	0x206
+ 896 0263 01        		.byte	0x1
+ 897 0264 05        		.byte	0x5
+ 898 0265 03        		.byte	0x3
+ 899 0266 0000 0000 		.long	usi_state
+ 900 026a 00        		.byte	0x0
+ 901               		.section	.debug_abbrev
+ 902 0000 01        		.uleb128 0x1
+ 903 0001 11        		.uleb128 0x11
+ 904 0002 01        		.byte	0x1
+ 905 0003 25        		.uleb128 0x25
+ 906 0004 0E        		.uleb128 0xe
+ 907 0005 13        		.uleb128 0x13
+ 908 0006 0B        		.uleb128 0xb
+ 909 0007 03        		.uleb128 0x3
+ 910 0008 0E        		.uleb128 0xe
+ 911 0009 1B        		.uleb128 0x1b
+ 912 000a 0E        		.uleb128 0xe
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 17
+
+
+ 913 000b 11        		.uleb128 0x11
+ 914 000c 01        		.uleb128 0x1
+ 915 000d 12        		.uleb128 0x12
+ 916 000e 01        		.uleb128 0x1
+ 917 000f 10        		.uleb128 0x10
+ 918 0010 06        		.uleb128 0x6
+ 919 0011 00        		.byte	0x0
+ 920 0012 00        		.byte	0x0
+ 921 0013 02        		.uleb128 0x2
+ 922 0014 24        		.uleb128 0x24
+ 923 0015 00        		.byte	0x0
+ 924 0016 0B        		.uleb128 0xb
+ 925 0017 0B        		.uleb128 0xb
+ 926 0018 3E        		.uleb128 0x3e
+ 927 0019 0B        		.uleb128 0xb
+ 928 001a 03        		.uleb128 0x3
+ 929 001b 0E        		.uleb128 0xe
+ 930 001c 00        		.byte	0x0
+ 931 001d 00        		.byte	0x0
+ 932 001e 03        		.uleb128 0x3
+ 933 001f 16        		.uleb128 0x16
+ 934 0020 00        		.byte	0x0
+ 935 0021 03        		.uleb128 0x3
+ 936 0022 0E        		.uleb128 0xe
+ 937 0023 3A        		.uleb128 0x3a
+ 938 0024 0B        		.uleb128 0xb
+ 939 0025 3B        		.uleb128 0x3b
+ 940 0026 0B        		.uleb128 0xb
+ 941 0027 49        		.uleb128 0x49
+ 942 0028 13        		.uleb128 0x13
+ 943 0029 00        		.byte	0x0
+ 944 002a 00        		.byte	0x0
+ 945 002b 04        		.uleb128 0x4
+ 946 002c 24        		.uleb128 0x24
+ 947 002d 00        		.byte	0x0
+ 948 002e 0B        		.uleb128 0xb
+ 949 002f 0B        		.uleb128 0xb
+ 950 0030 3E        		.uleb128 0x3e
+ 951 0031 0B        		.uleb128 0xb
+ 952 0032 03        		.uleb128 0x3
+ 953 0033 08        		.uleb128 0x8
+ 954 0034 00        		.byte	0x0
+ 955 0035 00        		.byte	0x0
+ 956 0036 05        		.uleb128 0x5
+ 957 0037 2E        		.uleb128 0x2e
+ 958 0038 00        		.byte	0x0
+ 959 0039 03        		.uleb128 0x3
+ 960 003a 0E        		.uleb128 0xe
+ 961 003b 3A        		.uleb128 0x3a
+ 962 003c 0B        		.uleb128 0xb
+ 963 003d 3B        		.uleb128 0x3b
+ 964 003e 0B        		.uleb128 0xb
+ 965 003f 27        		.uleb128 0x27
+ 966 0040 0C        		.uleb128 0xc
+ 967 0041 20        		.uleb128 0x20
+ 968 0042 0B        		.uleb128 0xb
+ 969 0043 00        		.byte	0x0
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 18
+
+
+ 970 0044 00        		.byte	0x0
+ 971 0045 06        		.uleb128 0x6
+ 972 0046 2E        		.uleb128 0x2e
+ 973 0047 01        		.byte	0x1
+ 974 0048 3F        		.uleb128 0x3f
+ 975 0049 0C        		.uleb128 0xc
+ 976 004a 03        		.uleb128 0x3
+ 977 004b 0E        		.uleb128 0xe
+ 978 004c 3A        		.uleb128 0x3a
+ 979 004d 0B        		.uleb128 0xb
+ 980 004e 3B        		.uleb128 0x3b
+ 981 004f 0B        		.uleb128 0xb
+ 982 0050 27        		.uleb128 0x27
+ 983 0051 0C        		.uleb128 0xc
+ 984 0052 11        		.uleb128 0x11
+ 985 0053 01        		.uleb128 0x1
+ 986 0054 12        		.uleb128 0x12
+ 987 0055 01        		.uleb128 0x1
+ 988 0056 40        		.uleb128 0x40
+ 989 0057 0A        		.uleb128 0xa
+ 990 0058 01        		.uleb128 0x1
+ 991 0059 13        		.uleb128 0x13
+ 992 005a 00        		.byte	0x0
+ 993 005b 00        		.byte	0x0
+ 994 005c 07        		.uleb128 0x7
+ 995 005d 05        		.uleb128 0x5
+ 996 005e 00        		.byte	0x0
+ 997 005f 03        		.uleb128 0x3
+ 998 0060 0E        		.uleb128 0xe
+ 999 0061 3A        		.uleb128 0x3a
+ 1000 0062 0B        		.uleb128 0xb
+ 1001 0063 3B        		.uleb128 0x3b
+ 1002 0064 0B        		.uleb128 0xb
+ 1003 0065 49        		.uleb128 0x49
+ 1004 0066 13        		.uleb128 0x13
+ 1005 0067 02        		.uleb128 0x2
+ 1006 0068 06        		.uleb128 0x6
+ 1007 0069 00        		.byte	0x0
+ 1008 006a 00        		.byte	0x0
+ 1009 006b 08        		.uleb128 0x8
+ 1010 006c 1D        		.uleb128 0x1d
+ 1011 006d 00        		.byte	0x0
+ 1012 006e 31        		.uleb128 0x31
+ 1013 006f 13        		.uleb128 0x13
+ 1014 0070 11        		.uleb128 0x11
+ 1015 0071 01        		.uleb128 0x1
+ 1016 0072 12        		.uleb128 0x12
+ 1017 0073 01        		.uleb128 0x1
+ 1018 0074 58        		.uleb128 0x58
+ 1019 0075 0B        		.uleb128 0xb
+ 1020 0076 59        		.uleb128 0x59
+ 1021 0077 0B        		.uleb128 0xb
+ 1022 0078 00        		.byte	0x0
+ 1023 0079 00        		.byte	0x0
+ 1024 007a 09        		.uleb128 0x9
+ 1025 007b 2E        		.uleb128 0x2e
+ 1026 007c 00        		.byte	0x0
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 19
+
+
+ 1027 007d 3F        		.uleb128 0x3f
+ 1028 007e 0C        		.uleb128 0xc
+ 1029 007f 03        		.uleb128 0x3
+ 1030 0080 0E        		.uleb128 0xe
+ 1031 0081 3A        		.uleb128 0x3a
+ 1032 0082 0B        		.uleb128 0xb
+ 1033 0083 3B        		.uleb128 0x3b
+ 1034 0084 0B        		.uleb128 0xb
+ 1035 0085 27        		.uleb128 0x27
+ 1036 0086 0C        		.uleb128 0xc
+ 1037 0087 49        		.uleb128 0x49
+ 1038 0088 13        		.uleb128 0x13
+ 1039 0089 11        		.uleb128 0x11
+ 1040 008a 01        		.uleb128 0x1
+ 1041 008b 12        		.uleb128 0x12
+ 1042 008c 01        		.uleb128 0x1
+ 1043 008d 40        		.uleb128 0x40
+ 1044 008e 0A        		.uleb128 0xa
+ 1045 008f 00        		.byte	0x0
+ 1046 0090 00        		.byte	0x0
+ 1047 0091 0A        		.uleb128 0xa
+ 1048 0092 2E        		.uleb128 0x2e
+ 1049 0093 01        		.byte	0x1
+ 1050 0094 3F        		.uleb128 0x3f
+ 1051 0095 0C        		.uleb128 0xc
+ 1052 0096 03        		.uleb128 0x3
+ 1053 0097 0E        		.uleb128 0xe
+ 1054 0098 3A        		.uleb128 0x3a
+ 1055 0099 0B        		.uleb128 0xb
+ 1056 009a 3B        		.uleb128 0x3b
+ 1057 009b 0B        		.uleb128 0xb
+ 1058 009c 27        		.uleb128 0x27
+ 1059 009d 0C        		.uleb128 0xc
+ 1060 009e 49        		.uleb128 0x49
+ 1061 009f 13        		.uleb128 0x13
+ 1062 00a0 11        		.uleb128 0x11
+ 1063 00a1 01        		.uleb128 0x1
+ 1064 00a2 12        		.uleb128 0x12
+ 1065 00a3 01        		.uleb128 0x1
+ 1066 00a4 40        		.uleb128 0x40
+ 1067 00a5 0A        		.uleb128 0xa
+ 1068 00a6 01        		.uleb128 0x1
+ 1069 00a7 13        		.uleb128 0x13
+ 1070 00a8 00        		.byte	0x0
+ 1071 00a9 00        		.byte	0x0
+ 1072 00aa 0B        		.uleb128 0xb
+ 1073 00ab 34        		.uleb128 0x34
+ 1074 00ac 00        		.byte	0x0
+ 1075 00ad 03        		.uleb128 0x3
+ 1076 00ae 08        		.uleb128 0x8
+ 1077 00af 3A        		.uleb128 0x3a
+ 1078 00b0 0B        		.uleb128 0xb
+ 1079 00b1 3B        		.uleb128 0x3b
+ 1080 00b2 0B        		.uleb128 0xb
+ 1081 00b3 49        		.uleb128 0x49
+ 1082 00b4 13        		.uleb128 0x13
+ 1083 00b5 02        		.uleb128 0x2
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 20
+
+
+ 1084 00b6 0A        		.uleb128 0xa
+ 1085 00b7 00        		.byte	0x0
+ 1086 00b8 00        		.byte	0x0
+ 1087 00b9 0C        		.uleb128 0xc
+ 1088 00ba 2E        		.uleb128 0x2e
+ 1089 00bb 00        		.byte	0x0
+ 1090 00bc 3F        		.uleb128 0x3f
+ 1091 00bd 0C        		.uleb128 0xc
+ 1092 00be 03        		.uleb128 0x3
+ 1093 00bf 0E        		.uleb128 0xe
+ 1094 00c0 3A        		.uleb128 0x3a
+ 1095 00c1 0B        		.uleb128 0xb
+ 1096 00c2 3B        		.uleb128 0x3b
+ 1097 00c3 0B        		.uleb128 0xb
+ 1098 00c4 27        		.uleb128 0x27
+ 1099 00c5 0C        		.uleb128 0xc
+ 1100 00c6 11        		.uleb128 0x11
+ 1101 00c7 01        		.uleb128 0x1
+ 1102 00c8 12        		.uleb128 0x12
+ 1103 00c9 01        		.uleb128 0x1
+ 1104 00ca 40        		.uleb128 0x40
+ 1105 00cb 0A        		.uleb128 0xa
+ 1106 00cc 00        		.byte	0x0
+ 1107 00cd 00        		.byte	0x0
+ 1108 00ce 0D        		.uleb128 0xd
+ 1109 00cf 05        		.uleb128 0x5
+ 1110 00d0 00        		.byte	0x0
+ 1111 00d1 03        		.uleb128 0x3
+ 1112 00d2 08        		.uleb128 0x8
+ 1113 00d3 3A        		.uleb128 0x3a
+ 1114 00d4 0B        		.uleb128 0xb
+ 1115 00d5 3B        		.uleb128 0x3b
+ 1116 00d6 0B        		.uleb128 0xb
+ 1117 00d7 49        		.uleb128 0x49
+ 1118 00d8 13        		.uleb128 0x13
+ 1119 00d9 02        		.uleb128 0x2
+ 1120 00da 0A        		.uleb128 0xa
+ 1121 00db 00        		.byte	0x0
+ 1122 00dc 00        		.byte	0x0
+ 1123 00dd 0E        		.uleb128 0xe
+ 1124 00de 0A        		.uleb128 0xa
+ 1125 00df 00        		.byte	0x0
+ 1126 00e0 03        		.uleb128 0x3
+ 1127 00e1 0E        		.uleb128 0xe
+ 1128 00e2 3A        		.uleb128 0x3a
+ 1129 00e3 0B        		.uleb128 0xb
+ 1130 00e4 3B        		.uleb128 0x3b
+ 1131 00e5 05        		.uleb128 0x5
+ 1132 00e6 00        		.byte	0x0
+ 1133 00e7 00        		.byte	0x0
+ 1134 00e8 0F        		.uleb128 0xf
+ 1135 00e9 0A        		.uleb128 0xa
+ 1136 00ea 00        		.byte	0x0
+ 1137 00eb 03        		.uleb128 0x3
+ 1138 00ec 0E        		.uleb128 0xe
+ 1139 00ed 3A        		.uleb128 0x3a
+ 1140 00ee 0B        		.uleb128 0xb
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 21
+
+
+ 1141 00ef 3B        		.uleb128 0x3b
+ 1142 00f0 05        		.uleb128 0x5
+ 1143 00f1 11        		.uleb128 0x11
+ 1144 00f2 01        		.uleb128 0x1
+ 1145 00f3 00        		.byte	0x0
+ 1146 00f4 00        		.byte	0x0
+ 1147 00f5 10        		.uleb128 0x10
+ 1148 00f6 0B        		.uleb128 0xb
+ 1149 00f7 01        		.byte	0x1
+ 1150 00f8 11        		.uleb128 0x11
+ 1151 00f9 01        		.uleb128 0x1
+ 1152 00fa 12        		.uleb128 0x12
+ 1153 00fb 01        		.uleb128 0x1
+ 1154 00fc 01        		.uleb128 0x1
+ 1155 00fd 13        		.uleb128 0x13
+ 1156 00fe 00        		.byte	0x0
+ 1157 00ff 00        		.byte	0x0
+ 1158 0100 11        		.uleb128 0x11
+ 1159 0101 34        		.uleb128 0x34
+ 1160 0102 00        		.byte	0x0
+ 1161 0103 03        		.uleb128 0x3
+ 1162 0104 0E        		.uleb128 0xe
+ 1163 0105 3A        		.uleb128 0x3a
+ 1164 0106 0B        		.uleb128 0xb
+ 1165 0107 3B        		.uleb128 0x3b
+ 1166 0108 0B        		.uleb128 0xb
+ 1167 0109 49        		.uleb128 0x49
+ 1168 010a 13        		.uleb128 0x13
+ 1169 010b 02        		.uleb128 0x2
+ 1170 010c 06        		.uleb128 0x6
+ 1171 010d 00        		.byte	0x0
+ 1172 010e 00        		.byte	0x0
+ 1173 010f 12        		.uleb128 0x12
+ 1174 0110 1D        		.uleb128 0x1d
+ 1175 0111 00        		.byte	0x0
+ 1176 0112 31        		.uleb128 0x31
+ 1177 0113 13        		.uleb128 0x13
+ 1178 0114 11        		.uleb128 0x11
+ 1179 0115 01        		.uleb128 0x1
+ 1180 0116 12        		.uleb128 0x12
+ 1181 0117 01        		.uleb128 0x1
+ 1182 0118 58        		.uleb128 0x58
+ 1183 0119 0B        		.uleb128 0xb
+ 1184 011a 59        		.uleb128 0x59
+ 1185 011b 05        		.uleb128 0x5
+ 1186 011c 00        		.byte	0x0
+ 1187 011d 00        		.byte	0x0
+ 1188 011e 13        		.uleb128 0x13
+ 1189 011f 01        		.uleb128 0x1
+ 1190 0120 01        		.byte	0x1
+ 1191 0121 49        		.uleb128 0x49
+ 1192 0122 13        		.uleb128 0x13
+ 1193 0123 01        		.uleb128 0x1
+ 1194 0124 13        		.uleb128 0x13
+ 1195 0125 00        		.byte	0x0
+ 1196 0126 00        		.byte	0x0
+ 1197 0127 14        		.uleb128 0x14
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 22
+
+
+ 1198 0128 21        		.uleb128 0x21
+ 1199 0129 00        		.byte	0x0
+ 1200 012a 49        		.uleb128 0x49
+ 1201 012b 13        		.uleb128 0x13
+ 1202 012c 2F        		.uleb128 0x2f
+ 1203 012d 05        		.uleb128 0x5
+ 1204 012e 00        		.byte	0x0
+ 1205 012f 00        		.byte	0x0
+ 1206 0130 15        		.uleb128 0x15
+ 1207 0131 24        		.uleb128 0x24
+ 1208 0132 00        		.byte	0x0
+ 1209 0133 0B        		.uleb128 0xb
+ 1210 0134 0B        		.uleb128 0xb
+ 1211 0135 3E        		.uleb128 0x3e
+ 1212 0136 0B        		.uleb128 0xb
+ 1213 0137 00        		.byte	0x0
+ 1214 0138 00        		.byte	0x0
+ 1215 0139 16        		.uleb128 0x16
+ 1216 013a 34        		.uleb128 0x34
+ 1217 013b 00        		.byte	0x0
+ 1218 013c 03        		.uleb128 0x3
+ 1219 013d 0E        		.uleb128 0xe
+ 1220 013e 3A        		.uleb128 0x3a
+ 1221 013f 0B        		.uleb128 0xb
+ 1222 0140 3B        		.uleb128 0x3b
+ 1223 0141 0B        		.uleb128 0xb
+ 1224 0142 49        		.uleb128 0x49
+ 1225 0143 13        		.uleb128 0x13
+ 1226 0144 3F        		.uleb128 0x3f
+ 1227 0145 0C        		.uleb128 0xc
+ 1228 0146 02        		.uleb128 0x2
+ 1229 0147 0A        		.uleb128 0xa
+ 1230 0148 00        		.byte	0x0
+ 1231 0149 00        		.byte	0x0
+ 1232 014a 17        		.uleb128 0x17
+ 1233 014b 35        		.uleb128 0x35
+ 1234 014c 00        		.byte	0x0
+ 1235 014d 49        		.uleb128 0x49
+ 1236 014e 13        		.uleb128 0x13
+ 1237 014f 00        		.byte	0x0
+ 1238 0150 00        		.byte	0x0
+ 1239 0151 00        		.byte	0x0
+ 1240               		.section	.debug_pubnames,"",@progbits
+ 1241 0000 0401 0000 		.long	0x104
+ 1242 0004 0200      		.word	0x2
+ 1243 0006 0000 0000 		.long	.Ldebug_info0
+ 1244 000a 6B02 0000 		.long	0x26b
+ 1245 000e 7100 0000 		.long	0x71
+ 1246 0012 6932 635F 		.string	"i2c_initialize"
+ 1246      696E 6974 
+ 1246      6961 6C69 
+ 1246      7A65 00
+ 1247 0021 A800 0000 		.long	0xa8
+ 1248 0025 6932 635F 		.string	"i2c_idle"
+ 1248      6964 6C65 
+ 1248      00
+ 1249 002e C000 0000 		.long	0xc0
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 23
+
+
+ 1250 0032 6932 635F 		.string	"i2c_message_ready"
+ 1250      6D65 7373 
+ 1250      6167 655F 
+ 1250      7265 6164 
+ 1250      7900 
+ 1251 0044 F700 0000 		.long	0xf7
+ 1252 0048 6932 635F 		.string	"i2c_message_done"
+ 1252      6D65 7373 
+ 1252      6167 655F 
+ 1252      646F 6E65 
+ 1252      00
+ 1253 0059 0B01 0000 		.long	0x10b
+ 1254 005d 6932 635F 		.string	"i2c_reply_ready"
+ 1254      7265 706C 
+ 1254      795F 7265 
+ 1254      6164 7900 
+ 1255 006d 2301 0000 		.long	0x123
+ 1256 0071 6932 635F 		.string	"i2c_reply_done"
+ 1256      7265 706C 
+ 1256      795F 646F 
+ 1256      6E65 00
+ 1257 0080 4701 0000 		.long	0x147
+ 1258 0084 5F5F 7665 		.string	"__vector_13"
+ 1258      6374 6F72 
+ 1258      5F31 3300 
+ 1259 0090 6F01 0000 		.long	0x16f
+ 1260 0094 5F5F 7665 		.string	"__vector_14"
+ 1260      6374 6F72 
+ 1260      5F31 3400 
+ 1261 00a0 DD01 0000 		.long	0x1dd
+ 1262 00a4 6932 635F 		.string	"i2c_rdbuf"
+ 1262      7264 6275 
+ 1262      6600 
+ 1263 00ae F401 0000 		.long	0x1f4
+ 1264 00b2 6932 635F 		.string	"i2c_rdlen"
+ 1264      7264 6C65 
+ 1264      6E00 
+ 1265 00bc 0B02 0000 		.long	0x20b
+ 1266 00c0 6932 635F 		.string	"i2c_wrbuf"
+ 1266      7772 6275 
+ 1266      6600 
+ 1267 00ca 2202 0000 		.long	0x222
+ 1268 00ce 6932 635F 		.string	"i2c_wrlen"
+ 1268      7772 6C65 
+ 1268      6E00 
+ 1269 00d8 3402 0000 		.long	0x234
+ 1270 00dc 6932 635F 		.string	"i2c_address"
+ 1270      6164 6472 
+ 1270      6573 7300 
+ 1271 00e8 4602 0000 		.long	0x246
+ 1272 00ec 6932 635F 		.string	"i2c_rdptr"
+ 1272      7264 7074 
+ 1272      7200 
+ 1273 00f6 5802 0000 		.long	0x258
+ 1274 00fa 7573 695F 		.string	"usi_state"
+ 1274      7374 6174 
+ 1274      6500 
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 24
+
+
+ 1275 0104 0000 0000 		.long	0x0
+ 1276               		.section	.debug_aranges,"",@progbits
+ 1277 0000 1C00 0000 		.long	0x1c
+ 1278 0004 0200      		.word	0x2
+ 1279 0006 0000 0000 		.long	.Ldebug_info0
+ 1280 000a 04        		.byte	0x4
+ 1281 000b 00        		.byte	0x0
+ 1282 000c 0000      		.word	0x0
+ 1283 000e 0000      		.word	0x0
+ 1284 0010 0000 0000 		.long	.Ltext0
+ 1285 0014 FC01 0000 		.long	.Letext0-.Ltext0
+ 1286 0018 0000 0000 		.long	0x0
+ 1287 001c 0000 0000 		.long	0x0
+ 1288               		.section	.debug_line
+ 1289 0000 4203 0000 		.long	.LELT0-.LSLT0
+ 1290               	.LSLT0:
+ 1291 0004 0200      		.word	0x2
+ 1292 0006 5800 0000 		.long	.LELTP0-.LASLTP0
+ 1293               	.LASLTP0:
+ 1294 000a 01        		.byte	0x1
+ 1295 000b 01        		.byte	0x1
+ 1296 000c F6        		.byte	0xf6
+ 1297 000d F5        		.byte	0xf5
+ 1298 000e 0A        		.byte	0xa
+ 1299 000f 00        		.byte	0x0
+ 1300 0010 01        		.byte	0x1
+ 1301 0011 01        		.byte	0x1
+ 1302 0012 01        		.byte	0x1
+ 1303 0013 01        		.byte	0x1
+ 1304 0014 00        		.byte	0x0
+ 1305 0015 00        		.byte	0x0
+ 1306 0016 00        		.byte	0x0
+ 1307 0017 01        		.byte	0x1
+ 1308 0018 633A 2F77 		.ascii	"c:/winavr-20100110/lib/gcc/../../avr/include"
+ 1308      696E 6176 
+ 1308      722D 3230 
+ 1308      3130 3031 
+ 1308      3130 2F6C 
+ 1309 0044 00        		.byte	0
+ 1310 0045 00        		.byte	0x0
+ 1311 0046 6932 632D 		.string	"i2c-slave.c"
+ 1311      736C 6176 
+ 1311      652E 6300 
+ 1312 0052 00        		.uleb128 0x0
+ 1313 0053 00        		.uleb128 0x0
+ 1314 0054 00        		.uleb128 0x0
+ 1315 0055 7374 6469 		.string	"stdint.h"
+ 1315      6E74 2E68 
+ 1315      00
+ 1316 005e 01        		.uleb128 0x1
+ 1317 005f 00        		.uleb128 0x0
+ 1318 0060 00        		.uleb128 0x0
+ 1319 0061 00        		.byte	0x0
+ 1320               	.LELTP0:
+ 1321 0062 00        		.byte	0x0
+ 1322 0063 05        		.uleb128 0x5
+ 1323 0064 02        		.byte	0x2
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 25
+
+
+ 1324 0065 0000 0000 		.long	.LM1
+ 1325 0069 75        		.byte	0x75
+ 1326 006a 00        		.byte	0x0
+ 1327 006b 05        		.uleb128 0x5
+ 1328 006c 02        		.byte	0x2
+ 1329 006d 0000 0000 		.long	.LM2
+ 1330 0071 15        		.byte	0x15
+ 1331 0072 00        		.byte	0x0
+ 1332 0073 05        		.uleb128 0x5
+ 1333 0074 02        		.byte	0x2
+ 1334 0075 0000 0000 		.long	.LM3
+ 1335 0079 16        		.byte	0x16
+ 1336 007a 00        		.byte	0x0
+ 1337 007b 05        		.uleb128 0x5
+ 1338 007c 02        		.byte	0x2
+ 1339 007d 0000 0000 		.long	.LM4
+ 1340 0081 15        		.byte	0x15
+ 1341 0082 00        		.byte	0x0
+ 1342 0083 05        		.uleb128 0x5
+ 1343 0084 02        		.byte	0x2
+ 1344 0085 0000 0000 		.long	.LM5
+ 1345 0089 15        		.byte	0x15
+ 1346 008a 00        		.byte	0x0
+ 1347 008b 05        		.uleb128 0x5
+ 1348 008c 02        		.byte	0x2
+ 1349 008d 0000 0000 		.long	.LM6
+ 1350 0091 16        		.byte	0x16
+ 1351 0092 00        		.byte	0x0
+ 1352 0093 05        		.uleb128 0x5
+ 1353 0094 02        		.byte	0x2
+ 1354 0095 0000 0000 		.long	.LM7
+ 1355 0099 15        		.byte	0x15
+ 1356 009a 00        		.byte	0x0
+ 1357 009b 05        		.uleb128 0x5
+ 1358 009c 02        		.byte	0x2
+ 1359 009d 0000 0000 		.long	.LM8
+ 1360 00a1 03        		.byte	0x3
+ 1361 00a2 6D        		.sleb128 -19
+ 1362 00a3 01        		.byte	0x1
+ 1363 00a4 00        		.byte	0x0
+ 1364 00a5 05        		.uleb128 0x5
+ 1365 00a6 02        		.byte	0x2
+ 1366 00a7 0000 0000 		.long	.LM9
+ 1367 00ab 15        		.byte	0x15
+ 1368 00ac 00        		.byte	0x0
+ 1369 00ad 05        		.uleb128 0x5
+ 1370 00ae 02        		.byte	0x2
+ 1371 00af 0000 0000 		.long	.LM10
+ 1372 00b3 15        		.byte	0x15
+ 1373 00b4 00        		.byte	0x0
+ 1374 00b5 05        		.uleb128 0x5
+ 1375 00b6 02        		.byte	0x2
+ 1376 00b7 0000 0000 		.long	.LM11
+ 1377 00bb 15        		.byte	0x15
+ 1378 00bc 00        		.byte	0x0
+ 1379 00bd 05        		.uleb128 0x5
+ 1380 00be 02        		.byte	0x2
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 26
+
+
+ 1381 00bf 0000 0000 		.long	.LM12
+ 1382 00c3 27        		.byte	0x27
+ 1383 00c4 00        		.byte	0x0
+ 1384 00c5 05        		.uleb128 0x5
+ 1385 00c6 02        		.byte	0x2
+ 1386 00c7 0000 0000 		.long	.LM13
+ 1387 00cb 1B        		.byte	0x1b
+ 1388 00cc 00        		.byte	0x0
+ 1389 00cd 05        		.uleb128 0x5
+ 1390 00ce 02        		.byte	0x2
+ 1391 00cf 0000 0000 		.long	.LM14
+ 1392 00d3 15        		.byte	0x15
+ 1393 00d4 00        		.byte	0x0
+ 1394 00d5 05        		.uleb128 0x5
+ 1395 00d6 02        		.byte	0x2
+ 1396 00d7 0000 0000 		.long	.LM15
+ 1397 00db 15        		.byte	0x15
+ 1398 00dc 00        		.byte	0x0
+ 1399 00dd 05        		.uleb128 0x5
+ 1400 00de 02        		.byte	0x2
+ 1401 00df 0000 0000 		.long	.LM16
+ 1402 00e3 1C        		.byte	0x1c
+ 1403 00e4 00        		.byte	0x0
+ 1404 00e5 05        		.uleb128 0x5
+ 1405 00e6 02        		.byte	0x2
+ 1406 00e7 0000 0000 		.long	.LM17
+ 1407 00eb 15        		.byte	0x15
+ 1408 00ec 00        		.byte	0x0
+ 1409 00ed 05        		.uleb128 0x5
+ 1410 00ee 02        		.byte	0x2
+ 1411 00ef 0000 0000 		.long	.LM18
+ 1412 00f3 15        		.byte	0x15
+ 1413 00f4 00        		.byte	0x0
+ 1414 00f5 05        		.uleb128 0x5
+ 1415 00f6 02        		.byte	0x2
+ 1416 00f7 0000 0000 		.long	.LM19
+ 1417 00fb 15        		.byte	0x15
+ 1418 00fc 00        		.byte	0x0
+ 1419 00fd 05        		.uleb128 0x5
+ 1420 00fe 02        		.byte	0x2
+ 1421 00ff 0000 0000 		.long	.LM20
+ 1422 0103 15        		.byte	0x15
+ 1423 0104 00        		.byte	0x0
+ 1424 0105 05        		.uleb128 0x5
+ 1425 0106 02        		.byte	0x2
+ 1426 0107 0000 0000 		.long	.LM21
+ 1427 010b 03        		.byte	0x3
+ 1428 010c 55        		.sleb128 -43
+ 1429 010d 01        		.byte	0x1
+ 1430 010e 00        		.byte	0x0
+ 1431 010f 05        		.uleb128 0x5
+ 1432 0110 02        		.byte	0x2
+ 1433 0111 0000 0000 		.long	.LM22
+ 1434 0115 15        		.byte	0x15
+ 1435 0116 00        		.byte	0x0
+ 1436 0117 05        		.uleb128 0x5
+ 1437 0118 02        		.byte	0x2
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 27
+
+
+ 1438 0119 0000 0000 		.long	.LM23
+ 1439 011d 15        		.byte	0x15
+ 1440 011e 00        		.byte	0x0
+ 1441 011f 05        		.uleb128 0x5
+ 1442 0120 02        		.byte	0x2
+ 1443 0121 0000 0000 		.long	.LM24
+ 1444 0125 15        		.byte	0x15
+ 1445 0126 00        		.byte	0x0
+ 1446 0127 05        		.uleb128 0x5
+ 1447 0128 02        		.byte	0x2
+ 1448 0129 0000 0000 		.long	.LM25
+ 1449 012d 3E        		.byte	0x3e
+ 1450 012e 00        		.byte	0x0
+ 1451 012f 05        		.uleb128 0x5
+ 1452 0130 02        		.byte	0x2
+ 1453 0131 0000 0000 		.long	.LM26
+ 1454 0135 18        		.byte	0x18
+ 1455 0136 00        		.byte	0x0
+ 1456 0137 05        		.uleb128 0x5
+ 1457 0138 02        		.byte	0x2
+ 1458 0139 0000 0000 		.long	.LM27
+ 1459 013d 16        		.byte	0x16
+ 1460 013e 00        		.byte	0x0
+ 1461 013f 05        		.uleb128 0x5
+ 1462 0140 02        		.byte	0x2
+ 1463 0141 0000 0000 		.long	.LM28
+ 1464 0145 1B        		.byte	0x1b
+ 1465 0146 00        		.byte	0x0
+ 1466 0147 05        		.uleb128 0x5
+ 1467 0148 02        		.byte	0x2
+ 1468 0149 0000 0000 		.long	.LM29
+ 1469 014d 15        		.byte	0x15
+ 1470 014e 00        		.byte	0x0
+ 1471 014f 05        		.uleb128 0x5
+ 1472 0150 02        		.byte	0x2
+ 1473 0151 0000 0000 		.long	.LM30
+ 1474 0155 15        		.byte	0x15
+ 1475 0156 00        		.byte	0x0
+ 1476 0157 05        		.uleb128 0x5
+ 1477 0158 02        		.byte	0x2
+ 1478 0159 0000 0000 		.long	.LM31
+ 1479 015d 1C        		.byte	0x1c
+ 1480 015e 00        		.byte	0x0
+ 1481 015f 05        		.uleb128 0x5
+ 1482 0160 02        		.byte	0x2
+ 1483 0161 0000 0000 		.long	.LM32
+ 1484 0165 15        		.byte	0x15
+ 1485 0166 00        		.byte	0x0
+ 1486 0167 05        		.uleb128 0x5
+ 1487 0168 02        		.byte	0x2
+ 1488 0169 0000 0000 		.long	.LM33
+ 1489 016d 15        		.byte	0x15
+ 1490 016e 00        		.byte	0x0
+ 1491 016f 05        		.uleb128 0x5
+ 1492 0170 02        		.byte	0x2
+ 1493 0171 0000 0000 		.long	.LM34
+ 1494 0175 15        		.byte	0x15
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 28
+
+
+ 1495 0176 00        		.byte	0x0
+ 1496 0177 05        		.uleb128 0x5
+ 1497 0178 02        		.byte	0x2
+ 1498 0179 0000 0000 		.long	.LM35
+ 1499 017d 18        		.byte	0x18
+ 1500 017e 00        		.byte	0x0
+ 1501 017f 05        		.uleb128 0x5
+ 1502 0180 02        		.byte	0x2
+ 1503 0181 0000 0000 		.long	.LM36
+ 1504 0185 1B        		.byte	0x1b
+ 1505 0186 00        		.byte	0x0
+ 1506 0187 05        		.uleb128 0x5
+ 1507 0188 02        		.byte	0x2
+ 1508 0189 0000 0000 		.long	.LM37
+ 1509 018d 15        		.byte	0x15
+ 1510 018e 00        		.byte	0x0
+ 1511 018f 05        		.uleb128 0x5
+ 1512 0190 02        		.byte	0x2
+ 1513 0191 0000 0000 		.long	.LM38
+ 1514 0195 15        		.byte	0x15
+ 1515 0196 00        		.byte	0x0
+ 1516 0197 05        		.uleb128 0x5
+ 1517 0198 02        		.byte	0x2
+ 1518 0199 0000 0000 		.long	.LM39
+ 1519 019d 15        		.byte	0x15
+ 1520 019e 00        		.byte	0x0
+ 1521 019f 05        		.uleb128 0x5
+ 1522 01a0 02        		.byte	0x2
+ 1523 01a1 0000 0000 		.long	.LM40
+ 1524 01a5 1C        		.byte	0x1c
+ 1525 01a6 00        		.byte	0x0
+ 1526 01a7 05        		.uleb128 0x5
+ 1527 01a8 02        		.byte	0x2
+ 1528 01a9 0000 0000 		.long	.LM41
+ 1529 01ad 17        		.byte	0x17
+ 1530 01ae 00        		.byte	0x0
+ 1531 01af 05        		.uleb128 0x5
+ 1532 01b0 02        		.byte	0x2
+ 1533 01b1 0000 0000 		.long	.LM42
+ 1534 01b5 1F        		.byte	0x1f
+ 1535 01b6 00        		.byte	0x0
+ 1536 01b7 05        		.uleb128 0x5
+ 1537 01b8 02        		.byte	0x2
+ 1538 01b9 0000 0000 		.long	.LM43
+ 1539 01bd 03        		.byte	0x3
+ 1540 01be 957F      		.sleb128 -107
+ 1541 01c0 01        		.byte	0x1
+ 1542 01c1 00        		.byte	0x0
+ 1543 01c2 05        		.uleb128 0x5
+ 1544 01c3 02        		.byte	0x2
+ 1545 01c4 0000 0000 		.long	.LM44
+ 1546 01c8 15        		.byte	0x15
+ 1547 01c9 00        		.byte	0x0
+ 1548 01ca 05        		.uleb128 0x5
+ 1549 01cb 02        		.byte	0x2
+ 1550 01cc 0000 0000 		.long	.LM45
+ 1551 01d0 15        		.byte	0x15
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 29
+
+
+ 1552 01d1 00        		.byte	0x0
+ 1553 01d2 05        		.uleb128 0x5
+ 1554 01d3 02        		.byte	0x2
+ 1555 01d4 0000 0000 		.long	.LM46
+ 1556 01d8 15        		.byte	0x15
+ 1557 01d9 00        		.byte	0x0
+ 1558 01da 05        		.uleb128 0x5
+ 1559 01db 02        		.byte	0x2
+ 1560 01dc 0000 0000 		.long	.LM47
+ 1561 01e0 73        		.byte	0x73
+ 1562 01e1 00        		.byte	0x0
+ 1563 01e2 05        		.uleb128 0x5
+ 1564 01e3 02        		.byte	0x2
+ 1565 01e4 0000 0000 		.long	.LM48
+ 1566 01e8 2B        		.byte	0x2b
+ 1567 01e9 00        		.byte	0x0
+ 1568 01ea 05        		.uleb128 0x5
+ 1569 01eb 02        		.byte	0x2
+ 1570 01ec 0000 0000 		.long	.LM49
+ 1571 01f0 15        		.byte	0x15
+ 1572 01f1 00        		.byte	0x0
+ 1573 01f2 05        		.uleb128 0x5
+ 1574 01f3 02        		.byte	0x2
+ 1575 01f4 0000 0000 		.long	.LM50
+ 1576 01f8 15        		.byte	0x15
+ 1577 01f9 00        		.byte	0x0
+ 1578 01fa 05        		.uleb128 0x5
+ 1579 01fb 02        		.byte	0x2
+ 1580 01fc 0000 0000 		.long	.LM51
+ 1581 0200 18        		.byte	0x18
+ 1582 0201 00        		.byte	0x0
+ 1583 0202 05        		.uleb128 0x5
+ 1584 0203 02        		.byte	0x2
+ 1585 0204 0000 0000 		.long	.LM52
+ 1586 0208 1B        		.byte	0x1b
+ 1587 0209 00        		.byte	0x0
+ 1588 020a 05        		.uleb128 0x5
+ 1589 020b 02        		.byte	0x2
+ 1590 020c 0000 0000 		.long	.LM53
+ 1591 0210 15        		.byte	0x15
+ 1592 0211 00        		.byte	0x0
+ 1593 0212 05        		.uleb128 0x5
+ 1594 0213 02        		.byte	0x2
+ 1595 0214 0000 0000 		.long	.LM54
+ 1596 0218 18        		.byte	0x18
+ 1597 0219 00        		.byte	0x0
+ 1598 021a 05        		.uleb128 0x5
+ 1599 021b 02        		.byte	0x2
+ 1600 021c 0000 0000 		.long	.LM55
+ 1601 0220 15        		.byte	0x15
+ 1602 0221 00        		.byte	0x0
+ 1603 0222 05        		.uleb128 0x5
+ 1604 0223 02        		.byte	0x2
+ 1605 0224 0000 0000 		.long	.LM56
+ 1606 0228 15        		.byte	0x15
+ 1607 0229 00        		.byte	0x0
+ 1608 022a 05        		.uleb128 0x5
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 30
+
+
+ 1609 022b 02        		.byte	0x2
+ 1610 022c 0000 0000 		.long	.LM57
+ 1611 0230 15        		.byte	0x15
+ 1612 0231 00        		.byte	0x0
+ 1613 0232 05        		.uleb128 0x5
+ 1614 0233 02        		.byte	0x2
+ 1615 0234 0000 0000 		.long	.LM58
+ 1616 0238 16        		.byte	0x16
+ 1617 0239 00        		.byte	0x0
+ 1618 023a 05        		.uleb128 0x5
+ 1619 023b 02        		.byte	0x2
+ 1620 023c 0000 0000 		.long	.LM59
+ 1621 0240 15        		.byte	0x15
+ 1622 0241 00        		.byte	0x0
+ 1623 0242 05        		.uleb128 0x5
+ 1624 0243 02        		.byte	0x2
+ 1625 0244 0000 0000 		.long	.LM60
+ 1626 0248 16        		.byte	0x16
+ 1627 0249 00        		.byte	0x0
+ 1628 024a 05        		.uleb128 0x5
+ 1629 024b 02        		.byte	0x2
+ 1630 024c 0000 0000 		.long	.LM61
+ 1631 0250 16        		.byte	0x16
+ 1632 0251 00        		.byte	0x0
+ 1633 0252 05        		.uleb128 0x5
+ 1634 0253 02        		.byte	0x2
+ 1635 0254 0000 0000 		.long	.LM62
+ 1636 0258 15        		.byte	0x15
+ 1637 0259 00        		.byte	0x0
+ 1638 025a 05        		.uleb128 0x5
+ 1639 025b 02        		.byte	0x2
+ 1640 025c 0000 0000 		.long	.LM63
+ 1641 0260 16        		.byte	0x16
+ 1642 0261 00        		.byte	0x0
+ 1643 0262 05        		.uleb128 0x5
+ 1644 0263 02        		.byte	0x2
+ 1645 0264 0000 0000 		.long	.LM64
+ 1646 0268 15        		.byte	0x15
+ 1647 0269 00        		.byte	0x0
+ 1648 026a 05        		.uleb128 0x5
+ 1649 026b 02        		.byte	0x2
+ 1650 026c 0000 0000 		.long	.LM65
+ 1651 0270 18        		.byte	0x18
+ 1652 0271 00        		.byte	0x0
+ 1653 0272 05        		.uleb128 0x5
+ 1654 0273 02        		.byte	0x2
+ 1655 0274 0000 0000 		.long	.LM66
+ 1656 0278 1A        		.byte	0x1a
+ 1657 0279 00        		.byte	0x0
+ 1658 027a 05        		.uleb128 0x5
+ 1659 027b 02        		.byte	0x2
+ 1660 027c 0000 0000 		.long	.LM67
+ 1661 0280 15        		.byte	0x15
+ 1662 0281 00        		.byte	0x0
+ 1663 0282 05        		.uleb128 0x5
+ 1664 0283 02        		.byte	0x2
+ 1665 0284 0000 0000 		.long	.LM68
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 31
+
+
+ 1666 0288 15        		.byte	0x15
+ 1667 0289 00        		.byte	0x0
+ 1668 028a 05        		.uleb128 0x5
+ 1669 028b 02        		.byte	0x2
+ 1670 028c 0000 0000 		.long	.LM69
+ 1671 0290 15        		.byte	0x15
+ 1672 0291 00        		.byte	0x0
+ 1673 0292 05        		.uleb128 0x5
+ 1674 0293 02        		.byte	0x2
+ 1675 0294 0000 0000 		.long	.LM70
+ 1676 0298 15        		.byte	0x15
+ 1677 0299 00        		.byte	0x0
+ 1678 029a 05        		.uleb128 0x5
+ 1679 029b 02        		.byte	0x2
+ 1680 029c 0000 0000 		.long	.LM71
+ 1681 02a0 16        		.byte	0x16
+ 1682 02a1 00        		.byte	0x0
+ 1683 02a2 05        		.uleb128 0x5
+ 1684 02a3 02        		.byte	0x2
+ 1685 02a4 0000 0000 		.long	.LM72
+ 1686 02a8 19        		.byte	0x19
+ 1687 02a9 00        		.byte	0x0
+ 1688 02aa 05        		.uleb128 0x5
+ 1689 02ab 02        		.byte	0x2
+ 1690 02ac 0000 0000 		.long	.LM73
+ 1691 02b0 15        		.byte	0x15
+ 1692 02b1 00        		.byte	0x0
+ 1693 02b2 05        		.uleb128 0x5
+ 1694 02b3 02        		.byte	0x2
+ 1695 02b4 0000 0000 		.long	.LM74
+ 1696 02b8 15        		.byte	0x15
+ 1697 02b9 00        		.byte	0x0
+ 1698 02ba 05        		.uleb128 0x5
+ 1699 02bb 02        		.byte	0x2
+ 1700 02bc 0000 0000 		.long	.LM75
+ 1701 02c0 16        		.byte	0x16
+ 1702 02c1 00        		.byte	0x0
+ 1703 02c2 05        		.uleb128 0x5
+ 1704 02c3 02        		.byte	0x2
+ 1705 02c4 0000 0000 		.long	.LM76
+ 1706 02c8 19        		.byte	0x19
+ 1707 02c9 00        		.byte	0x0
+ 1708 02ca 05        		.uleb128 0x5
+ 1709 02cb 02        		.byte	0x2
+ 1710 02cc 0000 0000 		.long	.LM77
+ 1711 02d0 18        		.byte	0x18
+ 1712 02d1 00        		.byte	0x0
+ 1713 02d2 05        		.uleb128 0x5
+ 1714 02d3 02        		.byte	0x2
+ 1715 02d4 0000 0000 		.long	.LM78
+ 1716 02d8 19        		.byte	0x19
+ 1717 02d9 00        		.byte	0x0
+ 1718 02da 05        		.uleb128 0x5
+ 1719 02db 02        		.byte	0x2
+ 1720 02dc 0000 0000 		.long	.LM79
+ 1721 02e0 15        		.byte	0x15
+ 1722 02e1 00        		.byte	0x0
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 32
+
+
+ 1723 02e2 05        		.uleb128 0x5
+ 1724 02e3 02        		.byte	0x2
+ 1725 02e4 0000 0000 		.long	.LM80
+ 1726 02e8 16        		.byte	0x16
+ 1727 02e9 00        		.byte	0x0
+ 1728 02ea 05        		.uleb128 0x5
+ 1729 02eb 02        		.byte	0x2
+ 1730 02ec 0000 0000 		.long	.LM81
+ 1731 02f0 19        		.byte	0x19
+ 1732 02f1 00        		.byte	0x0
+ 1733 02f2 05        		.uleb128 0x5
+ 1734 02f3 02        		.byte	0x2
+ 1735 02f4 0000 0000 		.long	.LM82
+ 1736 02f8 16        		.byte	0x16
+ 1737 02f9 00        		.byte	0x0
+ 1738 02fa 05        		.uleb128 0x5
+ 1739 02fb 02        		.byte	0x2
+ 1740 02fc 0000 0000 		.long	.LM83
+ 1741 0300 15        		.byte	0x15
+ 1742 0301 00        		.byte	0x0
+ 1743 0302 05        		.uleb128 0x5
+ 1744 0303 02        		.byte	0x2
+ 1745 0304 0000 0000 		.long	.LM84
+ 1746 0308 15        		.byte	0x15
+ 1747 0309 00        		.byte	0x0
+ 1748 030a 05        		.uleb128 0x5
+ 1749 030b 02        		.byte	0x2
+ 1750 030c 0000 0000 		.long	.LM85
+ 1751 0310 15        		.byte	0x15
+ 1752 0311 00        		.byte	0x0
+ 1753 0312 05        		.uleb128 0x5
+ 1754 0313 02        		.byte	0x2
+ 1755 0314 0000 0000 		.long	.LM86
+ 1756 0318 03        		.byte	0x3
+ 1757 0319 B37E      		.sleb128 -205
+ 1758 031b 01        		.byte	0x1
+ 1759 031c 00        		.byte	0x0
+ 1760 031d 05        		.uleb128 0x5
+ 1761 031e 02        		.byte	0x2
+ 1762 031f 0000 0000 		.long	.LM87
+ 1763 0323 15        		.byte	0x15
+ 1764 0324 00        		.byte	0x0
+ 1765 0325 05        		.uleb128 0x5
+ 1766 0326 02        		.byte	0x2
+ 1767 0327 0000 0000 		.long	.LM88
+ 1768 032b 15        		.byte	0x15
+ 1769 032c 00        		.byte	0x0
+ 1770 032d 05        		.uleb128 0x5
+ 1771 032e 02        		.byte	0x2
+ 1772 032f 0000 0000 		.long	.LM89
+ 1773 0333 15        		.byte	0x15
+ 1774 0334 00        		.byte	0x0
+ 1775 0335 05        		.uleb128 0x5
+ 1776 0336 02        		.byte	0x2
+ 1777 0337 0000 0000 		.long	.LM90
+ 1778 033b E7        		.byte	0xe7
+ 1779 033c 00        		.byte	0x0
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 33
+
+
+ 1780 033d 05        		.uleb128 0x5
+ 1781 033e 02        		.byte	0x2
+ 1782 033f 0000 0000 		.long	.Letext0
+ 1783 0343 00        		.byte	0x0
+ 1784 0344 01        		.uleb128 0x1
+ 1785 0345 01        		.byte	0x1
+ 1786               	.LELT0:
+ 1787 0346 1600 0000 		.section	.debug_str,"MS",@progbits,1
+ 1787      0200 1000 
+ 1787      0000 0101 
+ 1787      FB0E 0A00 
+ 1787      0101 0101 
+ 1788               	.LASF8:
+ 1789 0000 6932 635F 		.string	"i2c_reply_ready"
+ 1789      7265 706C 
+ 1789      795F 7265 
+ 1789      6164 7900 
+ 1790               	.LASF17:
+ 1791 0010 6932 635F 		.string	"i2c_wrlen"
+ 1791      7772 6C65 
+ 1791      6E00 
+ 1792               	.LASF10:
+ 1793 001a 6932 635F 		.string	"i2c_reply_done"
+ 1793      7265 706C 
+ 1793      795F 646F 
+ 1793      6E65 00
+ 1794               	.LASF12:
+ 1795 0029 5F5F 7665 		.string	"__vector_13"
+ 1795      6374 6F72 
+ 1795      5F31 3300 
+ 1796               	.LASF13:
+ 1797 0035 5F5F 7665 		.string	"__vector_14"
+ 1797      6374 6F72 
+ 1797      5F31 3400 
+ 1798               	.LASF1:
+ 1799 0041 756E 7369 		.string	"unsigned char"
+ 1799      676E 6564 
+ 1799      2063 6861 
+ 1799      7200 
+ 1800               	.LASF14:
+ 1801 004f 6932 635F 		.string	"i2c_rdbuf"
+ 1801      7264 6275 
+ 1801      6600 
+ 1802               	.LASF4:
+ 1803 0059 6C6F 6E67 		.string	"long unsigned int"
+ 1803      2075 6E73 
+ 1803      6967 6E65 
+ 1803      6420 696E 
+ 1803      7400 
+ 1804               	.LASF11:
+ 1805 006b 6164 6472 		.string	"addr"
+ 1805      00
+ 1806               	.LASF21:
+ 1807 0070 474E 5520 		.string	"GNU C 4.3.3"
+ 1807      4320 342E 
+ 1807      332E 3300 
+ 1808               	.LASF7:
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 34
+
+
+ 1809 007c 6932 635F 		.string	"i2c_idle"
+ 1809      6964 6C65 
+ 1809      00
+ 1810               	.LASF15:
+ 1811 0085 6932 635F 		.string	"i2c_rdlen"
+ 1811      7264 6C65 
+ 1811      6E00 
+ 1812               	.LASF9:
+ 1813 008f 6932 635F 		.string	"i2c_initialize"
+ 1813      696E 6974 
+ 1813      6961 6C69 
+ 1813      7A65 00
+ 1814               	.LASF27:
+ 1815 009e 6932 635F 		.string	"i2c_message_done"
+ 1815      6D65 7373 
+ 1815      6167 655F 
+ 1815      646F 6E65 
+ 1815      00
+ 1816               	.LASF16:
+ 1817 00af 6932 635F 		.string	"i2c_wrbuf"
+ 1817      7772 6275 
+ 1817      6600 
+ 1818               	.LASF23:
+ 1819 00b9 5A3A 5C44 		.string	"Z:\\Documents\\GitHub\\l3\\source\\ps2avrGB_attiny\\i2cReceiver"
+ 1819      6F63 756D 
+ 1819      656E 7473 
+ 1819      5C47 6974 
+ 1819      4875 625C 
+ 1820               	.LASF2:
+ 1821 00f3 756E 7369 		.string	"unsigned int"
+ 1821      676E 6564 
+ 1821      2069 6E74 
+ 1821      00
+ 1822               	.LASF29:
+ 1823 0100 7365 6E64 		.string	"send"
+ 1823      00
+ 1824               	.LASF6:
+ 1825 0105 6C6F 6E67 		.string	"long long unsigned int"
+ 1825      206C 6F6E 
+ 1825      6720 756E 
+ 1825      7369 676E 
+ 1825      6564 2069 
+ 1826               	.LASF24:
+ 1827 011c 7569 6E74 		.string	"uint8_t"
+ 1827      385F 7400 
+ 1828               	.LASF26:
+ 1829 0124 6932 635F 		.string	"i2c_message_ready"
+ 1829      6D65 7373 
+ 1829      6167 655F 
+ 1829      7265 6164 
+ 1829      7900 
+ 1830               	.LASF5:
+ 1831 0136 6C6F 6E67 		.string	"long long int"
+ 1831      206C 6F6E 
+ 1831      6720 696E 
+ 1831      7400 
+ 1832               	.LASF19:
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 35
+
+
+ 1833 0144 6932 635F 		.string	"i2c_rdptr"
+ 1833      7264 7074 
+ 1833      7200 
+ 1834               	.LASF18:
+ 1835 014e 6932 635F 		.string	"i2c_address"
+ 1835      6164 6472 
+ 1835      6573 7300 
+ 1836               	.LASF22:
+ 1837 015a 6932 632D 		.string	"i2c-slave.c"
+ 1837      736C 6176 
+ 1837      652E 6300 
+ 1838               	.LASF20:
+ 1839 0166 7573 695F 		.string	"usi_state"
+ 1839      7374 6174 
+ 1839      6500 
+ 1840               	.LASF3:
+ 1841 0170 6C6F 6E67 		.string	"long int"
+ 1841      2069 6E74 
+ 1841      00
+ 1842               	.LASF28:
+ 1843 0179 6162 6F72 		.string	"abort"
+ 1843      7400 
+ 1844               	.LASF25:
+ 1845 017f 7573 695F 		.string	"usi_reset"
+ 1845      7265 7365 
+ 1845      7400 
+ 1846               	.LASF0:
+ 1847 0189 7369 676E 		.string	"signed char"
+ 1847      6564 2063 
+ 1847      6861 7200 
+ 1848               	.global __do_clear_bss
+GAS LISTING C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s 			page 36
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 i2c-slave.c
+C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s:2      *ABS*:0000003f __SREG__
+C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s:3      *ABS*:0000003e __SP_H__
+C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s:4      *ABS*:0000003d __SP_L__
+C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s:5      *ABS*:00000034 __CCP__
+C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s:6      *ABS*:00000000 __tmp_reg__
+C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s:7      *ABS*:00000001 __zero_reg__
+C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s:18     .text:00000000 i2c_initialize
+                            *COM*:00000001 i2c_address
+                            *COM*:00000001 i2c_rdlen
+                            *COM*:00000001 i2c_wrlen
+                            *COM*:00000001 usi_state
+C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s:58     .text:00000022 i2c_idle
+C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s:78     .text:00000032 i2c_message_ready
+C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s:135    .text:00000064 i2c_message_done
+C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s:149    .text:0000006a i2c_reply_ready
+C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s:180    .text:0000007e i2c_reply_done
+C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s:201    .text:00000086 __vector_13
+C:\Users\ADMINI~1\AppData\Local\Temp/ccITbK3F.s:260    .text:000000c8 __vector_14
+                            *COM*:00000001 i2c_rdptr
+                            *COM*:0000012c i2c_rdbuf
+                            *COM*:0000012c i2c_wrbuf
+
+UNDEFINED SYMBOLS
+__do_clear_bss
