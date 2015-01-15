@@ -14,6 +14,7 @@
 # you will have to deal with.
 
 AVRLIB = ./avrlib
+AVRLIB_CONF = ./avrlib/conf
 
 ########### change this lines according to your project ##################
 #put the name of the TRG mcu here (at90s8515, at90s8535, attiny22, atmega603 etc.)
@@ -45,6 +46,7 @@ JUMPSTART = 0x7C00
 			main.c \
 			$(AVRLIB)/timer.c \
 			led/ledM3.c \
+			$(AVRLIB)/i2c.c \
 #put additional assembler source file here
 #  The ASRC line allows you to list files which contain assembly code/routines that
 #  you would like to use from within your C programs.  The assembly code must be
@@ -60,14 +62,14 @@ JUMPSTART = 0x7C00
 	LIB	=
 
 #additional includes to compile
-	INC	= -Iusbdrv -Imatrix -Iled -Imacro
+	INC	= -Iusbdrv -Imatrix -Iled -Imacro -Itinycmd
 
 #assembler flags
 	ASFLAGS = -Wa, -gstabs -DF_CPU=$(F_CPU) -DKBDMOD_M3
 #TRG out
 	OUT = $(TRG)
 #compiler flags
-	CPFLAGS	= -g -Os -Wall -Wstrict-prototypes $(INC) -I$(AVRLIB) -DKBDMOD_M3 -DF_CPU=$(F_CPU)UL -Wa,-ahlms=$(<:.c=.lst)
+	CPFLAGS	= -g -Os -Wall -Wstrict-prototypes -I$(AVRLIB) -I$(AVRLIB_CONF) $(INC) -DKBDMOD_M3 -DF_CPU=$(F_CPU)UL -Wa,-ahlms=$(<:.c=.lst)
 
 #linker flags
 	LDFLAGS = -Wl,-Map=$(TRG).map,--cref,--section-start=.appinboot=$(JUMPSTART)

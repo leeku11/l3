@@ -53,14 +53,16 @@ F_CPU = 8000000
 	LIB	=
 
 #additional includes to compile
-	INC	= 
+#	INC	= 
+	INC	= ../../tinycmd
 
 #assembler flags
 	ASFLAGS = -Wa, -gstabs -DF_CPU=$(F_CPU) -I$(COMMON_DIR)
 #	ASFLAGS += -include $(HARDWARE_INFO_H)
 
 #compiler flags
-	CPFLAGS	= -g -Os -Wall -Wstrict-prototypes -I$(COMMON_DIR) -I$(INC) -I$(AVRLIB) $(LIBSRC) -DF_CPU=$(F_CPU)UL $(OPT_DEFS) -Wa,-ahlms=$(<:.c=.lst)
+#	CPFLAGS	= -g -Os -Wall -Wstrict-prototypes -I$(COMMON_DIR) -I$(INC) -I$(AVRLIB) $(LIBSRC) -DF_CPU=$(F_CPU)UL $(OPT_DEFS) -Wa,-ahlms=$(<:.c=.lst)
+	CPFLAGS	= -g -Os -Wall -Wstrict-prototypes -I$(INC) -DF_CPU=$(F_CPU)UL $(OPT_DEFS) -Wa,-ahlms=$(<:.c=.lst)
 #	CPFLAGS += -include $(HARDWARE_INFO_H)
 
 #linker flags

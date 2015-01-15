@@ -56,9 +56,10 @@ void i2cInit(void)
 	// TODO: should #ifdef these
 	sbi(PORTC, 0);	// i2c SCL on ATmega163,323,16,32,etc
 	sbi(PORTC, 1);	// i2c SDA on ATmega163,323,16,32,etc
+#if 0
 	sbi(PORTD, 0);	// i2c SCL on ATmega128,64
 	sbi(PORTD, 1);	// i2c SDA on ATmega128,64
-
+#endif
 	// clear SlaveReceive and SlaveTransmit handler to null
 	i2cSlaveReceive = 0;
 	i2cSlaveTransmit = 0;

@@ -40,4 +40,10 @@
 //#define F_CPU        3686400               		// 3.69MHz processor
 #define CYCLES_PER_US ((F_CPU+500000)/1000000) 	// cpu cycles per microsecond
 
+// Support features
+#define SUPPORT_TINY_CMD
+#ifdef SUPPORT_TINY_CMD
+#define SUPPORT_I2C
+#endif // SUPPORT_TINY_CMD
+
 #endif
