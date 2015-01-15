@@ -227,3 +227,5 @@ pip-log.txt
 *.hex
 *.map
 *.zip
+*.lst
+*.lst
