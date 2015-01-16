@@ -5,17 +5,9 @@ typedef enum
     LED_PIN_NUMLOCK,            // On/Off
     LED_PIN_CAPSLOCK,           // On/Off
     LED_PIN_SCROLLOCK,          // On/Off
-    LED_PIN_PRT,                // On/Off
     
-    LED_PIN_ESC,
-    
-    LED_PIN_Fx,
-    LED_PIN_PAD,
     LED_PIN_BASE,
     LED_PIN_WASD,                   
-    LED_PIN_ARROW18,
-    LED_PIN_VESEL,
-    LED_PIN_ALL
 }LED_BLOCK;    
 
 typedef enum

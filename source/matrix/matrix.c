@@ -210,10 +210,7 @@ uint8_t processReleasedFNkeys(uint8_t keyidx)
     if(keyidx >= K_LED0 && keyidx <= K_LED3)
     {
         ledmodeIndex = keyidx-K_LED0;
-        for (ledblock = LED_PIN_ESC; ledblock < LED_PIN_VESEL; ledblock++)
-        {
-            led_mode_change(ledblock, ledmode[ledmodeIndex][ledblock]);
-        }
+        led_mode_change(ledblock, ledmode[ledmodeIndex][ledblock]);
         led_mode_save();
         retVal = 1;
     }else if(keyidx >= K_LFX && keyidx <= K_LARR)
@@ -293,10 +290,7 @@ uint8_t scanmatrix(void)
         kbdsleepmode = 1;
         ledmodeIndex = 4;       // hidden OFF index
 
-        for (ledblock = LED_PIN_PRT; ledblock < LED_PIN_VESEL; ledblock++)
-        {
-            led_mode_change(ledblock, ledmode[ledmodeIndex][ledblock]);
-        }
+        led_mode_change(ledblock, ledmode[ledmodeIndex][ledblock]);
     }
     
 

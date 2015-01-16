@@ -356,6 +356,10 @@ int main(void)
 //   timerInit();
 //   timer1PWMInit(8);
 //   timer2PWMInit(8);
+   timer0Init();
+   timer0SetPrescaler(TIMER_CLK_DIV8);
+      
+
    keymap_init();
 
 #ifdef SUPPORT_I2C
@@ -366,7 +370,6 @@ int main(void)
    {
       led_check(1);
 
-    led_off(LED_PIN_Fx);
     led_off(LED_PIN_BASE);
     led_off(LED_PIN_WASD);
     
@@ -376,7 +379,6 @@ int main(void)
    else
    {
     
-    led_on(LED_PIN_Fx);
       led_check(0);
       led_mode_init();
       ps2main();

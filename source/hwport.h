@@ -13,41 +13,15 @@
 #define PS2_CLK_PULLUP_PIN      1
 
 
-#define LED_PRT_PORT        (uint8_t *const)&PORTC
-#define LED_PRT_PIN         0
+#define LED_NUM_PORT        (uint8_t *const)&PORTD
+#define LED_NUM_PIN         5
 
-#define LED_NUM_PORT        (uint8_t *const)&PORTC
-#define LED_NUM_PIN         0
+#define LED_CAP_PORT        (uint8_t *const)&PORTD
+#define LED_CAP_PIN         6
 
-#define LED_CAP_PORT        (uint8_t *const)&PORTC
-#define LED_CAP_PIN         0
+#define LED_SCR_PORT        (uint8_t *const)&PORTD
+#define LED_SCR_PIN         7
 
-#define LED_SCR_PORT        (uint8_t *const)&PORTC
-#define LED_SCR_PIN         0
-
-
-
-#define LED_WASD_PORT       (uint8_t *const)&PORTC
-#define LED_WASD_PIN        0
-
-#define LED_PAD_PORT        (uint8_t *const)&PORTC
-#define LED_PAD_PIN         0
-
-#define LED_ARROW18_PORT    (uint8_t *const)&PORTC
-#define LED_ARROW18_PIN     0
-
-#define LED_VESEL_PORT      (uint8_t *const)&PORTC
-#define LED_VESEL_PIN       0
-
-
-#define LED_Fx_PORT         (uint8_t *const)&PORTC
-#define LED_Fx_PIN          0
-
-#define LED_BASE_PORT       (uint8_t *const)&PORTC
-#define LED_BASE_PIN        0
-
-#define LED_ESC_PORT        (uint8_t *const)&PORTC
-#define LED_ESC_PIN         0
 
 #define BOOTLOADER_ADDRESS 0x7000
 

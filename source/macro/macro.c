@@ -375,10 +375,10 @@ void playMacroUSB(uint8_t macrokey)
         {
             if(esctoggle++ == 4)
             {
-                led_on(LED_PIN_ESC);
+//                led_on(LED_PIN_ESC);
                 esctoggle = 0;
             }else{
-                led_off(LED_PIN_ESC);
+//                led_off(LED_PIN_ESC);
             }
         
             wdt_reset();
@@ -443,10 +443,10 @@ void playMacroPS2(uint8_t macrokey)
     {
         if(esctoggle++ == 4)
         {
-            led_on(LED_PIN_ESC);
+//            led_on(LED_PIN_ESC);
             esctoggle = 0;
         }else{
-            led_off(LED_PIN_ESC);
+//            led_off(LED_PIN_ESC);
         }
         
 #ifdef KBDMOD_M3
