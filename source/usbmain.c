@@ -59,6 +59,7 @@ PROGMEM uchar keyboard_hid_report[] = {
     0x05, 0x01,          // Usage Page (Generic Desktop),
     0x09, 0x06,          // Usage (Keyboard),
     0xA1, 0x01,          // Collection (Application),
+
     0x75, 0x01,          //   Report Size (1),
     0x95, 0x08,          //   Report Count (8),
     0x05, 0x07,          //   Usage Page (Key Codes),
@@ -87,7 +88,8 @@ PROGMEM uchar keyboard_hid_report[] = {
     0x19, 0x00,          //   Usage Minimum (0),
     0x29, 0xFF,          //   Usage Maximum (255),
     0x81, 0x00,          //   Input (Data, Array),
-    0xc0                 // End Collection
+ 
+   0xc0                 // End Collection
 };
 
 
@@ -102,7 +104,7 @@ PROGMEM uchar keyboard_hid_report[] = {
  * http://www.microsoft.com/whdc/device/input/wheel.mspx
  */
 PROGMEM uchar mouse_hid_report[] = {
-#if MOUSE_ENABLE
+#if 0
     /* mouse */
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x02,                    // USAGE (Mouse)
@@ -150,7 +152,28 @@ PROGMEM uchar mouse_hid_report[] = {
     0x81, 0x06,                    //     INPUT (Data,Var,Rel)
     0xc0,                          //   END_COLLECTION
     0xc0,                          // END_COLLECTION
-#endif    
+
+#else
+    /* consumer */
+    0x06, 0x00, 0xff,              // USAGE_PAGE (Generic Desktop)
+    0x09, 0x01,                    // USAGE (Vendor Usage 1)
+    0xa1, 0x01,                    // COLLECTION (Application)
+    0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
+    0x26, 0xff, 0x00,              //   LOGICAL_MAXIMUM (255)
+    0x75, 0x08,                    //   REPORT_SIZE (8)
+
+    0x85, REPORT_ID_INFO,         //   REPORT_ID (1)
+    0x95, 0x07,                    //   REPORT_COUNT (7)
+    0x09, 0x00,                    //   USAGE (Undefined)
+    0xb2, 0x02, 0x01,              //   FEATURE (Data,Var,Abs,Buf)
+
+    0x85, REPORT_ID_BOOT,          //   REPORT_ID (2)
+    0x95, 0x83,              		//   REPORT_COUNT (131)
+    0x09, 0x00,                    //   USAGE (Undefined)
+    0xb2, 0x02, 0x01,              //   FEATURE (Data,Var,Abs,Buf)
+    0xc0,                           // END_COLLECTION
+#endif
+
     /* system control */
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x80,                    // USAGE (System Control)

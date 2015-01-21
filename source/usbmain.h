@@ -8,9 +8,10 @@ typedef struct report_extra{
 
 
 /* report id */
-#define REPORT_ID_MOUSE     1
-#define REPORT_ID_SYSTEM    2
-#define REPORT_ID_CONSUMER  3
+#define REPORT_ID_INFO      1
+#define REPORT_ID_BOOT      2
+#define REPORT_ID_SYSTEM    3
+#define REPORT_ID_CONSUMER  4
 
 
 extern uint8_t clearReportBuffer(void);
