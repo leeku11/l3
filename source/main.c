@@ -248,7 +248,7 @@ void tinycmd_led_on(uint8_t r, uint8_t g, uint8_t b)
 {
 #define MAX_LEVEL_MASK(a)               (a & 0x5F) // below 95
     uint8_t i;
-    led_type led;
+    tinycmd_led_type led;
     tinycmd_led_req_type *p_led_req = (tinycmd_led_req_type *)localBuffer;
     
     p_led_req->cmd_code = TINY_CMD_LED_F;
@@ -269,23 +269,6 @@ void tinycmd_led_on(uint8_t r, uint8_t g, uint8_t b)
     i2cMasterSend(TARGET_ADDR, p_led_req->pkt_len, p_led_req);
 }
 
-void tinycmd_test(void)
-{
-    uint8_t i;
-    tinycmd_test_req_type *p_test_req = (tinycmd_test_req_type *)localBuffer;
-
-    p_test_req->cmd_code = TINY_CMD_TEST_F;
-    p_test_req->pkt_len = sizeof(tinycmd_test_req_type);
-
-    p_test_req->data_len = 14*3;
-    for(i = 0; i < p_test_req->data_len; i++)
-    {
-        p_test_req->data[i] = 60+i;
-    }
-
-    i2cMasterSend(TARGET_ADDR, p_test_req->pkt_len, p_test_req);
-}
-
 void testI2C(uint8_t count)
 {
     switch(count % 7)
@@ -300,7 +283,6 @@ void testI2C(uint8_t count)
         tinycmd_three_lock(4, 2, 1);
         break;
     case 3:
-        tinycmd_test();
         break;
     case 4:
         tinycmd_led_on(0, 255, 255);
@@ -370,8 +352,8 @@ int main(void)
    {
       led_check(1);
 
-    led_off(LED_PIN_BASE);
-    led_off(LED_PIN_WASD);
+      led_off(LED_PIN_BASE);
+      led_off(LED_PIN_WASD);
     
       led_mode_init();
       usbmain();

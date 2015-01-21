@@ -17,17 +17,17 @@
 
 ########### change this lines according to your project ##################
 #put the name of the target mcu here (at90s8515, at90s8535, attiny22, atmega603 etc.)
-MCU = attiny85
-# MCU = atmega161
-# MCU = atmega128
+	MCU = attiny85
 
-F_CPU = 8000000
+	F_CPU = 8000000
 
 #put the name of the target file here (without extension)
 #  Your "target" file is your C source file that is at the top level of your code.
 #  In other words, this is the file which contains your main() function.
 
 	TRG = main
+	
+	TINYCMD = ../../tinycmd
 
 #put your C sourcefiles here 
 #  Here you must list any C source files which are used by your target file.
@@ -37,6 +37,7 @@ F_CPU = 8000000
 	SRC +=  i2c-slave.c\
 			../Light_WS2812/light_ws2812.c \
 			$(TRG).c \
+			$(AVRLIB)\timeratt.c
 			
 #put additional assembler source file here
 #  The ASRC line allows you to list files which contain assembly code/routines that
@@ -54,7 +55,7 @@ F_CPU = 8000000
 
 #additional includes to compile
 #	INC	= 
-	INC	= ../../tinycmd
+	INC	= $(TINYCMD)
 
 #assembler flags
 	ASFLAGS = -Wa, -gstabs -DF_CPU=$(F_CPU) -I$(COMMON_DIR)
@@ -62,7 +63,7 @@ F_CPU = 8000000
 
 #compiler flags
 #	CPFLAGS	= -g -Os -Wall -Wstrict-prototypes -I$(COMMON_DIR) -I$(INC) -I$(AVRLIB) $(LIBSRC) -DF_CPU=$(F_CPU)UL $(OPT_DEFS) -Wa,-ahlms=$(<:.c=.lst)
-	CPFLAGS	= -g -Os -Wall -Wstrict-prototypes -I$(INC) -DF_CPU=$(F_CPU)UL $(OPT_DEFS) -Wa,-ahlms=$(<:.c=.lst)
+	CPFLAGS	= -g -Os -Wall -Wstrict-prototypes -I$(INC) -I$(AVRLIB) -DF_CPU=$(F_CPU)UL $(OPT_DEFS) -Wa,-ahlms=$(<:.c=.lst)
 #	CPFLAGS += -include $(HARDWARE_INFO_H)
 
 #linker flags

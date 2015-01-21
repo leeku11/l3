@@ -547,6 +547,9 @@ uint8_t usbmain(void) {
     uint8_t updateNeeded = 0;
     uint8_t idleCounter = 0;
     uint32_t interfaceCount = 0;
+#ifdef SUPPORT_I2C
+    uint8_t test_cout = 0;
+#endif
 	interfaceReady = 0;
 
     DEBUG_PRINT(("USB\n"));
@@ -565,9 +568,16 @@ uint8_t usbmain(void) {
         // main event loop
 
         if(interfaceReady == 0 && interfaceCount++ > 12000){
-//		   Reset_AVR();
+		   //Reset_AVR();
 			//break;
 		}
+
+#ifdef SUPPORT_I2C
+        if(test_cout++%2000 == 0)
+        {
+			testI2C(test_cout);
+        }
+#endif // SUPPORT_I2C
                 
         wdt_reset();
         usbPoll();

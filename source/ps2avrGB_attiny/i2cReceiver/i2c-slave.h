@@ -36,8 +36,8 @@
 
 //#define I2C_RDSIZE	0x12C	// slave => master buffer size
 //#define I2C_WRSIZE	0x12C	// master => slave buffer size
-#define I2C_RDSIZE	0x60	// slave => master buffer size
-#define I2C_WRSIZE	0x60	// master => slave buffer size
+#define I2C_RDSIZE	0x50	// slave => master buffer size
+#define I2C_WRSIZE	0x50	// master => slave buffer size
 
 void    i2c_initialize (uint8_t addr);		// set slave address, 8bit format
 uint8_t	i2c_idle (void);

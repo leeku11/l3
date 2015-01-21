@@ -7,6 +7,7 @@
 
 #include "i2c-slave.h"
 #include "../Light_WS2812/light_ws2812.h"
+#include "timeratt.h"
 
 #define SUPPORT_TINY_CMD
 #ifdef SUPPORT_TINY_CMD
@@ -24,35 +25,48 @@
 #define ws2812_pin3  4	// PB4 -> OC1B
 //#define ws2812_pin4  5 //reset... do not use!!
 
+typedef struct {
+    uint8_t led_max;
+    uint8_t level_max;
+} sys_config_type;
+
 // local data buffer
 uint8_t localBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
-uint8_t localBufferLength = I2C_RECEIVE_DATA_BUFFER_SIZE;
+//uint8_t localBufferLength = I2C_RECEIVE_DATA_BUFFER_SIZE;
+uint8_t localBufferLength;
 
 uint8_t cmdBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
+
+uint8_t threeLock[3] = { 0, 0, 0 }; // initial level
+sys_config_type sysConfig;
 
 void i2cSlaveReceiveService(uint8_t receiveDataLength, uint8_t* receiveData);
 
 
 #ifdef SUPPORT_TINY_CMD
-//tinycmd_pkt_req_type tinycmd_req;
-
-uint8_t handle_ver(tinycmd_pkt_req_type *p_req);
-uint8_t handle_reset(tinycmd_pkt_req_type *p_req);
-uint8_t handle_three_lock(tinycmd_pkt_req_type *p_req);
-uint8_t handle_led(tinycmd_pkt_req_type *p_req);
-uint8_t handle_test(tinycmd_pkt_req_type *p_req);
+uint8_t handle_cmd_ver(tinycmd_pkt_req_type *p_req);
+uint8_t handle_cmd_reset(tinycmd_pkt_req_type *p_req);
+uint8_t handle_cmd_three_lock(tinycmd_pkt_req_type *p_req);
+uint8_t handle_cmd_led_all(tinycmd_pkt_req_type *p_req);
+uint8_t handle_cmd_led(tinycmd_pkt_req_type *p_req);
+uint8_t handle_cmd_test(tinycmd_pkt_req_type *p_req);
+uint8_t handle_cmd_pwm(tinycmd_pkt_req_type *p_req);
+uint8_t handle_cmd_config(tinycmd_pkt_req_type *p_req);
 
 const tinycmd_handler_func handle_cmd_func[] = {
-    handle_ver,
-    handle_reset,
-    handle_three_lock,
-    handle_led,
-    handle_test,
+    handle_cmd_ver,
+    handle_cmd_reset,
+    handle_cmd_three_lock,
+    handle_cmd_led_all,
+    handle_cmd_led,
+    handle_cmd_pwm,
+    handle_cmd_config,
+    handle_cmd_test,
     0
 };
-#define HANDLER_SIZE            (sizeof(handle_cmd_func)/sizeof(tinycmd_handler_func))
+#define CMD_HANDLER_TABLE_SIZE            (sizeof(handle_cmd_func)/sizeof(tinycmd_handler_func))
 
-uint8_t handle_ver(tinycmd_pkt_req_type *p_req)
+uint8_t handle_cmd_ver(tinycmd_pkt_req_type *p_req)
 {
     uint8_t *pTmp;
     uint8_t i;
@@ -68,9 +82,9 @@ uint8_t handle_ver(tinycmd_pkt_req_type *p_req)
 
     pTmp = (uint8_t *)localBuffer;
     // Three lock
-    *(pTmp++) = 0;
-    *(pTmp++) = 0;
-    *(pTmp++) = 0;
+    *(pTmp++) = threeLock[0];
+    *(pTmp++) = threeLock[1];
+    *(pTmp++) = threeLock[2];
 
     for(i = 0; i < 2; i++)
     {
@@ -85,7 +99,7 @@ uint8_t handle_ver(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
-uint8_t handle_reset(tinycmd_pkt_req_type *p_req)
+uint8_t handle_cmd_reset(tinycmd_pkt_req_type *p_req)
 {
     uint8_t *pTmp;
     uint8_t i;
@@ -101,9 +115,9 @@ uint8_t handle_reset(tinycmd_pkt_req_type *p_req)
 
     pTmp = (uint8_t *)localBuffer;
     // Three lock
-    *(pTmp++) = 0;
-    *(pTmp++) = 0;
-    *(pTmp++) = 0;
+    *(pTmp++) = threeLock[0];
+    *(pTmp++) = threeLock[1];
+    *(pTmp++) = threeLock[2];
 
     for(i = 0; i < 4; i++)
     {
@@ -118,7 +132,7 @@ uint8_t handle_reset(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
-uint8_t handle_three_lock(tinycmd_pkt_req_type *p_req)
+uint8_t handle_cmd_three_lock(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_three_lock_req_type *p_three_lock = (tinycmd_three_lock_req_type *)p_req;
     uint8_t *pTmp;
@@ -135,9 +149,9 @@ uint8_t handle_three_lock(tinycmd_pkt_req_type *p_req)
 
     pTmp = (uint8_t *)localBuffer;
     // Three lock
-    *(pTmp++) = 0;
-    *(pTmp++) = 0;
-    *(pTmp++) = 0;
+    *(pTmp++) = threeLock[0];
+    *(pTmp++) = threeLock[1];
+    *(pTmp++) = threeLock[2];
 
     for(i = 0; i < 4; i++)
     {
@@ -174,7 +188,46 @@ uint8_t handle_three_lock(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
-uint8_t handle_led(tinycmd_pkt_req_type *p_req)
+uint8_t handle_cmd_led_all(tinycmd_pkt_req_type *p_req)
+{
+    tinycmd_led_all_req_type *p_led = (tinycmd_led_all_req_type *)p_req;
+    uint8_t *pTmp, *pLed;
+    uint8_t i;
+
+    // Off
+    pTmp = (uint8_t *)localBuffer;
+    for(i = 0; i < 15; i++)
+    {
+        *(pTmp++) = 0;
+        *(pTmp++) = 0;
+        *(pTmp++) = 0;
+    }
+
+    pTmp = (uint8_t *)localBuffer;
+
+    // Three lock
+    *(pTmp++) = threeLock[0];
+    *(pTmp++) = threeLock[1];
+    *(pTmp++) = threeLock[2];
+
+    if(p_led->on)
+    {
+        pLed = (uint8_t *)&p_led->led;
+        for(i = 0; i < 14; i++)
+        {
+            *(pTmp++) = *(pLed++);
+            *(pTmp++) = *(pLed++);
+            *(pTmp++) = *(pLed++);
+        }
+    }
+    localBufferLength = 15*3;
+
+    ws2812_sendarray(localBuffer,localBufferLength);        // output message data to port D
+    
+    return 0;
+}
+
+uint8_t handle_cmd_led(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_led_req_type *p_led = (tinycmd_led_req_type *)p_req;
     uint8_t *pTmp, *pLed;
@@ -192,9 +245,9 @@ uint8_t handle_led(tinycmd_pkt_req_type *p_req)
     pTmp = (uint8_t *)localBuffer;
 
     // Three lock
-    *(pTmp++) = 0;
-    *(pTmp++) = 0;
-    *(pTmp++) = 0;
+    *(pTmp++) = threeLock[0];
+    *(pTmp++) = threeLock[1];
+    *(pTmp++) = threeLock[2];
     
     for(i = 0; i < p_led->offset; i++)
     {
@@ -217,35 +270,28 @@ uint8_t handle_led(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
-uint8_t handle_test(tinycmd_pkt_req_type *p_req)
+uint8_t handle_cmd_pwm(tinycmd_pkt_req_type *p_req)
 {
-    tinycmd_test_req_type *p_test = (tinycmd_test_req_type *)p_req;
-    uint8_t *pTmp;
-    uint8_t i;
+    tinycmd_pwm_req_type *p_pwm = (tinycmd_pwm_req_type *)p_req;
+    uint8_t *pTmp = (uint8_t *)localBuffer;
 
-    pTmp = (uint8_t *)localBuffer;
-    for(i = 0; i < 15; i++)
-    {
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-    }
+    return 0;
+}
 
-    pTmp = (uint8_t *)localBuffer;
-    
-    // Three lock
-    *(pTmp++) = 0;
-    *(pTmp++) = 0;
-    *(pTmp++) = 0;
-    
-    for(i = 0; i < p_test->data_len; i++)
-    {
-        *(pTmp++) = p_test->data[i];
-    }
+uint8_t handle_cmd_config(tinycmd_pkt_req_type *p_req)
+{
+    tinycmd_config_req_type *p_config = (tinycmd_config_req_type *)p_req;
+    uint8_t *pTmp = (uint8_t *)localBuffer;
 
-    localBufferLength = 15*3;
+    sysConfig.led_max = p_config->value.led_max;
+    sysConfig.level_max = p_config->value.level_max;
 
-    ws2812_sendarray(localBuffer,localBufferLength);        // output message data to port D
+    return 0;
+}
+
+uint8_t handle_cmd_test(tinycmd_pkt_req_type *p_req)
+{
+    tinycmd_test_data_type *p_data = (tinycmd_test_data_type *)&p_req->test.data;
 
     return 0;
 }
@@ -308,17 +354,19 @@ void blink(void){
         PORTB ^= (1<<PB1);
     }
 }
- 
+
 int main(void)
 {
     uint8_t i;
     uint8_t *pTmp;
     uint8_t rcvlen;
-    uint8_t rgb;
-    CLKPR=_BV(CLKPCE);
+    
+    CLKPR=_BV(CLKPCE);  // Clock Prescaler Change Enable
     CLKPR=0;			// set clock prescaler to 1 (attiny 25/45/85/24/44/84/13/13A)
 
-    DDRB |= (1<<PB4) | (1<<PB1);
+    // Port B Data Direction Register
+    //DDRB |= (1<<PB4) | (1<<PB3) | (1<<PB1);    // PB1 and PB4 is LED0 and LED1 driver.
+    DDRB |= (1<<PB4) | (1<<PB1);    // PB1 and PB4 is LED0 and LED1 driver.
     PORTB |= (1<<PB4) | (1<<PB1);
 
     count = 0;
@@ -329,35 +377,31 @@ int main(void)
     i2c_initialize( LOCAL_ADDR );
 
     initWs2812(ws2812_pin);
+
+    timer1Init();
+    timer1SetPrescaler(TIMER_CLK_DIV8);
+    
     sei();
 
     for(;;)
     {
         count++;
         rcvlen = i2c_message_ready();
+        pTmp = i2c_wrbuf;
+        // copy the received data to a local buffer
+        for(i=0; i<rcvlen; i++)
+        {
+            cmdBuffer[i] = *pTmp++;
+        }
+        i2c_message_done();
 
         if(rcvlen != 0)
         {
-            tinycmd_pkt_req_type *pReq;
-            pTmp = i2c_wrbuf;
-            // copy the received data to a local buffer
-            for(i=0; i<rcvlen; i++)
-            {
-                cmdBuffer[i] = *pTmp++;
-            }
-            //localBufferLength = rcvlen;
-
-            i2c_message_done();
-
-            pReq = (tinycmd_pkt_req_type *)cmdBuffer;
-
+            tinycmd_pkt_req_type *p_req = (tinycmd_pkt_req_type *)cmdBuffer;
             // handle command
-            if(pReq->cmd_code < HANDLER_SIZE)
+            if(handle_cmd_func[p_req->cmd_code] != 0)
             {
-                if(handle_cmd_func[pReq->cmd_code] != 0)
-                {
-                    handle_cmd_func[pReq->cmd_code](pReq);
-                }
+                handle_cmd_func[p_req->cmd_code](p_req);
             }
         }
 #if 0
@@ -365,24 +409,21 @@ int main(void)
         {
             if(count%50000 == 0)
             {
-                //if(rgb != 1)
+                pTmp = localBuffer;
+                for(i = 0; i < 20; i++)
                 {
-                    //rgb = 1;
-                    pTmp = localBuffer;
-                    for(i = 0; i < 20; i++)
-                    {
-                        *(pTmp++) = 50;
-                        *(pTmp++) = 50;
-                        *(pTmp++) = 50;
-                    }
-                    
-                    ws2812_sendarray(localBuffer, 15*3);
+                    *(pTmp++) = 50;
+                    *(pTmp++) = 50;
+                    *(pTmp++) = 50;
                 }
+                
+                ws2812_sendarray(localBuffer, 15*3);
             }
         }
         //PORTB |= (1<<PB4);
         //blink();
 #endif
+
     }
 
     return 0;
