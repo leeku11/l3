@@ -548,7 +548,8 @@ uint8_t usbmain(void) {
     uint8_t idleCounter = 0;
     uint32_t interfaceCount = 0;
 #ifdef SUPPORT_I2C
-    uint8_t test_cout = 0;
+    uint16_t test_cnt = 0, test_cnt2 = 0;
+    uint8_t duty = 0;
 #endif
 	interfaceReady = 0;
 
@@ -573,9 +574,9 @@ uint8_t usbmain(void) {
 		}
 
 #ifdef SUPPORT_I2C
-        if(test_cout++%2000 == 0)
+        if(test_cnt++%2000 == 0)
         {
-			testI2C(test_cout);
+			testI2C(test_cnt2++, duty++);
         }
 #endif // SUPPORT_I2C
                 

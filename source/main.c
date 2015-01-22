@@ -235,11 +235,24 @@ void tinycmd_reset(uint8_t type)
 
 void tinycmd_three_lock(uint8_t num, uint8_t caps, uint8_t scroll)
 {
+    uint8_t lock = 0;
     tinycmd_three_lock_req_type *p_three_lock_req = (tinycmd_three_lock_req_type *)localBuffer;
     
     p_three_lock_req->cmd_code = TINY_CMD_THREE_LOCK_F;
     p_three_lock_req->pkt_len = sizeof(tinycmd_three_lock_req_type);
-    p_three_lock_req->lock = num | caps | scroll;
+    if(num)
+    {
+        lock |= (1<<2);
+    }
+    if(caps)
+    {
+        lock |= (1<<1);
+    }
+    if(scroll)
+    {
+        lock |= (1<<0);
+    }
+    p_three_lock_req->lock = lock;
 
     i2cMasterSend(TARGET_ADDR, p_three_lock_req->pkt_len, p_three_lock_req);
 }
@@ -269,29 +282,46 @@ void tinycmd_led_on(uint8_t r, uint8_t g, uint8_t b)
     i2cMasterSend(TARGET_ADDR, p_led_req->pkt_len, p_led_req);
 }
 
-void testI2C(uint8_t count)
+void tinycmd_pwm(uint8_t on, uint8_t duty)
 {
-    switch(count % 7)
+    tinycmd_pwm_req_type *p_pwm_req = (tinycmd_pwm_req_type *)localBuffer;
+
+    p_pwm_req->cmd_code = TINY_CMD_PWM_F;
+    p_pwm_req->pkt_len = sizeof(tinycmd_pwm_req_type);
+    p_pwm_req->enable = on;
+    p_pwm_req->duty = duty;
+
+    i2cMasterSend(TARGET_ADDR, p_pwm_req->pkt_len, p_pwm_req);
+}
+
+void testI2C(uint8_t count, uint8_t duty)
+{
+    switch(count % 8)
     {
     case 0:
         tinycmd_ver();
         break;
     case 1:
-        tinycmd_reset(TINY_RESET_SOFT);
+        tinycmd_pwm(TRUE, duty);
         break;
     case 2:
-        tinycmd_three_lock(4, 2, 1);
+        //tinycmd_reset(TINY_RESET_SOFT);
         break;
     case 3:
+        //tinycmd_three_lock(1, 1, 1);
         break;
     case 4:
-        tinycmd_led_on(0, 255, 255);
         break;
     case 5:
-        tinycmd_led_on(255, 0, 255);
+        //tinycmd_led_on(0, 255, 255);
         break;
     case 6:
-        tinycmd_led_on(255, 255, 0);
+        tinycmd_pwm(FALSE, duty);
+        break;
+    case 7:
+        break;
+    case 8:
+        //tinycmd_led_on(255, 255, 0);
         break;
     default:
         break;

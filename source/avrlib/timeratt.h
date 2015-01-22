@@ -305,8 +305,8 @@ void timer1PWMBOn(void);			///< Turn on timer1 Channel B (OC1B) PWM output.
 void timer1PWMAOff(void);			///< turn off timer1 Channel A (OC1A) PWM output
 void timer1PWMBOff(void);			///< turn off timer1 Channel B (OC1B) PWM output
 
-void timer1PWMASet(u16 pwmDuty);	///< set duty of timer1 Channel A (OC1A) PWM output
-void timer1PWMBSet(u16 pwmDuty);	///< set duty of timer1 Channel B (OC1B) PWM output
+void timer1PWMASet(u08 pwmDuty);	///< set duty of timer1 Channel A (OC1A) PWM output
+void timer1PWMBSet(u08 pwmDuty);	///< set duty of timer1 Channel B (OC1B) PWM output
 
 //@}
 //@}

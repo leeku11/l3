@@ -285,8 +285,8 @@ void timer1PWMAOn(void)
 	// turn on channel A (OC1A) PWM output
 	// set OC1A as non-inverted PWM
 	sbi(TCCR1, PWM1A);
-	sbi(TCCR1, COM1A0);
 	sbi(TCCR1, COM1A1);
+	cbi(TCCR1, COM1A0);
 }
 
 void timer1PWMBOn(void)
@@ -294,8 +294,8 @@ void timer1PWMBOn(void)
 	// turn on channel B (OC1B) PWM output
 	// set OC1B as non-inverted PWM
 	sbi(GTCCR, PWM1B);
-	sbi(GTCCR, COM1B0);
 	sbi(GTCCR, COM1B1);
+	cbi(GTCCR, COM1B0);
 }
 
 void timer1PWMAOff(void)
@@ -305,8 +305,8 @@ void timer1PWMAOff(void)
 
 	// turn off channel A (OC1A) PWM output
 	// set OC1A (OutputCompare action) to none
-	cbi(TCCR1,COM1A0);
 	cbi(TCCR1,COM1A1);
+	cbi(TCCR1,COM1A0);
 }
 
 void timer1PWMBOff(void)
@@ -316,12 +316,12 @@ void timer1PWMBOff(void)
 
 	// turn off channel B (OC1B) PWM output
 	// set OC1B (OutputCompare action) to none
-	cbi(GTCCR,COM1B0);
 	cbi(GTCCR,COM1B1);
+	cbi(GTCCR,COM1B0);
 }
 
 
-void timer1PWMASet(u16 pwmDuty)
+void timer1PWMASet(u08 pwmDuty)
 {
 	// set PWM (output compare) duty for channel A
 	// this PWM output is generated on OC1A pin
@@ -333,7 +333,7 @@ void timer1PWMASet(u16 pwmDuty)
 	OCR1A = pwmDuty;
 }
 
-void timer1PWMBSet(u16 pwmDuty)
+void timer1PWMBSet(u08 pwmDuty)
 {
 	// set PWM (output compare) duty for channel B
 	// this PWM output is generated on OC1B pin

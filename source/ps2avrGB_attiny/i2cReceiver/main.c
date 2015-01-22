@@ -21,6 +21,10 @@
 #define I2C_SEND_DATA_BUFFER_SIZE		I2C_RDSIZE	//0x5A
 #define I2C_RECEIVE_DATA_BUFFER_SIZE	I2C_WRSIZE	//0x5A	//30 led
 
+#define LED_NUM           21
+#define LED_ELEMENT       3
+#define LED_ARRAY_SIZE    (LED_NUM*LED_ELEMENT)
+
 #define ws2812_pin2  1
 #define ws2812_pin3  4	// PB4 -> OC1B
 //#define ws2812_pin4  5 //reset... do not use!!
@@ -37,7 +41,7 @@ uint8_t localBufferLength;
 
 uint8_t cmdBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
 
-uint8_t threeLock[3] = { 0, 0, 0 }; // initial level
+uint8_t threeLock[3] = { 100, 100, 100 }; // initial level
 sys_config_type sysConfig;
 
 void i2cSlaveReceiveService(uint8_t receiveDataLength, uint8_t* receiveData);
@@ -66,68 +70,57 @@ const tinycmd_handler_func handle_cmd_func[] = {
 };
 #define CMD_HANDLER_TABLE_SIZE            (sizeof(handle_cmd_func)/sizeof(tinycmd_handler_func))
 
-uint8_t handle_cmd_ver(tinycmd_pkt_req_type *p_req)
+void three_lock_state(uint8_t num, uint8_t caps, uint8_t scroll)
 {
-    uint8_t *pTmp;
-    uint8_t i;
+    threeLock[0] = num;
+    threeLock[1] = caps;
+    threeLock[2] = scroll;
+}
 
-    // Off
-    pTmp = (uint8_t *)localBuffer;
-    for(i = 0; i < 15; i++)
+void led_array_clear(uint8_t *p_buf)
+{
+    memset(p_buf, 0, LED_ARRAY_SIZE);
+}
+
+void led_array_on(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
+{
+    uint8_t i;
+    uint8_t *pTmp = localBuffer;
+    
+    if(on == 0)
     {
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
+        r = g = b = 0;
     }
 
-    pTmp = (uint8_t *)localBuffer;
     // Three lock
     *(pTmp++) = threeLock[0];
     *(pTmp++) = threeLock[1];
     *(pTmp++) = threeLock[2];
-
-    for(i = 0; i < 2; i++)
+    
+    for(i = 0; i < LED_NUM; i++)
     {
-        *(pTmp++) = 70;
-        *(pTmp++) = 70;
-        *(pTmp++) = 70;
+        *(pTmp++) = g;
+        *(pTmp++) = r;
+        *(pTmp++) = b;
     }
-    localBufferLength = 15*3;
+    localBufferLength = LED_ARRAY_SIZE;
+    ws2812_sendarray(localBuffer, LED_ARRAY_SIZE);
+}
 
-    ws2812_sendarray(localBuffer,localBufferLength);        // output message data to port D
+uint8_t handle_cmd_ver(tinycmd_pkt_req_type *p_req)
+{
+    // clear buffer
+    led_array_clear(localBuffer);
+    led_array_on(FALSE, 50, 50, 50);
 
     return 0;
 }
 
 uint8_t handle_cmd_reset(tinycmd_pkt_req_type *p_req)
 {
-    uint8_t *pTmp;
-    uint8_t i;
-
-    // Off
-    pTmp = (uint8_t *)localBuffer;
-    for(i = 0; i < 15; i++)
-    {
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-    }
-
-    pTmp = (uint8_t *)localBuffer;
-    // Three lock
-    *(pTmp++) = threeLock[0];
-    *(pTmp++) = threeLock[1];
-    *(pTmp++) = threeLock[2];
-
-    for(i = 0; i < 4; i++)
-    {
-        *(pTmp++) = 0;
-        *(pTmp++) = 200;
-        *(pTmp++) = 0;
-    }
-    localBufferLength = 15*3;
-
-    ws2812_sendarray(localBuffer,localBufferLength);        // output message data to port D
+    // clear buffer
+    led_array_clear(localBuffer);
+    led_array_on(TRUE, 0, 100, 0);
 
     return 0;
 }
@@ -137,6 +130,10 @@ uint8_t handle_cmd_three_lock(tinycmd_pkt_req_type *p_req)
     tinycmd_three_lock_req_type *p_three_lock = (tinycmd_three_lock_req_type *)p_req;
     uint8_t *pTmp;
     uint8_t i;
+
+    // clear buffer
+    led_array_clear(localBuffer);
+
 
     // Off
     pTmp = (uint8_t *)localBuffer;
@@ -273,7 +270,28 @@ uint8_t handle_cmd_led(tinycmd_pkt_req_type *p_req)
 uint8_t handle_cmd_pwm(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_pwm_req_type *p_pwm = (tinycmd_pwm_req_type *)p_req;
-    uint8_t *pTmp = (uint8_t *)localBuffer;
+
+    if(p_pwm->enable)
+    {
+        led_array_clear(localBuffer);
+        led_array_on(TRUE, 100, 100, 0);
+        led_array_on(FALSE, 0, 0, 0);
+        
+        //timer1PWMASet(p_pwm->duty);
+        //timer1PWMBSet(p_pwm->duty);
+        timer1PWMASet(10);
+        timer1PWMBSet(10);
+        timer1PWMAOn();
+        timer1PWMBOn();
+    }
+    else
+    {
+        led_array_clear(localBuffer);
+        led_array_on(TRUE, 100, 0, 100);
+        led_array_on(FALSE, 0, 0, 0);
+        
+        timer1PWMOff();
+    }
 
     return 0;
 }
@@ -365,14 +383,14 @@ int main(void)
     CLKPR=0;			// set clock prescaler to 1 (attiny 25/45/85/24/44/84/13/13A)
 
     // Port B Data Direction Register
-    //DDRB |= (1<<PB4) | (1<<PB3) | (1<<PB1);    // PB1 and PB4 is LED0 and LED1 driver.
-    DDRB |= (1<<PB4) | (1<<PB1);    // PB1 and PB4 is LED0 and LED1 driver.
+    DDRB |= (1<<PB4) | (1<<PB3) | (1<<PB1);    // PB1 and PB4 is LED0 and LED1 driver.
+    //DDRB |= (1<<PB4) | (1<<PB1);    // PB1 and PB4 is LED0 and LED1 driver.
     PORTB |= (1<<PB4) | (1<<PB1);
 
     count = 0;
 
     // port output
-    DDRB |= (1<<ws2812_pin)|(1<<ws2812_pin2)|(1<<ws2812_pin3);
+    //DDRB |= (1<<ws2812_pin)|(1<<ws2812_pin2)|(1<<ws2812_pin3);
 
     i2c_initialize( LOCAL_ADDR );
 
@@ -380,6 +398,9 @@ int main(void)
 
     timer1Init();
     timer1SetPrescaler(TIMER_CLK_DIV8);
+    timer1PWMInit(0);
+
+    led_array_on(TRUE, 0, 150, 0);
     
     sei();
 
@@ -387,16 +408,17 @@ int main(void)
     {
         count++;
         rcvlen = i2c_message_ready();
-        pTmp = i2c_wrbuf;
-        // copy the received data to a local buffer
-        for(i=0; i<rcvlen; i++)
-        {
-            cmdBuffer[i] = *pTmp++;
-        }
-        i2c_message_done();
 
         if(rcvlen != 0)
         {
+            pTmp = i2c_wrbuf;
+            // copy the received data to a local buffer
+            for(i=0; i<rcvlen; i++)
+            {
+                cmdBuffer[i] = *pTmp++;
+            }
+            i2c_message_done();
+            
             tinycmd_pkt_req_type *p_req = (tinycmd_pkt_req_type *)cmdBuffer;
             // handle command
             if(handle_cmd_func[p_req->cmd_code] != 0)
