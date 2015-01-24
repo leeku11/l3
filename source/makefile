@@ -47,6 +47,8 @@ JUMPSTART = 0x7C00
 			$(AVRLIB)/timer.c \
 			led/ledM3.c \
 			$(AVRLIB)/i2c.c \
+			tinycmd/tinycmdmain.c \
+			
 #put additional assembler source file here
 #  The ASRC line allows you to list files which contain assembly code/routines that
 #  you would like to use from within your C programs.  The assembly code must be

@@ -45,14 +45,25 @@ typedef struct
   uint8_t lock;
 } tinycmd_three_lock_req_type;
 
+// TINY_CMD_BL_LED_ALL_F
 typedef struct
 {
   uint8_t cmd_code;
   uint8_t pkt_len;
   uint8_t on; // on or off
   tinycmd_led_type led;
-} tinycmd_led_all_req_type;
+} tinycmd_bl_led_all_req_type;
 
+// TINY_CMD_BL_LED_POS_F
+typedef struct
+{
+  uint8_t cmd_code;
+  uint8_t pkt_len;
+  uint8_t pos; // position
+  tinycmd_led_type led;
+} tinycmd_bl_led_pos_req_type;
+
+// TINY_CMD_BL_LED_RANGE_F
 typedef struct
 {
   uint8_t cmd_code;
@@ -60,7 +71,15 @@ typedef struct
   uint8_t num;
   uint8_t offset;
   tinycmd_led_type led[TINYCMD_LED_MAX];
-} tinycmd_led_req_type;
+} tinycmd_bl_led_range_req_type;
+
+// TINY_CMD_BL_LED_EFFECT_F
+typedef struct
+{
+  uint8_t cmd_code;
+  uint8_t pkt_len;
+  uint8_t effect;
+} tinycmd_bl_led_effect_req_type;
 
 typedef struct
 {
@@ -94,8 +113,10 @@ typedef union
   uint8_t cmd_code;
   tinycmd_ver_req_type                 ver;
   tinycmd_three_lock_req_type          three_lock;
-  tinycmd_led_all_req_type             led_all;
-  tinycmd_led_req_type                 led;
+  tinycmd_bl_led_all_req_type          bl_led_all;
+  tinycmd_bl_led_pos_req_type          bl_led_pos;
+  tinycmd_bl_led_range_req_type        bl_led_range;
+  tinycmd_bl_led_effect_req_type       bl_led_effect;
   tinycmd_pwm_req_type                 pwm;
   tinycmd_config_req_type              config;
   tinycmd_test_req_type                test;

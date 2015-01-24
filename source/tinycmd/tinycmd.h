@@ -7,15 +7,19 @@
 
 #define TINY_CMD_THREE_LOCK_F           2
 
-#define TINY_CMD_LED_ALL_F              3
+#define TINY_CMD_BL_LED_ALL_F           3
 
-#define TINY_CMD_LED_F                  4
+#define TINY_CMD_BL_LED_POS_F           4
 
-#define TINY_CMD_PWM_F                  5
+#define TINY_CMD_BL_LED_RANGE_F         5
 
-#define TINY_CMD_CONFIG_F               6
+#define TINY_CMD_BL_LED_EFFECT_F        6
 
-#define TINY_CMD_TEST_F                 7
+#define TINY_CMD_PWM_F                  7
+
+#define TINY_CMD_CONFIG_F               8
+
+#define TINY_CMD_TEST_F                 9
 
 
 #define TINY_CMD_MAX                    127

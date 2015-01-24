@@ -23,17 +23,9 @@
 #include "matrix.h"
 #include "macro.h"
 
-#ifdef SUPPORT_TINY_CMD
-#include "tinycmd.h"
-#include "tinycmdpkt.h"
-#endif // SUPPORT_TINY_CMD
-
 
 #ifdef SUPPORT_I2C
 #include "i2c.h"        // include i2c support
-
-#define LOCAL_ADDR      0xA0
-#define TARGET_ADDR     0xB0
 
 // local data buffer
 unsigned char localBuffer[0x60];
@@ -211,123 +203,6 @@ void initI2C(void)
     //	attempts to read data from us as a slave)
     i2cSetSlaveTransmitHandler( i2cSlaveTransmitService );
 }
-
-void tinycmd_ver(void)
-{
-    tinycmd_ver_req_type *p_ver_req = (tinycmd_ver_req_type *)localBuffer;
-    
-    p_ver_req->cmd_code = TINY_CMD_VER_F;
-    p_ver_req->pkt_len = sizeof(tinycmd_ver_req_type);
-
-    i2cMasterSend(TARGET_ADDR, p_ver_req->pkt_len, p_ver_req);
-}
-
-void tinycmd_reset(uint8_t type)
-{
-    tinycmd_reset_req_type *p_reset_req = (tinycmd_reset_req_type *)localBuffer;
-    
-    p_reset_req->cmd_code = TINY_CMD_RESET_F;
-    p_reset_req->pkt_len = sizeof(tinycmd_reset_req_type);
-    p_reset_req->type = TINY_RESET_HARD;
-
-    i2cMasterSend(TARGET_ADDR, p_reset_req->pkt_len, p_reset_req);
-}
-
-void tinycmd_three_lock(uint8_t num, uint8_t caps, uint8_t scroll)
-{
-    uint8_t lock = 0;
-    tinycmd_three_lock_req_type *p_three_lock_req = (tinycmd_three_lock_req_type *)localBuffer;
-    
-    p_three_lock_req->cmd_code = TINY_CMD_THREE_LOCK_F;
-    p_three_lock_req->pkt_len = sizeof(tinycmd_three_lock_req_type);
-    if(num)
-    {
-        lock |= (1<<2);
-    }
-    if(caps)
-    {
-        lock |= (1<<1);
-    }
-    if(scroll)
-    {
-        lock |= (1<<0);
-    }
-    p_three_lock_req->lock = lock;
-
-    i2cMasterSend(TARGET_ADDR, p_three_lock_req->pkt_len, p_three_lock_req);
-}
-
-void tinycmd_led_on(uint8_t r, uint8_t g, uint8_t b)
-{
-#define MAX_LEVEL_MASK(a)               (a & 0x5F) // below 95
-    uint8_t i;
-    tinycmd_led_type led;
-    tinycmd_led_req_type *p_led_req = (tinycmd_led_req_type *)localBuffer;
-    
-    p_led_req->cmd_code = TINY_CMD_LED_F;
-    p_led_req->pkt_len = sizeof(tinycmd_led_req_type);
-
-    p_led_req->num = 5;
-    p_led_req->offset = 6;
-    
-    led.g = MAX_LEVEL_MASK(g);
-    led.r = MAX_LEVEL_MASK(r);
-    led.b = MAX_LEVEL_MASK(b);
-
-    for(i = 0; i < p_led_req->num; i++)
-    {
-       p_led_req->led[i] = led;
-    }
-
-    i2cMasterSend(TARGET_ADDR, p_led_req->pkt_len, p_led_req);
-}
-
-void tinycmd_pwm(uint8_t on, uint8_t duty)
-{
-    tinycmd_pwm_req_type *p_pwm_req = (tinycmd_pwm_req_type *)localBuffer;
-
-    p_pwm_req->cmd_code = TINY_CMD_PWM_F;
-    p_pwm_req->pkt_len = sizeof(tinycmd_pwm_req_type);
-    p_pwm_req->enable = on;
-    p_pwm_req->duty = duty;
-
-    i2cMasterSend(TARGET_ADDR, p_pwm_req->pkt_len, p_pwm_req);
-}
-
-void testI2C(uint8_t count, uint8_t duty)
-{
-    switch(count % 8)
-    {
-    case 0:
-        tinycmd_ver();
-        break;
-    case 1:
-        tinycmd_pwm(TRUE, duty);
-        break;
-    case 2:
-        //tinycmd_reset(TINY_RESET_SOFT);
-        break;
-    case 3:
-        //tinycmd_three_lock(1, 1, 1);
-        break;
-    case 4:
-        break;
-    case 5:
-        //tinycmd_led_on(0, 255, 255);
-        break;
-    case 6:
-        tinycmd_pwm(FALSE, duty);
-        break;
-    case 7:
-        break;
-    case 8:
-        //tinycmd_led_on(255, 255, 0);
-        break;
-    default:
-        break;
-    }
-}
-
 #endif // SUPPORT_I2C
 
 int8_t checkInterface(void)

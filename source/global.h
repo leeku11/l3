@@ -44,6 +44,8 @@
 #define SUPPORT_TINY_CMD
 #ifdef SUPPORT_TINY_CMD
 #define SUPPORT_I2C
+#define LOCAL_ADDR      0xA0
+#define TARGET_ADDR     0xB0
 #endif // SUPPORT_TINY_CMD
 
 #endif

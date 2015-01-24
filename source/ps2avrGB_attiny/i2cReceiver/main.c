@@ -43,29 +43,37 @@ uint8_t cmdBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
 
 uint8_t threeLock[3] = { 100, 100, 100 }; // initial level
 sys_config_type sysConfig;
+uint8_t pwmDutyMax;
+uint8_t pwmDuty;
+uint8_t pwmStep;
+uint8_t pwmState;
 
 void i2cSlaveReceiveService(uint8_t receiveDataLength, uint8_t* receiveData);
 
 
 #ifdef SUPPORT_TINY_CMD
-uint8_t handle_cmd_ver(tinycmd_pkt_req_type *p_req);
-uint8_t handle_cmd_reset(tinycmd_pkt_req_type *p_req);
-uint8_t handle_cmd_three_lock(tinycmd_pkt_req_type *p_req);
-uint8_t handle_cmd_led_all(tinycmd_pkt_req_type *p_req);
-uint8_t handle_cmd_led(tinycmd_pkt_req_type *p_req);
-uint8_t handle_cmd_test(tinycmd_pkt_req_type *p_req);
-uint8_t handle_cmd_pwm(tinycmd_pkt_req_type *p_req);
-uint8_t handle_cmd_config(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_ver(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_reset(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_bl_led_all(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_bl_led_pos(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_bl_led_range(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_bl_led_effect(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_pwm(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_test(tinycmd_pkt_req_type *p_req);
 
 const tinycmd_handler_func handle_cmd_func[] = {
-    handle_cmd_ver,
-    handle_cmd_reset,
-    handle_cmd_three_lock,
-    handle_cmd_led_all,
-    handle_cmd_led,
-    handle_cmd_pwm,
-    handle_cmd_config,
-    handle_cmd_test,
+    handlecmd_ver,
+    handlecmd_reset,
+    handlecmd_three_lock,
+    handlecmd_bl_led_all,
+    handlecmd_bl_led_pos,
+    handlecmd_bl_led_range,
+    handlecmd_bl_led_effect,
+    handlecmd_pwm,
+    handlecmd_config,
+    handlecmd_test,
     0
 };
 #define CMD_HANDLER_TABLE_SIZE            (sizeof(handle_cmd_func)/sizeof(tinycmd_handler_func))
@@ -97,17 +105,17 @@ void led_array_on(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
     *(pTmp++) = threeLock[1];
     *(pTmp++) = threeLock[2];
     
-    for(i = 0; i < LED_NUM; i++)
+    for(i = 1; i < LED_NUM; i++)
     {
-        *(pTmp++) = g;
-        *(pTmp++) = r;
         *(pTmp++) = b;
+        *(pTmp++) = r;
+        *(pTmp++) = g;
     }
     localBufferLength = LED_ARRAY_SIZE;
-    ws2812_sendarray(localBuffer, LED_ARRAY_SIZE);
+    ws2812_sendarray(localBuffer, localBufferLength);
 }
 
-uint8_t handle_cmd_ver(tinycmd_pkt_req_type *p_req)
+uint8_t handlecmd_ver(tinycmd_pkt_req_type *p_req)
 {
     // clear buffer
     led_array_clear(localBuffer);
@@ -116,7 +124,7 @@ uint8_t handle_cmd_ver(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
-uint8_t handle_cmd_reset(tinycmd_pkt_req_type *p_req)
+uint8_t handlecmd_reset(tinycmd_pkt_req_type *p_req)
 {
     // clear buffer
     led_array_clear(localBuffer);
@@ -125,7 +133,7 @@ uint8_t handle_cmd_reset(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
-uint8_t handle_cmd_three_lock(tinycmd_pkt_req_type *p_req)
+uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_three_lock_req_type *p_three_lock = (tinycmd_three_lock_req_type *)p_req;
     uint8_t *pTmp;
@@ -185,20 +193,24 @@ uint8_t handle_cmd_three_lock(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
-uint8_t handle_cmd_led_all(tinycmd_pkt_req_type *p_req)
+uint8_t handlecmd_bl_led_all(tinycmd_pkt_req_type *p_req)
 {
-    tinycmd_led_all_req_type *p_led = (tinycmd_led_all_req_type *)p_req;
-    uint8_t *pTmp, *pLed;
+    tinycmd_bl_led_all_req_type *p_bl_led_all = (tinycmd_bl_led_all_req_type *)p_req;
+    // clear buffer
+    led_array_clear(localBuffer);
+    led_array_on(p_bl_led_all->on, p_bl_led_all->led.r, p_bl_led_all->led.g, p_bl_led_all->led.b);
+    
+    return 0;
+}
+
+uint8_t handlecmd_bl_led_pos(tinycmd_pkt_req_type *p_req)
+{
+    tinycmd_bl_led_pos_req_type *p_bl_led_pos = (tinycmd_bl_led_pos_req_type *)p_req;
+    uint8_t *pTmp;
     uint8_t i;
 
-    // Off
-    pTmp = (uint8_t *)localBuffer;
-    for(i = 0; i < 15; i++)
-    {
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-    }
+    // clear buffer
+    led_array_clear(localBuffer);
 
     pTmp = (uint8_t *)localBuffer;
 
@@ -207,9 +219,38 @@ uint8_t handle_cmd_led_all(tinycmd_pkt_req_type *p_req)
     *(pTmp++) = threeLock[1];
     *(pTmp++) = threeLock[2];
 
-    if(p_led->on)
+    pTmp += 3*p_bl_led_pos->pos;
+    
+    *(pTmp++) = p_bl_led_pos->led.b;
+    *(pTmp++) = p_bl_led_pos->led.r;
+    *(pTmp++) = p_bl_led_pos->led.g;
+    
+    localBufferLength = 15*3;
+
+    ws2812_sendarray(localBuffer,localBufferLength);        // output message data to port D
+
+    return 0;
+}
+
+uint8_t handlecmd_bl_led_range(tinycmd_pkt_req_type *p_req)
+{
+    tinycmd_bl_led_range_req_type *p_bl_led_range = (tinycmd_bl_led_range_req_type *)p_req;
+    uint8_t *pTmp, *pLed;
+    uint8_t i;
+
+    // clear buffer
+    led_array_clear(localBuffer);
+
+    pTmp = (uint8_t *)localBuffer;
+
+    // Three lock
+    *(pTmp++) = threeLock[0];
+    *(pTmp++) = threeLock[1];
+    *(pTmp++) = threeLock[2];
+
+    //if(p_bl_led_range->on)
     {
-        pLed = (uint8_t *)&p_led->led;
+        pLed = (uint8_t *)&p_bl_led_range->led;
         for(i = 0; i < 14; i++)
         {
             *(pTmp++) = *(pLed++);
@@ -224,68 +265,47 @@ uint8_t handle_cmd_led_all(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
-uint8_t handle_cmd_led(tinycmd_pkt_req_type *p_req)
+uint8_t handlecmd_bl_led_effect(tinycmd_pkt_req_type *p_req)
 {
-    tinycmd_led_req_type *p_led = (tinycmd_led_req_type *)p_req;
-    uint8_t *pTmp, *pLed;
-    uint8_t i;
-
-    // Off
-    pTmp = (uint8_t *)localBuffer;
-    for(i = 0; i < 15; i++)
-    {
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-    }
-
-    pTmp = (uint8_t *)localBuffer;
-
-    // Three lock
-    *(pTmp++) = threeLock[0];
-    *(pTmp++) = threeLock[1];
-    *(pTmp++) = threeLock[2];
-    
-    for(i = 0; i < p_led->offset; i++)
-    {
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-    }
-    
-    pLed = (uint8_t *)p_req->led.led;
-    for(i = 0; i < p_led->num; i++)
-    {
-        *(pTmp++) = *(pLed++);
-        *(pTmp++) = *(pLed++);
-        *(pTmp++) = *(pLed++);
-    }
-    localBufferLength = 15*3;
-
-    ws2812_sendarray(localBuffer,localBufferLength);        // output message data to port D
-    
     return 0;
 }
 
-uint8_t handle_cmd_pwm(tinycmd_pkt_req_type *p_req)
+// test
+void pwm_on(uint8_t duty)
+{
+    pwmState = 1;
+    pwmStep = 8;
+    
+    pwmDuty = duty;
+    timer1PWMASet(pwmDuty);
+    timer1PWMBSet(pwmDuty);
+    timer1PWMAOn();
+    timer1PWMBOn();
+}
+
+uint8_t handlecmd_pwm(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_pwm_req_type *p_pwm = (tinycmd_pwm_req_type *)p_req;
 
     if(p_pwm->enable)
     {
+        pwmState = 1;
         led_array_clear(localBuffer);
         led_array_on(TRUE, 100, 100, 0);
         led_array_on(FALSE, 0, 0, 0);
+
+        pwmDutyMax = p_pwm->duty;
+        pwmDuty = 1;
+        pwmStep = 5;
         
-        //timer1PWMASet(p_pwm->duty);
-        //timer1PWMBSet(p_pwm->duty);
-        timer1PWMASet(10);
-        timer1PWMBSet(10);
+        timer1PWMASet(pwmDuty);
+        timer1PWMBSet(pwmDuty);
         timer1PWMAOn();
         timer1PWMBOn();
     }
     else
     {
+        pwmState = 0;
         led_array_clear(localBuffer);
         led_array_on(TRUE, 100, 0, 100);
         led_array_on(FALSE, 0, 0, 0);
@@ -296,7 +316,7 @@ uint8_t handle_cmd_pwm(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
-uint8_t handle_cmd_config(tinycmd_pkt_req_type *p_req)
+uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_config_req_type *p_config = (tinycmd_config_req_type *)p_req;
     uint8_t *pTmp = (uint8_t *)localBuffer;
@@ -307,7 +327,7 @@ uint8_t handle_cmd_config(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
-uint8_t handle_cmd_test(tinycmd_pkt_req_type *p_req)
+uint8_t handlecmd_test(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_test_data_type *p_data = (tinycmd_test_data_type *)&p_req->test.data;
 
@@ -402,6 +422,11 @@ int main(void)
 
     led_array_on(TRUE, 0, 150, 0);
     
+    pwmState = 0;
+
+    //_lkh test
+    pwm_on(0);
+    
     sei();
 
     for(;;)
@@ -426,9 +451,18 @@ int main(void)
                 handle_cmd_func[p_req->cmd_code](p_req);
             }
         }
-#if 0
         else
         {
+            if(count%5000 == 0)
+            {
+                if(pwmState)
+                {
+                    pwmDuty += pwmStep;
+                    timer1PWMASet(pwmDuty);
+                    timer1PWMBSet(pwmDuty);
+                }
+            }
+#if 0
             if(count%50000 == 0)
             {
                 pTmp = localBuffer;
@@ -441,10 +475,10 @@ int main(void)
                 
                 ws2812_sendarray(localBuffer, 15*3);
             }
+#endif
         }
         //PORTB |= (1<<PB4);
         //blink();
-#endif
 
     }
 

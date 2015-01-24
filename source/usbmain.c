@@ -17,6 +17,10 @@
 #include "usbmain.h"
 #include "hwport.h"
 
+#ifdef SUPPORT_TINY_CMD
+#include "tinycmdapi.h"
+#endif
+
 uint8_t interfaceReady = 0;
 
 
@@ -520,6 +524,9 @@ uint8_t buildHIDreports(uint8_t keyidx)
         {
             keyboardReport[reportIndex] = keyidx; // set next available entry
             reportIndex++;
+#ifdef SUPPORT_TINY_CMD
+            tinycmd_api_set_bl_color(keyidx, 70);
+#endif // SUPPORT_TINY_CMD
         }
         
     }    
@@ -573,13 +580,6 @@ uint8_t usbmain(void) {
 			//break;
 		}
 
-#ifdef SUPPORT_I2C
-        if(test_cnt++%2000 == 0)
-        {
-			testI2C(test_cnt2++, duty++);
-        }
-#endif // SUPPORT_I2C
-                
         wdt_reset();
         usbPoll();
 
