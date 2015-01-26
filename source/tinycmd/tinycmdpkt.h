@@ -85,6 +85,7 @@ typedef struct
 {
   uint8_t cmd_code;
   uint8_t pkt_len;
+  uint8_t channel;
   uint8_t enable;
   uint8_t duty;
 } tinycmd_pwm_req_type;

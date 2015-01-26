@@ -30,6 +30,7 @@ uint32_t MATRIX[MAX_COL];
 uint32_t curMATRIX[MAX_COL];
 int8_t debounceMATRIX[MAX_COL][MAX_ROW];
 uint8_t svkeyidx[MAX_COL][MAX_ROW];
+uint8_t  currentLayer[MAX_COL][MAX_ROW];
 
 uint8_t matrixFN[MAX_LAYER];           // (col << 4 | row)
 uint8_t layer = 0;
@@ -80,7 +81,7 @@ static uint8_t findFNkey(void)
     	{
     		for(row=0;row<MAX_ROW;row++)
             {
-               keyidx = pgm_read_byte(keymap[i]+(col*MAX_ROW)+row);
+               keyidx = pgm_read_byte(keylayer(i)+(col*MAX_ROW)+row);
     			if(keyidx == K_FN)
     			{
                     matrixFN[i] = col << 5 | row;
@@ -100,6 +101,7 @@ static uint8_t findFNkey(void)
 void keymap_init(void) 
 {
 	int16_t i, j, keyidx;
+    uint8_t *pBuf;
 #if 1
 	// set zero for every flags
 	for(i=0;i<MAX_KEY;i++)
@@ -147,6 +149,13 @@ void keymap_init(void)
     if (layer >= MAX_LAYER)
         layer = 0;
 
+      pBuf = &currentLayer[0][0];
+
+    for(i = 0; i < MAX_ROW*MAX_COL; i++)
+    {
+        *pBuf++ = pgm_read_byte(keylayer(layer) + i);
+    }
+
    swap_load();
 }
 
@@ -172,11 +181,8 @@ uint8_t processPushedFNkeys(uint8_t keyidx)
     }else if(keyidx >= K_L0 && keyidx <= K_L6)
     {
         layer = keyidx - K_L0;
-        
-        key = pgm_read_byte(keymap[layer]+(5*MAX_ROW)+15);
-        isLED3000 = (key == K_LEFT)? 1 : 0;
-        
         eeprom_write_byte(EEPADDR_KEYLAYER, layer);
+        keymap_init();
         led_mode_init();
         retVal = 1;
     }else if(keyidx >= K_M01 && keyidx <= K_M52)
@@ -516,7 +522,13 @@ uint8_t scankey(void)
 //            keyaddr += row;
 
  //           keyidx = pgm_read_byte(keyaddr); //keymap[t_layer]+(col*MAX_ROW)+row);
-            keyidx = pgm_read_byte(keymap[t_layer]+(col*MAX_ROW)+row);
+ //           keyidx = pgm_read_byte(keymap[t_layer]+(col*MAX_ROW)+row);
+
+            if(t_layer != 3)
+                keyidx = currentLayer[col][row];
+            else
+                keyidx = pgm_read_byte(keylayer(t_layer)+(col*MAX_ROW)+row);
+            
 
             if (keyidx == K_NONE)
                 continue;

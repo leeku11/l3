@@ -28,6 +28,7 @@
 #include "i2c.h"        // include i2c support
 
 // local data buffer
+uint8_t tinyExist = 1;
 unsigned char localBuffer[0x60];
 unsigned char localBufferLength;
 #endif // SUPPORT_I2C

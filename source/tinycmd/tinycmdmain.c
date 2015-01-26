@@ -5,6 +5,7 @@
 #include "tinycmdpkt.h"
 #include "i2c.h"
 
+extern uint8_t tinyExist;           // 1 : attiny85 is exist, 0 : not
 extern unsigned char localBuffer[0x60];
 extern unsigned char localBufferLength;
 
@@ -120,12 +121,13 @@ void tinycmd_bl_led_range(uint8_t num, uint8_t offset, uint8_t r, uint8_t g, uin
     i2cMasterSend(TARGET_ADDR, p_bl_led_range_req->pkt_len, (uint8_t *)p_bl_led_range_req);
 }
 
-void tinycmd_pwm(uint8_t on, uint8_t duty)
+void tinycmd_pwm(uint8_t channel, uint8_t on, uint8_t duty)
 {
     tinycmd_pwm_req_type *p_pwm_req = (tinycmd_pwm_req_type *)localBuffer;
 
     p_pwm_req->cmd_code = TINY_CMD_PWM_F;
     p_pwm_req->pkt_len = sizeof(tinycmd_pwm_req_type);
+    p_pwm_req->channel = channel;
     p_pwm_req->enable = on;
     p_pwm_req->duty = duty;
 

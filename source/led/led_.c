@@ -9,7 +9,7 @@
 
 #include "led.h"
 #include "global.h"
-#include "timer.h"
+#include "timer128.h"
 #include "keymap.h"
 #include "matrix.h"
 #include "hwaddress.h"
@@ -18,13 +18,37 @@
 #define PUSHED_LEVEL_MAX        20
 
 
-static uint8_t *const ledport[] = {LED_NUM_PORT, LED_CAP_PORT,LED_SCR_PORT};
+static uint8_t *const ledport[] = {LED_NUM_PORT, LED_CAP_PORT,LED_SCR_PORT, LED_PRT_PORT, 
+                                    LED_ESC_PORT,LED_Fx_PORT,LED_PAD_PORT, LED_BASE_PORT, 
+                                    LED_WASD_PORT,LED_ARROW18_PORT, LED_VESEL_PORT};
     
-static uint8_t const ledpin[] = {LED_NUM_PIN, LED_CAP_PIN, LED_SCR_PIN};
+static uint8_t const ledpin[] = {LED_NUM_PIN, LED_CAP_PIN, LED_SCR_PIN, LED_PRT_PIN, 
+                                    LED_ESC_PIN,LED_Fx_PIN,LED_PAD_PIN,LED_BASE_PIN, 
+                                    LED_WASD_PIN,LED_ARROW18_PIN, LED_VESEL_PIN};
 uint8_t ledmodeIndex;
 
 #define LEDMODE_ARRAY_SIZE 5*11
-uint8_t ledmode[5][11] ={};
+uint8_t ledmode[5][11] ={ 
+        {LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, 
+        LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, 
+        LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS},
+        
+        {LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, 
+        LED_EFFECT_ALWAYS, LED_EFFECT_FADING, LED_EFFECT_FADING, LED_EFFECT_FADING, 
+        LED_EFFECT_FADING, LED_EFFECT_FADING, LED_EFFECT_FADING},
+        
+        {LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, 
+        LED_EFFECT_ALWAYS, LED_EFFECT_FADING_PUSH_ON, LED_EFFECT_FADING_PUSH_ON, LED_EFFECT_FADING_PUSH_ON, 
+        LED_EFFECT_FADING_PUSH_ON, LED_EFFECT_FADING_PUSH_ON, LED_EFFECT_FADING_PUSH_ON},
+        
+        {LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS, 
+        LED_EFFECT_ALWAYS, LED_EFFECT_PUSHED_LEVEL, LED_EFFECT_PUSHED_LEVEL, LED_EFFECT_PUSHED_LEVEL, 
+        LED_EFFECT_PUSHED_LEVEL, LED_EFFECT_PUSHED_LEVEL, LED_EFFECT_PUSHED_LEVEL},
+        
+        {LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, 
+        LED_EFFECT_FADING, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, 
+        LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF}
+};
 
 
 static uint8_t speed[] = {1, 1, 1, 1, 5, 5, 5, 5, 5, 5, 5};
@@ -32,7 +56,7 @@ static uint8_t brigspeed[] = {1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3};
 static uint8_t pwmDir[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 static uint16_t pwmCounter[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-static uint16_t pushedLevelStay[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static int16_t pushedLevelStay[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 static uint8_t pushedLevel[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 static uint16_t pushedLevelDuty[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 uint8_t LEDstate;     ///< current state of the LEDs
@@ -49,14 +73,40 @@ void led_off(LED_BLOCK block)
         case LED_PIN_NUMLOCK:
         case LED_PIN_CAPSLOCK:
         case LED_PIN_SCROLLOCK:
+        case LED_PIN_PRT:
+
+        case LED_PIN_ESC:
+        case LED_PIN_Fx:
         case LED_PIN_BASE:
         case LED_PIN_WASD:
+        case LED_PIN_VESEL:
             break;                    
+
+        case LED_PIN_PAD:
+#ifdef KBDMOD_M5            
+            if(!isLED3000)
+                *(ledport[LED_PIN_VESEL]) &= ~(BV(ledpin[LED_PIN_VESEL]));
+#endif
+            break;
+        case LED_PIN_ARROW18:
+#ifdef KBDMOD_M5
+            if(isLED3000)
+                *(ledport[LED_PIN_VESEL]) &= ~(BV(ledpin[LED_PIN_VESEL]));
+#endif
+            *(ledport[block]) &= ~(BV(ledpin[block]));
+            break;
+            
+        case LED_PIN_ALL:
+            for (i = 0; i < LED_PIN_ALL; i++)
+            {
+                *(ledport[i]) &= ~(BV(ledpin[i]));
+            }
+            return;
         default:
             return;
     }
     
- //    *(ledport[block]) &= ~(BV(ledpin[block]));
+    *(ledport[block]) &= ~(BV(ledpin[block]));
 }
 
 void led_on(LED_BLOCK block)
@@ -68,13 +118,39 @@ void led_on(LED_BLOCK block)
         case LED_PIN_NUMLOCK:
         case LED_PIN_CAPSLOCK:
         case LED_PIN_SCROLLOCK:
+        case LED_PIN_PRT:
+
+        case LED_PIN_ESC:
+        case LED_PIN_Fx:
         case LED_PIN_BASE:
         case LED_PIN_WASD:
+        case LED_PIN_VESEL:
+            break;                    
+
+        case LED_PIN_PAD:
+#ifdef KBDMOD_M5            
+            if(!isLED3000)
+                *(ledport[LED_PIN_VESEL]) |= BV(ledpin[LED_PIN_VESEL]);
+#endif            
+            break;
+        case LED_PIN_ARROW18:
+#ifdef KBDMOD_M5            
+            if(isLED3000)
+                *(ledport[LED_PIN_VESEL]) |= BV(ledpin[LED_PIN_VESEL]);
+#endif
+            break;
+        case LED_PIN_ALL:
+            for (i = 0; i < LED_PIN_ALL; i++)
+            {
+                *(ledport[i]) |= BV(ledpin[i]);
+            }
+
+            return;
         default:
             return;
     }
- //    led_wave_off(block);
- //    *(ledport[block]) |= BV(ledpin[block]);
+    led_wave_off(block);
+    *(ledport[block]) |= BV(ledpin[block]);
 }
 
 
@@ -82,11 +158,44 @@ void led_wave_on(LED_BLOCK block)
 {
     switch(block)
     {
+        case LED_PIN_ESC:
+            timer3PWMCOn();
+            break;
+        case LED_PIN_Fx:
+            timer3PWMAOn();
+            break;
+        case LED_PIN_PAD:
+            timer0PWMOn();
+#ifdef KBDMOD_M5            
+            if(!isLED3000)
+                timer1PWMAOn();
+#endif
+            break;
         case LED_PIN_BASE:
-            //timer1PWMBOn();
+            timer3PWMBOn();
             break;
         case LED_PIN_WASD:
-            //timer2PWMOn();
+            timer1PWMCOn();
+            break;
+        case LED_PIN_ARROW18:
+            timer1PWMBOn();
+#ifdef KBDMOD_M5            
+            if(isLED3000)
+                timer1PWMAOn();
+#endif
+            break;
+        case LED_PIN_VESEL:
+            timer1PWMAOn();
+            break;
+            
+        case LED_PIN_ALL:
+            timer3PWMCOn();
+            timer3PWMAOn();
+            timer3PWMBOn();
+            timer1PWMCOn();
+            timer1PWMBOn();
+            timer1PWMAOn();
+            timer0PWMOn();
             break;
         default:
             break;
@@ -97,11 +206,46 @@ void led_wave_off(LED_BLOCK block)
 {
     switch(block)
     {
+        case LED_PIN_ESC:
+            timer3PWMCOff();
+            break;
+        case LED_PIN_Fx:
+            timer3PWMAOff();
+            break;
+        case LED_PIN_PAD:
+            timer0PWMOff();
+            
+#ifdef KBDMOD_M5            
+            if(!isLED3000)
+                timer1PWMAOff();
+#endif
+            break;
         case LED_PIN_BASE:
-            timer1PWMBOff();
+            timer3PWMBOff();
             break;
         case LED_PIN_WASD:
-            timer2PWMOff();
+            timer1PWMCOff();
+            break;
+        case LED_PIN_ARROW18:
+            timer1PWMBOff();
+#ifdef KBDMOD_M5            
+            if(isLED3000)
+                timer1PWMAOff();
+#endif
+            break;
+
+        case LED_PIN_VESEL:
+            timer1PWMAOff();
+            break;
+
+        case LED_PIN_ALL:
+            timer3PWMCOff();
+            timer3PWMAOff();
+            timer3PWMBOff();
+            timer1PWMCOff();
+            timer1PWMBOff();
+            timer1PWMAOff();
+            timer0PWMOff();
             break;
         default:
             break;
@@ -115,15 +259,51 @@ void led_wave_set(LED_BLOCK block, uint16_t duty)
 {
     switch(block)
     {
+        case LED_PIN_ESC:
+            timer3PWMCSet(duty);
+            break;
+        case LED_PIN_Fx:
+            timer3PWMASet(duty);
+            break;
+        case LED_PIN_PAD:
+            timer0PWMSet(duty);
+#ifdef KBDMOD_M5            
+            if(!isLED3000)
+                timer1PWMASet(duty);
+#endif
+            break;
         case LED_PIN_BASE:
-            //timer1PWMBSet(duty);
+            timer3PWMBSet(duty);
             break;
         case LED_PIN_WASD:
-            //timer2PWMSet(duty);
+            timer1PWMCSet(duty);
             break;
-       default:
+        case LED_PIN_ARROW18:
+            timer1PWMBSet(duty);
+#ifdef KBDMOD_M5            
+            if(isLED3000)
+                timer1PWMASet(duty);
+#endif
+            break;
+        case LED_PIN_VESEL:
+            timer1PWMASet(duty);
+            break;
+            
+        case LED_PIN_ALL:
+            timer3PWMCSet(duty);
+            timer3PWMASet(duty);
+            timer3PWMBSet(duty);
+            timer1PWMCSet(duty);
+            timer1PWMBSet(duty);
+            timer1PWMASet(duty);
+            timer0PWMSet(duty);
+            break;
+        default:
             break;
     }
+
+
+
 }
 
 
@@ -133,7 +313,7 @@ void led_blink(int matrixState)
 {
     LED_BLOCK ledblock;
 
-    for (ledblock = LED_PIN_BASE; ledblock<=LED_PIN_WASD; ledblock++)
+    for (ledblock = LED_PIN_Fx; ledblock<LED_PIN_VESEL; ledblock++)
     {
         
         if(matrixState & SCAN_DIRTY)      // 1 or more key is pushed
@@ -174,7 +354,7 @@ void led_fader(void)
 {
     
     uint8_t ledblock;
-    for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
+    for (ledblock = LED_PIN_ESC; ledblock < LED_PIN_VESEL; ledblock++)
     {
         if((ledmode[ledmodeIndex][ledblock] == LED_EFFECT_FADING) || ((ledmode[ledmodeIndex][ledblock] == LED_EFFECT_FADING_PUSH_ON) && (scankeycntms > 1000)))
         {
@@ -253,47 +433,125 @@ void led_fader(void)
 
 void led_check(uint8_t forward)
 {
-    led_on(LED_PIN_NUMLOCK);
+    led_off(LED_PIN_ALL);
+    if(forward){
+        led_on(LED_PIN_PRT);
+    }else{
+        led_on(LED_PIN_NUMLOCK);
+    }
     _delay_ms(100);
+    led_off(LED_PIN_ALL);
     led_on(LED_PIN_SCROLLOCK);
+
     _delay_ms(100);
-    led_on(LED_PIN_NUMLOCK);
+    led_off(LED_PIN_ALL);
+    if(forward){
+        led_on(LED_PIN_NUMLOCK);
+    }else{
+        led_on(LED_PIN_PRT);
+    }
     _delay_ms(100);
+    led_off(LED_PIN_ALL);
 }
 
 
 void led_3lockupdate(uint8_t LEDstate)
 {
     uint8_t ledblock;
-       if (LEDstate & LED_NUM) { // light up caps lock
-           led_on(LED_PIN_NUMLOCK);
-       } else {
-           led_off(LED_PIN_NUMLOCK);
-       }
+        if (LEDstate & LED_NUM) { // light up caps lock
+            led_on(LED_PIN_NUMLOCK);
+        } else {
+            led_off(LED_PIN_NUMLOCK);
+        }
         if (LEDstate & LED_CAPS) { // light up caps lock
             led_on(LED_PIN_CAPSLOCK);
-            for(ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
+            for(ledblock = LED_PIN_Fx; ledblock <= LED_PIN_ARROW18; ledblock++)
             {
                 if (ledmode[ledmodeIndex][ledblock] == LED_EFFECT_BASECAPS)
                     led_on(ledblock);
             }
         } else {
             led_off(LED_PIN_CAPSLOCK);
-            for(ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
+            for(ledblock = LED_PIN_Fx; ledblock <= LED_PIN_ARROW18; ledblock++)
             {
                 if (ledmode[ledmodeIndex][ledblock] == LED_EFFECT_BASECAPS)
                     led_off(ledblock);
             }
-       if (LEDstate & LED_SCROLL) { // light up caps lock
-           led_on(LED_PIN_SCROLLOCK);
-       } else {
-           led_off(LED_PIN_SCROLLOCK);
         }
-   }
+        if (LEDstate & LED_SCROLL) { // light up caps lock
+            led_on(LED_PIN_SCROLLOCK);
+        } else {
+            led_off(LED_PIN_SCROLLOCK);
+        }
 }
 
 #define LED_INDICATOR_MAXTIME 90
 #define LED_INDICATOR_MAXINDEX 16
+
+uint8_t ledESCIndicator[6][LED_INDICATOR_MAXINDEX] = {
+   {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+   {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+   {1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+   {1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+   {1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+   {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0}
+};
+
+uint8_t ledPRTIndicator[6][LED_INDICATOR_MAXINDEX] = {
+   {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+   {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+   {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0},
+   {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0},
+   {1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+   {1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+};
+
+
+uint8_t ledESCIndicatorTimer;
+uint8_t ledESCIndicatorIndex;
+
+uint8_t ledPRTIndicatorTimer;
+uint8_t ledPRTIndicatorIndex;
+
+
+void led_ESCIndicater(uint8_t layer)
+{
+    if(ledESCIndicatorTimer++ >= LED_INDICATOR_MAXTIME)
+    {
+        if(ledESCIndicator[layer][ledESCIndicatorIndex] == 1)
+        {
+            led_on(LED_PIN_ESC);
+        }else
+        {
+            led_off(LED_PIN_ESC);
+        }
+        if (++ledESCIndicatorIndex >= LED_INDICATOR_MAXINDEX)
+        {
+            ledESCIndicatorIndex = 0;
+        }
+        ledESCIndicatorTimer = 0;
+    }
+}
+
+void led_PRTIndicater(uint8_t index)
+{
+    if(ledPRTIndicatorTimer++ >= LED_INDICATOR_MAXTIME)
+    {
+        if(ledPRTIndicator[index][ledPRTIndicatorIndex] == 1)
+        {
+            led_on(LED_PIN_PRT);
+        }else
+        {
+            led_off(LED_PIN_PRT);
+        }
+        if (++ledPRTIndicatorIndex >= LED_INDICATOR_MAXINDEX)
+        {
+            ledPRTIndicatorIndex = 0;
+        }
+        ledPRTIndicatorTimer = 0;
+    }
+}
+
 
 
 void led_mode_init(void)
@@ -301,24 +559,21 @@ void led_mode_init(void)
     LED_BLOCK ledblock;
     int16_t i;
     uint8_t *buf;
-    ledmodeIndex = eeprom_read_byte(EEPADDR_LEDMODE_INDEX); 
+    ledmodeIndex = eeprom_read_byte(EEPADDR_LED_STATUS); 
     if (ledmodeIndex > 4)
         ledmodeIndex = 0;
     buf = ledmode;
     for (i = 0; i < LEDMODE_ARRAY_SIZE; i++)
     {
-        *buf++ = pgm_read_byte(LEDMODE_ADDRESS+i);
-//        *buf++ = eeprom_read_byte(EEPADDR_LED_MODE+i);
+//        *buf++ = pgm_read_byte_far(LEDMODE_ADDRESS+i);
+        *buf++ = eeprom_read_byte(EEPADDR_LED_MODE+i);
     }
-
-    for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
+    for (ledblock = LED_PIN_ESC; ledblock < LED_PIN_VESEL; ledblock++)
     {
       pwmDir[ledblock ] = 0;
       pwmCounter[ledblock] = 0;
         led_mode_change(ledblock, ledmode[ledmodeIndex][ledblock]);
     }
-    
-    led_3lockupdate(LEDstate);
 }
 
 void led_mode_change (LED_BLOCK ledblock, int mode)
@@ -348,7 +603,7 @@ void led_mode_change (LED_BLOCK ledblock, int mode)
 
 void led_mode_save(void)
 {
-    eeprom_write_byte(EEPADDR_LEDMODE_INDEX, ledmodeIndex);
+    eeprom_write_byte(EEPADDR_LED_STATUS, ledmodeIndex);
 }
 
 void led_pushed_level_cal(void)
@@ -356,7 +611,7 @@ void led_pushed_level_cal(void)
     LED_BLOCK ledblock;
 	// update pushed level
 	
-    for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
+    for (ledblock = LED_PIN_ESC; ledblock < LED_PIN_ALL; ledblock++)
     { 
         if(pushedLevel[ledblock] < PUSHED_LEVEL_MAX)
         {
@@ -367,11 +622,11 @@ void led_pushed_level_cal(void)
 	}
 }
 
-uint8_t PROGMEM ledstart[32] = "LED record mode - push any key@";
-uint8_t PROGMEM ledend[32] = "LED record done@";
-uint8_t PROGMEM sledmode[8][15] = {"fading@", "fading-pushon@", "pushed-weight@","pushon@", "pushoff@", "always@", "caps@", "off@"}; 
-uint8_t PROGMEM sledblk[5][8] = {"Fx----", "Pad---", "Base--", "WASD--", "Arrow-"};
-uint8_t PROGMEM line[] = "=====================@";
+uint8_t ledstart[] = "LED record mode - push any key@";
+uint8_t ledend[] = "LED record done@";
+uint8_t sledmode[8][15] = {"fading@", "fading-pushon@", "pushed-weight@","pushon@", "pushoff@", "always@", "caps@", "off@"}; 
+uint8_t sledblk[5][7] = {"Fx----", "Pad---", "Base--", "WASD--", "Arrow-"};
+
 void recordLED(uint8_t ledkey)
 {
     ledmodeIndex = ledkey - K_LED0;
@@ -388,10 +643,13 @@ void recordLED(uint8_t ledkey)
     long address;
     index = 0;
     page = 0;
-    long keyaddr;
-    uint8_t *tmpBuf;
-    sendString(ledstart);
+
+
     wdt_reset();
+
+
+
+    sendString(ledstart);
 
     for(col = 0; col < MAX_COL; col++)
     {
@@ -400,7 +658,6 @@ void recordLED(uint8_t ledkey)
             debounceMATRIX[col][row] = -1;
         }
     }
-    sendString(line);
 
     while(1)
     {
@@ -467,31 +724,28 @@ void recordLED(uint8_t ledkey)
                {
                     if (keyidx == K_FN)
                     {
-                        sendString(line);
+                        flash_writeinpage(ledmode, LEDMODE_ADDRESS);
+                        led_mode_save();
+
                         wdt_reset();
-                        for (ledblk = LED_PIN_BASE; ledblk <= LED_PIN_WASD; ledblk++)
+                        sendString("===========================@");
+
+                        for (ledblk = LED_PIN_Fx; ledblk < LED_PIN_VESEL; ledblk++)
                         {
+                           wdt_reset();
                            sendString(sledblk[ledblk-5]);
                            sendString(sledmode[ledmode[ledmodeIndex][ledblk]]);
                         }
-                        sendString(line);
+                        sendString("===========================@");
                         wdt_reset();
+
                         sendString(ledend);
-
-
-                        flash_writeinpage(ledmode, LEDMODE_ADDRESS);
-                        wdt_reset();
-                        led_mode_save();
-                        wdt_reset();
-                        
-
                         return;
                     }else
                     {
                         ledblk = keyidx - K_LFX + 5;
-                        ledmode[ledmodeIndex][ledblk] = ledmode[ledmodeIndex][ledblk] + 1;
                         
-                        if(ledmode[ledmodeIndex][ledblk] >= LED_EFFECT_NONE)
+                        if(++ledmode[ledmodeIndex][ledblk] >= LED_EFFECT_NONE)
                         {
                             ledmode[ledmodeIndex][ledblk] = LED_EFFECT_FADING;
                         }
@@ -502,7 +756,7 @@ void recordLED(uint8_t ledkey)
                         wdt_reset();
                         sendString(sledmode[ledmode[ledmodeIndex][ledblk]]);
 
-                         for (ledblk = LED_PIN_BASE; ledblk <= LED_PIN_WASD; ledblk++)
+                         for (ledblk = LED_PIN_Fx; ledblk < LED_PIN_VESEL; ledblk++)
                          {
                               pwmDir[ledblk ] = 0;
                               pwmCounter[ledblk] = 0;

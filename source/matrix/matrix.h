@@ -5,12 +5,14 @@
 
 #define DEBOUNCE_MAX        4           // 10 is 5ms at 12MHz XTAL
 
+#define keylayer(layer)  (KEYMAP_LAYER0 + (0x100 * layer))
+
 
 extern uint32_t MATRIX[MAX_COL];
 extern uint32_t curMATRIX[MAX_COL];
 extern int8_t debounceMATRIX[MAX_COL][MAX_ROW];
 extern uint8_t svkeyidx[MAX_COL][MAX_ROW];
-
+extern uint8_t  currentLayer[MAX_COL][MAX_ROW];
 
 extern uint8_t matrixFN[MAX_LAYER];           // (col << 4 | row)
 extern uint8_t layer;

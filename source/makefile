@@ -32,7 +32,7 @@ JUMPSTART = 0x7C00
 #  Your "TRG" file is your C source file that is at the top level of your code.
 #  In other words, this is the file which contains your main() function.
 
-	TRG = SyryanEM7
+	TRG = L3
 
 #put your C sourcefiles here 
 #  Here you must list any C source files which are used by your TRG file.
@@ -45,7 +45,7 @@ JUMPSTART = 0x7C00
 			usbmain.c ps2main.c keysta.c \
 			main.c \
 			$(AVRLIB)/timer.c \
-			led/ledM3.c \
+			led/led.c \
 			$(AVRLIB)/i2c.c \
 			tinycmd/tinycmdmain.c \
 			
@@ -124,14 +124,16 @@ usbdrv/oddebug.o :	usbdrv/oddebug.c 	usbdrv/oddebug.h
 usbdrv/usbdrvasm.o : usbdrv/usbdrvasm.asm usbdrv/usbdrvasm.S usbdrv/usbportability.h	usbdrv/usbdrv.h  usbconfig.h
 
 all:
+	avr-size -C --mcu=atmega32 l3.elf
 	rm -rf $(TRG)
 	mkdir $(TRG)
 	mv *.lst $(TRG)
 	mv *.bin $(TRG)
 	mv *.cof $(TRG)
 	mv *.eep $(TRG)
-	mv *.elf $(TRG)
+	cp *.elf $(TRG)
 	mv *.hex $(TRG)
 	mv *.map $(TRG)
 	cp *.bat $(TRG)
 	cp bootloadHID_M3.exe $(TRG)
+   

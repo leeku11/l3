@@ -264,31 +264,27 @@ void led_check(uint8_t forward)
 
 void led_3lockupdate(uint8_t LEDstate)
 {
-    uint8_t ledblock;
+   if (tinyExist)
+   {
+      tinycmd_three_lock((LEDstate & LED_NUM), (LEDstate & LED_CAPS), (LEDstate & LED_SCROLL));
+   }else
+   {
        if (LEDstate & LED_NUM) { // light up caps lock
            led_on(LED_PIN_NUMLOCK);
        } else {
            led_off(LED_PIN_NUMLOCK);
        }
-        if (LEDstate & LED_CAPS) { // light up caps lock
-            led_on(LED_PIN_CAPSLOCK);
-            for(ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
-            {
-                if (ledmode[ledmodeIndex][ledblock] == LED_EFFECT_BASECAPS)
-                    led_on(ledblock);
-            }
-        } else {
-            led_off(LED_PIN_CAPSLOCK);
-            for(ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
-            {
-                if (ledmode[ledmodeIndex][ledblock] == LED_EFFECT_BASECAPS)
-                    led_off(ledblock);
-            }
+       if (LEDstate & LED_CAPS) { // light up caps lock
+         led_on(LED_PIN_CAPSLOCK);
+       } else {
+         led_off(LED_PIN_CAPSLOCK);
        if (LEDstate & LED_SCROLL) { // light up caps lock
            led_on(LED_PIN_SCROLLOCK);
        } else {
            led_off(LED_PIN_SCROLLOCK);
-        }
+       }
+       }
+         
    }
 }
 
@@ -445,7 +441,7 @@ void recordLED(uint8_t ledkey)
          row = i;
 #endif
 
-        keyidx = pgm_read_byte(keymap[6]+(col*MAX_ROW)+row);
+        keyidx = pgm_read_byte(keylayer(6)+(col*MAX_ROW)+row);
 
          if (keyidx == K_NONE)
             continue;

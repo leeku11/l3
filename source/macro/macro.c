@@ -355,21 +355,13 @@ void playMacroUSB(uint8_t macrokey)
     {
         return;
     }
-#ifdef KBDMOD_M3
     keyidx = pgm_read_byte(address++);
-#else
-    keyidx = pgm_read_byte_far(address++);
-#endif
     for (i = 0; i < MAX_MACRO_LEN; i++)
     {
         if((K_Modifiers < keyidx) && (keyidx < K_Modifiers_end))
         {
             key.mode ^= modifierBitmap[keyidx -K_Modifiers];
-#ifdef KBDMOD_M3
             keyidx = pgm_read_byte(address++);
-#else            
-            keyidx = pgm_read_byte_far(address++);
-#endif
         }
         while(((keyidx < K_Modifiers) || (K_Modifiers_end < keyidx)) && keyidx != K_NONE && keyidx < K_M01)
         {
@@ -393,11 +385,7 @@ void playMacroUSB(uint8_t macrokey)
             sendKey(key);
             
             wdt_reset();
-#ifdef KBDMOD_M3
             keyidx = pgm_read_byte(address++);
-#else            
-            keyidx = pgm_read_byte_far(address++);
-#endif
         }
         if(keyidx == K_NONE)
             break;
@@ -651,7 +639,7 @@ void recordMacro(uint8_t macrokey)
 
             row = i;
 
-            keyidx = pgm_read_byte(keymap[t_layer]+(col*MAX_ROW)+row);
+            keyidx = pgm_read_byte(keylayer(t_layer)+(col*MAX_ROW)+row);
 
          if ((keyidx <= ErrorUndefined) || (K_Modifiers_end <= keyidx))
             continue;
