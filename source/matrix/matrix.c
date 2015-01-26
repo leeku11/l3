@@ -160,13 +160,6 @@ void keymap_init(void)
 }
 
 
-uint8_t macrokeystring[3][30] = {
-                                {K_H, K_E, K_L, K_L, K_O, K_H, K_E, K_L, K_L, K_O,K_H, K_E, K_L, K_L, K_O,K_H, K_E, K_L, K_L, K_O,K_H, K_E, K_L, K_L, K_O, K_NONE},
-                                {K_RCTRL, K_V, K_RCTRL, K_C, K_P, K_NONE},
-                                {K_LSHIFT, K_H, K_LSHIFT, K_I, K_G, K_H, K_LSHIFT, K_1, K_LSHIFT, K_NONE}
-                             };
-
-
 uint8_t processPushedFNkeys(uint8_t keyidx)
 {
     uint8_t retVal = 0;

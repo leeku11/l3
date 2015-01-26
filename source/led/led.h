@@ -10,6 +10,7 @@ typedef enum
     LED_PIN_WASD,                   
 }LED_BLOCK;    
 
+
 typedef enum
 {
     LED_EFFECT_FADING          = 0,
@@ -29,9 +30,16 @@ typedef enum
 #define LED_COMPOSE 0x08  ///< compose LED on a boot-protocol keyboard
 #define LED_KANA    0x10  ///< kana LED on a boot-protocol keyboard
 
+
+#define LEDMODE_INDEX_MAX  3
+#define LED_BLOCK_MAX  5
+#define LEDMODE_ARRAY_SIZE LEDMODE_INDEX_MAX*LED_BLOCK_MAX
+
+
+extern uint8_t tinyExist;
 extern uint8_t LEDstate;     ///< current state of the LEDs
 extern uint8_t ledmodeIndex;
-extern uint8_t ledmode[5][11];
+extern uint8_t ledmode[LEDMODE_INDEX_MAX][LED_BLOCK_MAX];
 void led_blink(int matrixState);
 void led_fader(void);
 void led_check(uint8_t forward);

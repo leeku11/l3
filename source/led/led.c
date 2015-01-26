@@ -17,24 +17,32 @@
 
 #define PUSHED_LEVEL_MAX        20
 
+#define PWM_OFF                 0
+#define PWM_ON                  1
+
+#define PWM_CHANNEL_0           0
+#define PWM_CHANNEL_1           1
+
+#define PWM_DUTY_MIN            0
+#define PWM_DUTY_MAX            255
 
 static uint8_t *const ledport[] = {LED_NUM_PORT, LED_CAP_PORT,LED_SCR_PORT};
     
 static uint8_t const ledpin[] = {LED_NUM_PIN, LED_CAP_PIN, LED_SCR_PIN};
 uint8_t ledmodeIndex;
 
-#define LEDMODE_ARRAY_SIZE 5*11
-uint8_t ledmode[5][11] ={};
+
+uint8_t ledmode[LEDMODE_INDEX_MAX][LED_BLOCK_MAX] ={};
 
 
-static uint8_t speed[] = {1, 1, 1, 1, 5, 5, 5, 5, 5, 5, 5};
-static uint8_t brigspeed[] = {1, 1, 1, 1, 3, 3, 3, 3, 3, 3, 3};
-static uint8_t pwmDir[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-static uint16_t pwmCounter[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static uint8_t speed[LED_BLOCK_MAX] = {0, 0, 0, 5, 5};
+static uint8_t brigspeed[LED_BLOCK_MAX] = {0, 0, 0, 3, 3};
+static uint8_t pwmDir[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
+static uint16_t pwmCounter[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 
-static uint16_t pushedLevelStay[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-static uint8_t pushedLevel[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-static uint16_t pushedLevelDuty[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static uint16_t pushedLevelStay[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
+static uint8_t pushedLevel[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
+static uint16_t pushedLevelDuty[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 uint8_t LEDstate;     ///< current state of the LEDs
 
 extern uint16_t scankeycntms;
@@ -49,32 +57,39 @@ void led_off(LED_BLOCK block)
         case LED_PIN_NUMLOCK:
         case LED_PIN_CAPSLOCK:
         case LED_PIN_SCROLLOCK:
+            *(ledport[block]) |= BV(ledpin[block]);
+            break;
         case LED_PIN_BASE:
+//            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
+            break;
         case LED_PIN_WASD:
+//            tinycmd_pwm(PWM_CHANNEL_1, PWM_OFF, PWM_DUTY_MIN);
             break;                    
         default:
             return;
     }
-    
- //    *(ledport[block]) &= ~(BV(ledpin[block]));
 }
 
 void led_on(LED_BLOCK block)
 {
-    
     uint8_t i;
     switch(block)
     {
         case LED_PIN_NUMLOCK:
         case LED_PIN_CAPSLOCK:
         case LED_PIN_SCROLLOCK:
+//            *(ledport[block]) |= BV(ledpin[block]);
+            break;
         case LED_PIN_BASE:
+//            tinycmd_pwm(PWM_CHANNEL_0, PWM_ON, PWM_DUTY_MAX);
+            break;
         case LED_PIN_WASD:
+//            tinycmd_pwm(PWM_CHANNEL_1, PWM_ON, PWM_DUTY_MAX);
+            break;
         default:
             return;
     }
- //    led_wave_off(block);
- //    *(ledport[block]) |= BV(ledpin[block]);
+    
 }
 
 
@@ -83,10 +98,10 @@ void led_wave_on(LED_BLOCK block)
     switch(block)
     {
         case LED_PIN_BASE:
-            //timer1PWMBOn();
+//            tinycmd_pwm(PWM_CHANNEL_0, PWM_ON, PWM_DUTY_MAX-1);
             break;
         case LED_PIN_WASD:
-            //timer2PWMOn();
+//            tinycmd_pwm(PWM_CHANNEL_1, PWM_ON, PWM_DUTY_MAX-1);
             break;
         default:
             break;
@@ -98,10 +113,10 @@ void led_wave_off(LED_BLOCK block)
     switch(block)
     {
         case LED_PIN_BASE:
-            timer1PWMBOff();
+//            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
             break;
         case LED_PIN_WASD:
-            timer2PWMOff();
+//            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
             break;
         default:
             break;
@@ -116,10 +131,10 @@ void led_wave_set(LED_BLOCK block, uint16_t duty)
     switch(block)
     {
         case LED_PIN_BASE:
-            //timer1PWMBSet(duty);
+//            tinycmd_pwm(PWM_CHANNEL_0, PWM_ON, duty);
             break;
         case LED_PIN_WASD:
-            //timer2PWMSet(duty);
+//            tinycmd_pwm(PWM_CHANNEL_1, PWM_ON, duty);
             break;
        default:
             break;
@@ -133,7 +148,7 @@ void led_blink(int matrixState)
 {
     LED_BLOCK ledblock;
 
-    for (ledblock = LED_PIN_BASE; ledblock<=LED_PIN_WASD; ledblock++)
+    for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
     {
         
         if(matrixState & SCAN_DIRTY)      // 1 or more key is pushed
@@ -264,7 +279,11 @@ void led_check(uint8_t forward)
 
 void led_3lockupdate(uint8_t LEDstate)
 {
-    uint8_t ledblock;
+   if (tinyExist)
+   {
+      tinycmd_three_lock((LEDstate & LED_NUM), (LEDstate & LED_CAPS), (LEDstate & LED_SCROLL));
+   }else
+   {
        if (LEDstate & LED_NUM) { // light up caps lock
            led_on(LED_PIN_NUMLOCK);
        } else {
@@ -272,28 +291,17 @@ void led_3lockupdate(uint8_t LEDstate)
        }
         if (LEDstate & LED_CAPS) { // light up caps lock
             led_on(LED_PIN_CAPSLOCK);
-            for(ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
-            {
-                if (ledmode[ledmodeIndex][ledblock] == LED_EFFECT_BASECAPS)
-                    led_on(ledblock);
-            }
         } else {
             led_off(LED_PIN_CAPSLOCK);
-            for(ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
-            {
-                if (ledmode[ledmodeIndex][ledblock] == LED_EFFECT_BASECAPS)
-                    led_off(ledblock);
-            }
        if (LEDstate & LED_SCROLL) { // light up caps lock
            led_on(LED_PIN_SCROLLOCK);
        } else {
            led_off(LED_PIN_SCROLLOCK);
         }
    }
+         
+   }
 }
-
-#define LED_INDICATOR_MAXTIME 90
-#define LED_INDICATOR_MAXINDEX 16
 
 
 void led_mode_init(void)
@@ -302,7 +310,7 @@ void led_mode_init(void)
     int16_t i;
     uint8_t *buf;
     ledmodeIndex = eeprom_read_byte(EEPADDR_LEDMODE_INDEX); 
-    if (ledmodeIndex > 4)
+    if (ledmodeIndex >= LEDMODE_INDEX_MAX)
         ledmodeIndex = 0;
     buf = ledmode;
     for (i = 0; i < LEDMODE_ARRAY_SIZE; i++)
@@ -429,23 +437,9 @@ void recordLED(uint8_t ledkey)
         prev >>= 1;
         cur >>= 1;
 
-#ifdef KBDMOD_M5
-        if (i < 8)
-        {
-            row = 10+i;
-        }else if (i < 16)
-        {
-            row = -6+i;
-        }else
-        {
-            row = -16+i;
-        }
-        
-#else //KBDMOD_M7
          row = i;
-#endif
 
-        keyidx = pgm_read_byte(keymap[6]+(col*MAX_ROW)+row);
+        keyidx = pgm_read_byte(keylayer(layer)+(col*MAX_ROW)+row);
 
          if (keyidx == K_NONE)
             continue;
@@ -488,7 +482,11 @@ void recordLED(uint8_t ledkey)
                         return;
                     }else
                     {
-                        ledblk = keyidx - K_LFX + 5;
+                        if((K_RIGHT <= keyidx) && (keyidx <= K_UP))
+                            ledblk = LED_PIN_WASD;
+                        else
+                            ledblk = LED_PIN_BASE;
+                        
                         ledmode[ledmodeIndex][ledblk] = ledmode[ledmodeIndex][ledblk] + 1;
                         
                         if(ledmode[ledmodeIndex][ledblk] >= LED_EFFECT_NONE)
