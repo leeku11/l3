@@ -483,10 +483,10 @@ uint8_t scankey(void)
    //static int pushedLevel_prev = 0;
 
     /* LED Blinker */
-    led_blink(matrixState);
+    //led_blink(matrixState);
 
     /* LED Fader */
-    led_fader();
+    //led_fader();
 
     clearReportBuffer();
    

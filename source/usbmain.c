@@ -361,6 +361,9 @@ MODIFIERS modifierBitmap[] = {
 };
 
 
+#define HID_REPORT_KEBOARD  0x0200
+#define HID_REPORT_BOOT     (0x0300 | REPORT_ID_BOOT)
+#define HID_REPORT_OPTION   (0x0300 | REPORT_ID_INFO)
 
 
 /**
@@ -379,10 +382,25 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
     if ((rq->bmRequestType & USBRQ_TYPE_MASK) == USBRQ_TYPE_CLASS) {
         // class request type
         if (rq->bRequest == USBRQ_HID_GET_REPORT) {
+
             // wValue: ReportType (highbyte), ReportID (lowbyte)
             // we only have one report type, so don't look at wValue
-            usbMsgPtr = (usbMsgPtr_t)keyboardReport;
-            return sizeof(keyboardReport);
+            if (rq->wValue.word == HID_REPORT_KEBOARD)
+            {
+                usbMsgPtr = (usbMsgPtr_t)keyboardReport;
+                return sizeof(keyboardReport);
+            }else if (rq->wValue.word == HID_REPORT_BOOT)
+            {
+
+
+            }else if (rq->wValue.word == HID_REPORT_OPTION)
+            {
+
+
+            }
+
+
+
         } else if (rq->bRequest == USBRQ_HID_SET_REPORT) {
             if (rq->wValue.word == 0x0200 && rq->wIndex.word == 0) {
                 // We expect one byte reports

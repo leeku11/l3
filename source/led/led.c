@@ -58,10 +58,10 @@ void led_off(LED_BLOCK block)
 //            *(ledport[block]) |= BV(ledpin[block]);
             break;
         case LED_PIN_BASE:
-//            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
+            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
             break;
         case LED_PIN_WASD:
-//            tinycmd_pwm(PWM_CHANNEL_1, PWM_OFF, PWM_DUTY_MIN);
+            tinycmd_pwm(PWM_CHANNEL_1, PWM_OFF, PWM_DUTY_MIN);
             break;                    
         default:
             return;
@@ -79,10 +79,10 @@ void led_on(LED_BLOCK block)
 //            *(ledport[block]) |= BV(ledpin[block]);
             break;
         case LED_PIN_BASE:
-//            tinycmd_pwm(PWM_CHANNEL_0, PWM_ON, PWM_DUTY_MAX);
+            tinycmd_pwm(PWM_CHANNEL_0, PWM_ON, PWM_DUTY_MAX);
             break;
         case LED_PIN_WASD:
-//            tinycmd_pwm(PWM_CHANNEL_1, PWM_ON, PWM_DUTY_MAX);
+            tinycmd_pwm(PWM_CHANNEL_1, PWM_ON, PWM_DUTY_MAX);
             break;
         default:
             return;
@@ -96,10 +96,10 @@ void led_wave_on(LED_BLOCK block)
     switch(block)
     {
         case LED_PIN_BASE:
-//            tinycmd_pwm(PWM_CHANNEL_0, PWM_ON, PWM_DUTY_MAX-1);
+            tinycmd_pwm(PWM_CHANNEL_0, PWM_ON, PWM_DUTY_MAX-1);
             break;
         case LED_PIN_WASD:
-//            tinycmd_pwm(PWM_CHANNEL_1, PWM_ON, PWM_DUTY_MAX-1);
+            tinycmd_pwm(PWM_CHANNEL_1, PWM_ON, PWM_DUTY_MAX-1);
             break;
         default:
             break;
@@ -111,10 +111,10 @@ void led_wave_off(LED_BLOCK block)
     switch(block)
     {
         case LED_PIN_BASE:
-//            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
+            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
             break;
         case LED_PIN_WASD:
-//            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
+            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
             break;
         default:
             break;
@@ -129,10 +129,10 @@ void led_wave_set(LED_BLOCK block, uint16_t duty)
     switch(block)
     {
         case LED_PIN_BASE:
-//            tinycmd_pwm(PWM_CHANNEL_0, PWM_ON, duty);
+            tinycmd_pwm(PWM_CHANNEL_0, PWM_ON, duty);
             break;
         case LED_PIN_WASD:
-//            tinycmd_pwm(PWM_CHANNEL_1, PWM_ON, duty);
+            tinycmd_pwm(PWM_CHANNEL_1, PWM_ON, duty);
             break;
        default:
             break;

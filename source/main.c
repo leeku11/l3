@@ -295,6 +295,7 @@ int main(void)
       led_off(LED_PIN_WASD);
     
       led_mode_init();
+      
       usbmain();
    }
    else
