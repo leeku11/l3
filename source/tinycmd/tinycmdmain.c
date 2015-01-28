@@ -134,7 +134,7 @@ void tinycmd_pwm(uint8_t channel, uint8_t on, uint8_t duty)
     i2cMasterSend(TARGET_ADDR, p_pwm_req->pkt_len, (uint8_t *)p_pwm_req);
 }
 
-void tinycmd_api_set_bl_color(int8_t index, uint8_t level)
+void tinycmd_api_set_bl_color(uint8_t index, uint8_t level)
 {
     tinycmd_led_type led;
     uint8_t r = 0, g = 0, b = 0;
@@ -152,6 +152,19 @@ void tinycmd_api_set_bl_color(int8_t index, uint8_t level)
     }
 
     tinycmd_bl_led_all(1, r, g, b);
+}
+
+void tinycmd_set_led_mode(uint8_t storage, uint8_t block, uint8_t mode)
+{
+    tinycmd_set_led_mode_req_type *p_set_led_mode_req = (tinycmd_set_led_mode_req_type *)localBuffer;
+
+    p_set_led_mode_req->cmd_code = TINY_CMD_SET_LED_MODE_F;
+    p_set_led_mode_req->pkt_len = sizeof(tinycmd_set_led_mode_req_type);
+    p_set_led_mode_req->storage = storage;
+    p_set_led_mode_req->block = block;
+    p_set_led_mode_req->mode = mode;
+
+    i2cMasterSend(TARGET_ADDR, p_set_led_mode_req->pkt_len, (uint8_t *)p_set_led_mode_req);
 }
 
 #if 0

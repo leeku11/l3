@@ -191,7 +191,9 @@ void led_fader(void)
     uint8_t ledblock;
     for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
     {
-        if((ledmode[ledmodeIndex][ledblock] == LED_EFFECT_FADING) || ((ledmode[ledmodeIndex][ledblock] == LED_EFFECT_FADING_PUSH_ON) && (scankeycntms > 1000)))
+        if((scankeycntms > 1000)
+            && (ledmode[ledmodeIndex][ledblock] == LED_EFFECT_FADING)
+                || ((ledmode[ledmodeIndex][ledblock] == LED_EFFECT_FADING_PUSH_ON)))
         {
             if(pwmDir[ledblock]==0)
             {
@@ -230,7 +232,8 @@ void led_fader(void)
        
             pwmCounter[ledblock]++;
 
-        }else if (ledmode[ledmodeIndex][ledblock] == LED_EFFECT_PUSHED_LEVEL)
+        }
+        else if (ledmode[ledmodeIndex][ledblock] == LED_EFFECT_PUSHED_LEVEL)
         {
     		// 일정시간 유지
 
@@ -256,7 +259,8 @@ void led_fader(void)
     		}
     		led_wave_set(ledblock, pushedLevelDuty[ledblock]);
 
-    	}else
+    	}
+    	else
         {
             led_wave_set(ledblock, 0);
             led_wave_off(ledblock);

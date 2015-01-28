@@ -14,5 +14,7 @@ void tinycmd_pwm(uint8_t channel, uint8_t on, uint8_t duty);
 
 void tinycmd_api_set_bl_color(int8_t index, uint8_t level);
 
+void tinycmd_set_led_mode(uint8_t storage, uint8_t block, uint8_t mode);
+
 #endif // TINYCMDAPI_H
 

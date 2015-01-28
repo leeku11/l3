@@ -29,6 +29,11 @@
 #define ws2812_pin3  4	// PB4 -> OC1B
 //#define ws2812_pin4  5 //reset... do not use!!
 
+#define TINY_LEDMODE_STORAGE_MAX        3
+#define TINY_LED_BLOCK_MAX              5
+#define LEDMODE_ARRAY_SIZE              (TINY_LEDMODE_STORAGE_MAX*TINY_LED_BLOCK_MAX)
+
+
 typedef struct {
     uint8_t led_max;
     uint8_t level_max;
@@ -42,6 +47,10 @@ uint8_t localBufferLength;
 uint8_t cmdBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
 
 uint8_t threeLock[3] = { 100, 100, 100 }; // initial level
+
+uint8_t tiny_ledmodeIndex;
+uint8_t tiny_ledmode[TINY_LEDMODE_STORAGE_MAX][TINY_LED_BLOCK_MAX];
+
 sys_config_type sysConfig;
 uint8_t pwmDutyMax;
 uint8_t pwmDuty;
@@ -60,6 +69,7 @@ uint8_t handlecmd_bl_led_pos(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_bl_led_range(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_bl_led_effect(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_pwm(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_set_led_mode(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_test(tinycmd_pkt_req_type *p_req);
 
@@ -72,6 +82,7 @@ const tinycmd_handler_func handle_cmd_func[] = {
     handlecmd_bl_led_range,
     handlecmd_bl_led_effect,
     handlecmd_pwm,
+    handlecmd_set_led_mode,
     handlecmd_config,
     handlecmd_test,
     0
@@ -316,6 +327,16 @@ uint8_t handlecmd_pwm(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
+uint8_t handlecmd_set_led_mode(tinycmd_pkt_req_type *p_req)
+{
+    tinycmd_set_led_mode_req_type *p_ledmode = (tinycmd_pwm_req_type *)p_req;
+
+    tiny_ledmode[p_ledmode->storage][p_ledmode->block] = p_ledmode->mode;
+    
+    return 0;
+}
+
+
 uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_config_req_type *p_config = (tinycmd_config_req_type *)p_req;
@@ -385,13 +406,134 @@ void i2cSlaveReceiveService(uint8_t receiveDataLength, uint8_t* receiveData)
 #define END_MARKER 255 // Signals the end of transmission
 int count;
 
-void blink(void){
-    // blink;
-    if(--count == 0){
-        PORTB ^= (1<<PB4);
-        PORTB ^= (1<<PB1);
+#if 0
+void blink(int matrixState)
+{
+    LED_BLOCK ledblock;
+
+    for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
+    {
+        
+        if(matrixState & SCAN_DIRTY)      // 1 or more key is pushed
+        {
+            switch(ledmode[ledmodeIndex][ledblock])
+            {
+
+                case LED_EFFECT_FADING_PUSH_ON:
+                case LED_EFFECT_PUSH_ON:
+                    led_on(ledblock);
+                    break;
+                case LED_EFFECT_PUSH_OFF:
+                    led_wave_off(ledblock);
+                    led_wave_set(ledblock, 0);
+                    led_off(ledblock);
+                    break;
+                default :
+                    break;
+            }             
+        }
+        else
+        {          // none of keys is pushed
+            switch(ledmode[ledmodeIndex][ledblock])
+                 {
+                     case LED_EFFECT_FADING_PUSH_ON:
+                     case LED_EFFECT_PUSH_ON:
+                        led_off(ledblock);
+                        break;
+                     case LED_EFFECT_PUSH_OFF:
+                        led_on(ledblock);
+                        break;
+                     default :
+                         break;
+                 }
+        }
     }
 }
+
+void fader(void)
+{
+    uint8_t ledblock;
+    for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
+    {
+        if((scankeycntms > 1000)
+            && (ledmode[ledmodeIndex][ledblock] == LED_EFFECT_FADING)
+                || ((ledmode[ledmodeIndex][ledblock] == LED_EFFECT_FADING_PUSH_ON)))
+        {
+            if(pwmDir[ledblock]==0)
+            {
+                led_wave_set(ledblock, ((uint16_t)(pwmCounter[ledblock]/brigspeed[ledblock])));        // brighter
+                if(pwmCounter[ledblock]>=255*brigspeed[ledblock])
+                    pwmDir[ledblock] = 1;
+                    
+            }
+            else if(pwmDir[ledblock]==2)
+            {
+                led_wave_set(ledblock, ((uint16_t)(255-pwmCounter[ledblock]/speed[ledblock])));    // darker
+                if(pwmCounter[ledblock]>=255*speed[ledblock])
+                    pwmDir[ledblock] = 3;
+
+            }
+            else if(pwmDir[ledblock]==1)
+            {
+                if(pwmCounter[ledblock]>=255*speed[ledblock])
+                   {
+                       pwmCounter[ledblock] = 0;
+                       pwmDir[ledblock] = 2;
+                   }
+            }else if(pwmDir[ledblock]==3)
+            {
+                if(pwmCounter[ledblock]>=255*brigspeed[ledblock])
+                   {
+                       pwmCounter[ledblock] = 0;
+                       pwmDir[ledblock] = 0;
+                   }
+            }
+
+
+            led_wave_on(ledblock);
+
+            // pwmDir 0~3 : idle
+       
+            pwmCounter[ledblock]++;
+
+        }
+        else if (ledmode[ledmodeIndex][ledblock] == LED_EFFECT_PUSHED_LEVEL)
+        {
+    		// 일정시간 유지
+
+    		if(pushedLevelStay[ledblock] > 0){
+    			pushedLevelStay[ledblock]--;
+    		}else{
+    			// 시간이 흐르면 레벨을 감소 시킨다.
+    			if(pushedLevelDuty[ledblock] > 0){
+    				pwmCounter[ledblock]++;
+    				if(pwmCounter[ledblock] >= speed[ledblock]){
+    					pwmCounter[ledblock] = 0;			
+    					pushedLevelDuty[ledblock]--;
+    					pushedLevel[ledblock] = PUSHED_LEVEL_MAX - (255-pushedLevelDuty[ledblock]) / (255/PUSHED_LEVEL_MAX);
+    					/*if(pushedLevel_prev != pushedLevel){
+    						DEBUG_PRINT(("---------------------------------decrease pushedLevel : %d, life : %d\n", pushedLevel, pushedLevelDuty));
+    						pushedLevel_prev = pushedLevel;
+    					}*/
+    				}
+    			}else{
+    				pushedLevel[ledblock] = 0;
+    				pwmCounter[ledblock] = 0;
+    			}
+    		}
+    		led_wave_set(ledblock, pushedLevelDuty[ledblock]);
+
+    	}
+    	else
+        {
+            led_wave_set(ledblock, 0);
+            led_wave_off(ledblock);
+            pwmCounter[ledblock]=0;
+            pwmDir[ledblock]=0;
+        }
+    }
+}
+#endif
 
 int main(void)
 {
