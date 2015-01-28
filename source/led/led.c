@@ -15,16 +15,11 @@
 #include "hwaddress.h"
 #include "macro.h"
 
-#define PUSHED_LEVEL_MAX        20
-
 #define PWM_OFF                 0
 #define PWM_ON                  1
 
 #define PWM_CHANNEL_0           0
 #define PWM_CHANNEL_1           1
-
-#define PWM_DUTY_MIN            0
-#define PWM_DUTY_MAX            255
 
 static uint8_t *const ledport[] = {LED_NUM_PORT, LED_CAP_PORT,LED_SCR_PORT};
     
@@ -57,7 +52,7 @@ void led_off(LED_BLOCK block)
         case LED_PIN_NUMLOCK:
         case LED_PIN_CAPSLOCK:
         case LED_PIN_SCROLLOCK:
-            *(ledport[block]) |= BV(ledpin[block]);
+//            *(ledport[block]) |= BV(ledpin[block]);
             break;
         case LED_PIN_BASE:
 //            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
@@ -331,6 +326,10 @@ void led_mode_init(void)
     }
     
     led_3lockupdate(LEDstate);
+
+#if 1//def SUPPORT_TINY_CMD
+    tinycmd_set_led_mode_all((uint8_t*)ledmode);
+#endif
 }
 
 void led_mode_change (LED_BLOCK ledblock, int mode)

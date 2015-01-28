@@ -24,17 +24,20 @@ typedef enum
     LED_EFFECT_NONE
 }LED_MODE;
 
-#define LED_NUM     0x01  ///< num LED on a boot-protocol keyboard
-#define LED_CAPS    0x02  ///< caps LED on a boot-protocol keyboard
-#define LED_SCROLL  0x04  ///< scroll LED on a boot-protocol keyboard
-#define LED_COMPOSE 0x08  ///< compose LED on a boot-protocol keyboard
-#define LED_KANA    0x10  ///< kana LED on a boot-protocol keyboard
+#define LED_NUM                 0x01  ///< num LED on a boot-protocol keyboard
+#define LED_CAPS                0x02  ///< caps LED on a boot-protocol keyboard
+#define LED_SCROLL              0x04  ///< scroll LED on a boot-protocol keyboard
+#define LED_COMPOSE             0x08  ///< compose LED on a boot-protocol keyboard
+#define LED_KANA                0x10  ///< kana LED on a boot-protocol keyboard
 
+#define PWM_DUTY_MIN            0
+#define PWM_DUTY_MAX            255
 
-#define LEDMODE_INDEX_MAX  3
-#define LED_BLOCK_MAX  5
+#define LEDMODE_INDEX_MAX       3
+#define LED_BLOCK_MAX           5
 #define LEDMODE_ARRAY_SIZE LEDMODE_INDEX_MAX*LED_BLOCK_MAX
 
+#define PUSHED_LEVEL_MAX        20
 
 extern uint8_t tinyExist;
 extern uint8_t LEDstate;     ///< current state of the LEDs

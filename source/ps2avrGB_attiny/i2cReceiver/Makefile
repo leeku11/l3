@@ -28,6 +28,9 @@
 	TRG = main
 	
 	TINYCMD = ../../tinycmd
+	LED =../../led
+	MATRIX = ../../matrix
+	MASTER = ../..
 
 #put your C sourcefiles here 
 #  Here you must list any C source files which are used by your target file.
@@ -55,7 +58,7 @@
 
 #additional includes to compile
 #	INC	= 
-	INC	= $(TINYCMD)
+	INC	= -I$(TINYCMD) -I$(LED) -I$(MATRIX) -I$(AVRLIB) -I$(MASTER)
 
 #assembler flags
 	ASFLAGS = -Wa, -gstabs -DF_CPU=$(F_CPU) -I$(COMMON_DIR)
@@ -63,7 +66,7 @@
 
 #compiler flags
 #	CPFLAGS	= -g -Os -Wall -Wstrict-prototypes -I$(COMMON_DIR) -I$(INC) -I$(AVRLIB) $(LIBSRC) -DF_CPU=$(F_CPU)UL $(OPT_DEFS) -Wa,-ahlms=$(<:.c=.lst)
-	CPFLAGS	= -g -Os -Wall -Wstrict-prototypes -I$(INC) -I$(AVRLIB) -DF_CPU=$(F_CPU)UL $(OPT_DEFS) -Wa,-ahlms=$(<:.c=.lst)
+	CPFLAGS	= -g -Os -Wall -Wstrict-prototypes $(INC) -DF_CPU=$(F_CPU)UL $(OPT_DEFS) -Wa,-ahlms=$(<:.c=.lst)
 #	CPFLAGS += -include $(HARDWARE_INFO_H)
 
 #linker flags

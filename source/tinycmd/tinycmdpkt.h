@@ -91,6 +91,14 @@ typedef struct
   uint8_t mode;
 } tinycmd_set_led_mode_req_type;
 
+// TINY_CMD_SET_LED_MODE_ALL_F
+typedef struct
+{
+  uint8_t cmd_code;
+  uint8_t pkt_len;
+  uint8_t data[15];
+} tinycmd_set_led_mode_all_req_type;
+
 typedef struct
 {
   uint8_t cmd_code;
@@ -132,6 +140,7 @@ typedef union
   tinycmd_config_req_type              config;
   tinycmd_test_req_type                test;
   tinycmd_set_led_mode_req_type        set_led_mode;
+  tinycmd_set_led_mode_all_req_type    set_led_mode_all;
 } tinycmd_pkt_req_type;
 
 #endif // TINYCMDPKT_H

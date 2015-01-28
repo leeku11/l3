@@ -21,7 +21,9 @@
 
 #define TINY_CMD_TEST_F                 9
 
-#define TINY_CMD_SET_LED_MODE_F         12
+#define TINY_CMD_SET_LED_MODE_F         10
+
+#define TINY_CMD_SET_LED_MODE_ALL_F     11
 
 #define TINY_CMD_MAX                    127
 

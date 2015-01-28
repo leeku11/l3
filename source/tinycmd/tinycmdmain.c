@@ -156,15 +156,31 @@ void tinycmd_api_set_bl_color(uint8_t index, uint8_t level)
 
 void tinycmd_set_led_mode(uint8_t storage, uint8_t block, uint8_t mode)
 {
-    tinycmd_set_led_mode_req_type *p_set_led_mode_req = (tinycmd_set_led_mode_req_type *)localBuffer;
+    tinycmd_set_led_mode_req_type *p_set_led_mode = (tinycmd_set_led_mode_req_type *)localBuffer;
 
-    p_set_led_mode_req->cmd_code = TINY_CMD_SET_LED_MODE_F;
-    p_set_led_mode_req->pkt_len = sizeof(tinycmd_set_led_mode_req_type);
-    p_set_led_mode_req->storage = storage;
-    p_set_led_mode_req->block = block;
-    p_set_led_mode_req->mode = mode;
+    p_set_led_mode->cmd_code = TINY_CMD_SET_LED_MODE_F;
+    p_set_led_mode->pkt_len = sizeof(tinycmd_set_led_mode_req_type);
+    p_set_led_mode->storage = storage;
+    p_set_led_mode->block = block;
+    p_set_led_mode->mode = mode;
 
-    i2cMasterSend(TARGET_ADDR, p_set_led_mode_req->pkt_len, (uint8_t *)p_set_led_mode_req);
+    i2cMasterSend(TARGET_ADDR, p_set_led_mode->pkt_len, (uint8_t *)p_set_led_mode);
+}
+
+void tinycmd_set_led_mode_all(uint8_t *p_led_mode_array)
+{
+    uint8_t i;
+    tinycmd_set_led_mode_all_req_type *p_set_led_mode_all = (tinycmd_set_led_mode_all_req_type *)localBuffer;
+
+    p_set_led_mode_all->cmd_code = TINY_CMD_SET_LED_MODE_ALL_F;
+    p_set_led_mode_all->pkt_len = sizeof(tinycmd_set_led_mode_all_req_type);
+
+    for(i = 0; i < 15; i++)
+    {
+        p_set_led_mode_all->data[i] = p_led_mode_array[i];
+    }
+
+    i2cMasterSend(TARGET_ADDR, p_set_led_mode_all->pkt_len, (uint8_t *)p_set_led_mode_all);
 }
 
 #if 0
