@@ -19,40 +19,44 @@
 #include "tinycmdhandler.h"
 #endif // SUPPORT_TINY_CMD
 
-#define LOCAL_ADDR  0xB0
+#define SLAVE_ADDR  0xB0
 //#define TARGET_ADDR 0xA0
 #define I2C_SEND_DATA_BUFFER_SIZE		I2C_RDSIZE	//0x5A
 #define I2C_RECEIVE_DATA_BUFFER_SIZE	I2C_WRSIZE	//0x5A	//30 led
 
-#define LED_NUM           21
-#define LED_ELEMENT       3
-#define LED_ARRAY_SIZE    (LED_NUM*LED_ELEMENT)
+#define CLED_NUM           21
+#define CLED_ELEMENT       3
+#define CLED_ARRAY_SIZE    (CLED_NUM*CLED_ELEMENT)
 
 #define ws2812_pin2  1
 #define ws2812_pin3  4	// PB4 -> OC1B
 //#define ws2812_pin4  5 //reset... do not use!!
 
-#define TINY_LEDMODE_STORAGE_MAX        3
-#define TINY_LED_BLOCK_MAX              5
-#define LEDMODE_ARRAY_SIZE              (TINY_LEDMODE_STORAGE_MAX*TINY_LED_BLOCK_MAX)
+//#define TINY_LEDMODE_STORAGE_MAX        3
+//#define TINY_LED_BLOCK_MAX              5
+//#define LEDMODE_ARRAY_SIZE              (TINY_LEDMODE_STORAGE_MAX*TINY_LED_BLOCK_MAX)
 
+#define TINYCMD_CMD_MASK                0x7F
+#define TINYCMD_RSP_MASK                0x80
+
+#define DEBUG_LED_ON(p, o, r, g, b)     led_pos_on(p, o, r, g, b)
 
 typedef struct {
     uint8_t led_max;
     uint8_t level_max;
+    uint8_t comm_init;
 } sys_config_type;
 
 // local data buffer
 uint8_t localBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
-//uint8_t localBufferLength = I2C_RECEIVE_DATA_BUFFER_SIZE;
 uint8_t localBufferLength;
 
 uint8_t cmdBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
 
-uint8_t threeLock[3] = { 100, 100, 100 }; // initial level
+uint8_t threeLock[3] = { 0, 0, 0 }; // initial level
 
 uint8_t ledmodeIndex = 0;
-uint8_t ledmode[TINY_LEDMODE_STORAGE_MAX][TINY_LED_BLOCK_MAX];
+uint8_t ledmode[LEDMODE_INDEX_MAX][LED_BLOCK_MAX];
 
 static uint8_t speed[LED_BLOCK_MAX] = {0, 0, 0, 5, 5};
 static uint8_t brigspeed[LED_BLOCK_MAX] = {0, 0, 0, 3, 3};
@@ -65,10 +69,6 @@ static uint16_t pushedLevelDuty[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 uint8_t LEDstate;     ///< current state of the LEDs
 
 sys_config_type sysConfig;
-uint8_t pwmDutyMax;
-uint8_t pwmDuty;
-uint8_t pwmStep;
-uint8_t pwmState;
 
 void i2cSlaveReceiveService(uint8_t receiveDataLength, uint8_t* receiveData);
 
@@ -124,7 +124,7 @@ void three_lock_on(void)
 
 void led_array_clear(uint8_t *p_buf)
 {
-    memset(p_buf, 0, LED_ARRAY_SIZE);
+    memset(p_buf, 0, CLED_ARRAY_SIZE);
 }
 
 void led_array_on(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
@@ -142,31 +142,73 @@ void led_array_on(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
     *(pTmp++) = threeLock[1];
     *(pTmp++) = threeLock[2];
     
-    for(i = 1; i < LED_NUM; i++)
+    for(i = 1; i < CLED_NUM; i++)
     {
-        *(pTmp++) = b;
-        *(pTmp++) = r;
         *(pTmp++) = g;
+        *(pTmp++) = r;
+        *(pTmp++) = b;
     }
-    localBufferLength = LED_ARRAY_SIZE;
+    localBufferLength = CLED_ARRAY_SIZE;
+    ws2812_sendarray(localBuffer, localBufferLength);
+}
+
+void led_pos_on(uint8_t pos, uint8_t on, uint8_t r, uint8_t g, uint8_t b)
+{
+    uint8_t i;
+    uint8_t *pTmp = localBuffer;
+
+    led_array_clear(pTmp);
+    
+    if(on == 0)
+    {
+        r = g = b = 0;
+    }
+
+    // Three lock
+    *(pTmp++) = threeLock[0];
+    *(pTmp++) = threeLock[1];
+    *(pTmp++) = threeLock[2];
+
+    pTmp += (pos * CLED_ELEMENT);
+    
+    *(pTmp++) = g;
+    *(pTmp++) = r;
+    *(pTmp++) = b;
+
+    localBufferLength = CLED_ARRAY_SIZE;
     ws2812_sendarray(localBuffer, localBufferLength);
 }
 
 uint8_t handlecmd_ver(tinycmd_pkt_req_type *p_req)
 {
-    // clear buffer
-    led_array_clear(localBuffer);
-    led_array_on(FALSE, 50, 50, 50);
+    tinycmd_ver_req_type *p_ver_req = (tinycmd_ver_req_type *)p_req;
+
+    if((p_ver_req->cmd_code & TINY_CMD_RSP_MASK) != 0)
+    {
+         /*
+         * To set response data, wait until i2c_reply_ready() returns nonzero,
+         * then fill i2c_rdbuf with the data, finally call i2c_reply_done(n).
+         * Interrupts are disabled while updating.
+         */
+        while(i2c_reply_ready() == 0);
+        
+        tinycmd_ver_rsp_type *p_ver_rsp = (tinycmd_ver_rsp_type *)i2c_rdbuf;
+
+        p_ver_rsp->cmd_code = TINY_CMD_VER_F;
+        p_ver_rsp->pkt_len = sizeof(tinycmd_ver_rsp_type);
+        p_ver_rsp->version = 0xA5;
+        i2c_reply_done(p_ver_rsp->pkt_len);
+
+        // debug
+        led_array_on(TRUE, 100, 0, 0);
+        //sysConfig.comm_init = 1;
+    }
 
     return 0;
 }
 
 uint8_t handlecmd_reset(tinycmd_pkt_req_type *p_req)
 {
-    // clear buffer
-    led_array_clear(localBuffer);
-    led_array_on(TRUE, 0, 100, 0);
-
     return 0;
 }
 
@@ -174,57 +216,30 @@ uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_three_lock_req_type *p_three_lock = (tinycmd_three_lock_req_type *)p_req;
     uint8_t *pTmp;
-    uint8_t i;
 
-    // clear buffer
-    led_array_clear(localBuffer);
-
-
-    // Off
-    pTmp = (uint8_t *)localBuffer;
-    for(i = 0; i < 15; i++)
+    threeLock[0] = 0;
+    threeLock[1] = 0;
+    threeLock[2] = 0;
+    
+    if(p_three_lock->lock & (1<<2))
     {
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
+        threeLock[0] = 50;
+    }
+    if(p_three_lock->lock & (1<<1))
+    {
+        threeLock[1] = 50;
+    }
+    if(p_three_lock->lock & (1<<0))
+    {
+        threeLock[2] = 50;
     }
 
     pTmp = (uint8_t *)localBuffer;
-    // Three lock
     *(pTmp++) = threeLock[0];
     *(pTmp++) = threeLock[1];
     *(pTmp++) = threeLock[2];
 
-    for(i = 0; i < 4; i++)
-    {
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-    }
-    
-    if(p_three_lock->lock & 0x4)
-    {
-        *(pTmp++) = 200;
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-    }
-    
-    if(p_three_lock->lock & 0x2)
-    {
-        *(pTmp++) = 0;
-        *(pTmp++) = 200;
-        *(pTmp++) = 0;
-    }
-    
-    if(p_three_lock->lock & 0x1)
-    {
-        *(pTmp++) = 0;
-        *(pTmp++) = 0;
-        *(pTmp++) = 200;
-    }
-    
-    localBufferLength = 15*3;
-
+    localBufferLength = CLED_ELEMENT;
     ws2812_sendarray(localBuffer,localBufferLength);        // output message data to port D
 
     return 0;
@@ -233,8 +248,7 @@ uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
 uint8_t handlecmd_bl_led_all(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_bl_led_all_req_type *p_bl_led_all = (tinycmd_bl_led_all_req_type *)p_req;
-    // clear buffer
-    led_array_clear(localBuffer);
+
     led_array_on(p_bl_led_all->on, p_bl_led_all->led.r, p_bl_led_all->led.g, p_bl_led_all->led.b);
     
     return 0;
@@ -244,7 +258,6 @@ uint8_t handlecmd_bl_led_pos(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_bl_led_pos_req_type *p_bl_led_pos = (tinycmd_bl_led_pos_req_type *)p_req;
     uint8_t *pTmp;
-    uint8_t i;
 
     // clear buffer
     led_array_clear(localBuffer);
@@ -256,13 +269,13 @@ uint8_t handlecmd_bl_led_pos(tinycmd_pkt_req_type *p_req)
     *(pTmp++) = threeLock[1];
     *(pTmp++) = threeLock[2];
 
-    pTmp += 3*p_bl_led_pos->pos;
+    pTmp += CLED_ELEMENT*p_bl_led_pos->pos;
     
     *(pTmp++) = p_bl_led_pos->led.b;
     *(pTmp++) = p_bl_led_pos->led.r;
     *(pTmp++) = p_bl_led_pos->led.g;
     
-    localBufferLength = 15*3;
+    localBufferLength = CLED_ARRAY_SIZE;
 
     ws2812_sendarray(localBuffer,localBufferLength);        // output message data to port D
 
@@ -285,17 +298,14 @@ uint8_t handlecmd_bl_led_range(tinycmd_pkt_req_type *p_req)
     *(pTmp++) = threeLock[1];
     *(pTmp++) = threeLock[2];
 
-    //if(p_bl_led_range->on)
+    pLed = (uint8_t *)&p_bl_led_range->led;
+    for(i = 1; i < CLED_NUM; i++)
     {
-        pLed = (uint8_t *)&p_bl_led_range->led;
-        for(i = 0; i < 14; i++)
-        {
-            *(pTmp++) = *(pLed++);
-            *(pTmp++) = *(pLed++);
-            *(pTmp++) = *(pLed++);
-        }
+        *(pTmp++) = *(pLed++);
+        *(pTmp++) = *(pLed++);
+        *(pTmp++) = *(pLed++);
     }
-    localBufferLength = 15*3;
+    localBufferLength = CLED_ARRAY_SIZE;
 
     ws2812_sendarray(localBuffer,localBufferLength);        // output message data to port D
     
@@ -307,55 +317,14 @@ uint8_t handlecmd_bl_led_effect(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
-// test
-void pwm_on(uint8_t duty)
-{
-    pwmState = 1;
-    pwmStep = 8;
-    
-    pwmDuty = duty;
-    timer1PWMASet(pwmDuty);
-    timer1PWMBSet(pwmDuty);
-    timer1PWMAOn();
-    timer1PWMBOn();
-}
-
 uint8_t handlecmd_pwm(tinycmd_pkt_req_type *p_req)
 {
-    tinycmd_pwm_req_type *p_pwm = (tinycmd_pwm_req_type *)p_req;
-
-    if(p_pwm->enable)
-    {
-        pwmState = 1;
-        led_array_clear(localBuffer);
-        led_array_on(TRUE, 100, 100, 0);
-        led_array_on(FALSE, 0, 0, 0);
-
-        pwmDutyMax = p_pwm->duty;
-        pwmDuty = 1;
-        pwmStep = 5;
-        
-        timer1PWMASet(pwmDuty);
-        timer1PWMBSet(pwmDuty);
-        timer1PWMAOn();
-        timer1PWMBOn();
-    }
-    else
-    {
-        pwmState = 0;
-        led_array_clear(localBuffer);
-        led_array_on(TRUE, 100, 0, 100);
-        led_array_on(FALSE, 0, 0, 0);
-        
-        timer1PWMOff();
-    }
-
     return 0;
 }
 
 uint8_t handlecmd_set_led_mode(tinycmd_pkt_req_type *p_req)
 {
-    tinycmd_set_led_mode_req_type *p_ledmode = (tinycmd_pwm_req_type *)p_req;
+    tinycmd_set_led_mode_req_type *p_ledmode = (tinycmd_set_led_mode_req_type *)p_req;
 
     ledmode[p_ledmode->storage][p_ledmode->block] = p_ledmode->mode;
     
@@ -364,18 +333,97 @@ uint8_t handlecmd_set_led_mode(tinycmd_pkt_req_type *p_req)
 
 uint8_t handlecmd_set_led_mode_all(tinycmd_pkt_req_type *p_req)
 {
-    tinycmd_set_led_mode_all_req_type *p_ledmode_all = (tinycmd_set_led_mode_all_req_type *)p_req;
+    tinycmd_set_led_mode_all_req_type *p_ledmode_all_req = (tinycmd_set_led_mode_all_req_type *)p_req;
+    uint16_t i = 0;
+ 
+    memcpy(ledmode, p_ledmode_all_req->data, sizeof(ledmode));
 
-        //led_array_clear(localBuffer);
-        led_array_on(TRUE, 100, 100, 0);
-        led_array_on(FALSE, 0, 0, 0);
-        led_array_on(TRUE, 0, 100, 100);
-        led_array_on(FALSE, 0, 0, 0);
-        led_array_on(TRUE, 100, 0, 100);
-        led_array_on(FALSE, 0, 0, 0);
+    if((p_ledmode_all_req->cmd_code & TINY_CMD_RSP_MASK) != 0)
+    {
+         /*
+         * To set response data, wait until i2c_reply_ready() returns nonzero,
+         * then fill i2c_rdbuf with the data, finally call i2c_reply_done(n).
+         * Interrupts are disabled while updating.
+         */
+        while(i2c_reply_ready() == 0);
+        
+        tinycmd_rsp_type *p_gen_rsp = (tinycmd_ver_rsp_type *)i2c_rdbuf;
+
+        p_gen_rsp->cmd_code = TINY_CMD_VER_F;
+        p_gen_rsp->pkt_len = sizeof(tinycmd_ver_rsp_type);
+        i2c_reply_done(p_gen_rsp->pkt_len);
+
+        // debug
+        //led_array_on(TRUE, 0, 100, 0);
+        sysConfig.comm_init = 1;
+
+#if 0
+{
+    uint8_t i, j;
+    uint8_t *pTmp = localBuffer;
     
-    memcpy(ledmode, p_ledmode_all->data, sizeof(uint8_t) * 15);
-    
+    // Three lock
+    *(pTmp++) = threeLock[0];
+    *(pTmp++) = threeLock[1];
+    *(pTmp++) = threeLock[2];
+
+    for(j = 0; j < 2; j++)
+    {
+        for(i = 0; i < 5; i++)
+        {
+            switch(ledmode[j][i])
+            {
+                case 0:
+                    *(pTmp++) = 0;
+                    *(pTmp++) = 0;
+                    *(pTmp++) = 0;
+                    break;
+                case 1:
+                    *(pTmp++) = 50;
+                    *(pTmp++) = 0;
+                    *(pTmp++) = 0;
+                    break;
+                case 2:
+                    *(pTmp++) = 0;
+                    *(pTmp++) = 50;
+                    *(pTmp++) = 0;
+                    break;
+                case 3:
+                    *(pTmp++) = 0;
+                    *(pTmp++) = 0;
+                    *(pTmp++) = 50;
+                    break;
+                case 4:
+                    *(pTmp++) = 50;
+                    *(pTmp++) = 50;
+                    *(pTmp++) = 0;
+                    break;
+                case 5:
+                    *(pTmp++) = 0;
+                    *(pTmp++) = 50;
+                    *(pTmp++) = 50;
+                    break;
+                case 6:
+                    *(pTmp++) = 50;
+                    *(pTmp++) = 0;
+                    *(pTmp++) = 50;
+                    break;
+                default:
+                    *(pTmp++) = 50;
+                    *(pTmp++) = 50;
+                    *(pTmp++) = 50;
+                    break;
+            }
+        }
+    }
+
+    localBufferLength = CLED_ARRAY_SIZE;
+    ws2812_sendarray(localBuffer, localBufferLength);
+}
+#endif
+
+    }
+
     return 0;
 }
 
@@ -383,7 +431,7 @@ uint8_t handlecmd_set_led_mode_all(tinycmd_pkt_req_type *p_req)
 uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_config_req_type *p_config = (tinycmd_config_req_type *)p_req;
-    uint8_t *pTmp = (uint8_t *)localBuffer;
+    //uint8_t *pTmp = (uint8_t *)localBuffer;
 
     sysConfig.led_max = p_config->value.led_max;
     sysConfig.level_max = p_config->value.level_max;
@@ -393,10 +441,27 @@ uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req)
 
 uint8_t handlecmd_test(tinycmd_pkt_req_type *p_req)
 {
-    tinycmd_test_data_type *p_data = (tinycmd_test_data_type *)&p_req->test.data;
+    //tinycmd_test_data_type *p_data = (tinycmd_test_data_type *)&p_req->test.data;
 
     return 0;
 }
+
+uint8_t handlecmd(tinycmd_pkt_req_type *p_req)
+{
+    uint8_t ret = 0;
+    uint8_t cmd;
+
+    cmd = p_req->cmd_code & TINYCMD_CMD_MASK;
+
+    // handle command
+    if(handle_cmd_func[cmd] != 0)
+    {
+        ret = handle_cmd_func[cmd](p_req);
+    }
+
+    return ret;
+}
+
 #endif // SUPPORT_TINY_CMD
 
 // slave operations
@@ -445,14 +510,24 @@ void i2cSlaveReceiveService(uint8_t receiveDataLength, uint8_t* receiveData)
     ws2812_sendarray(localBuffer,localBufferLength);
 }
 
+void i2cSlaveSend(uint8_t *pData, uint8_t len)
+{
+    memcpy((uint8_t *)i2c_rdbuf, pData, len);
+
+    /*
+    * To set response data, wait until i2c_reply_ready() returns nonzero,
+    * then fill i2c_rdbuf with the data, finally call i2c_reply_done(n).
+    * Interrupts are disabled while updating.
+    */
+    while(i2c_reply_ready() != 0);
+    i2c_reply_done(len);
+}
 
 #define END_MARKER 255 // Signals the end of transmission
-int count;
 
 #if 1
 void tiny_led_off(LED_BLOCK block)
 {
-    uint8_t i;
     switch(block)
     {
         case LED_PIN_NUMLOCK:
@@ -461,11 +536,9 @@ void tiny_led_off(LED_BLOCK block)
 //            *(ledport[block]) |= BV(ledpin[block]);
             break;
         case LED_PIN_BASE:
-//            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
             PORTB &= ~(1<<PB1);
             break;
         case LED_PIN_WASD:
-//            tinycmd_pwm(PWM_CHANNEL_1, PWM_OFF, PWM_DUTY_MIN);
             PORTB &= ~(1<<PB4);
             break;                    
         default:
@@ -475,7 +548,6 @@ void tiny_led_off(LED_BLOCK block)
 
 void tiny_led_on(LED_BLOCK block)
 {
-    uint8_t i;
     switch(block)
     {
         case LED_PIN_NUMLOCK:
@@ -484,11 +556,9 @@ void tiny_led_on(LED_BLOCK block)
 //            *(ledport[block]) |= BV(ledpin[block]);
             break;
         case LED_PIN_BASE:
-//            tinycmd_pwm(PWM_CHANNEL_0, PWM_ON, PWM_DUTY_MAX);
             PORTB |= (1<<PB1);
             break;
         case LED_PIN_WASD:
-//            tinycmd_pwm(PWM_CHANNEL_1, PWM_ON, PWM_DUTY_MAX);
             PORTB |= (1<<PB4);
             break;
         default:
@@ -502,14 +572,10 @@ void tiny_led_wave_on(LED_BLOCK block)
     switch(block)
     {
         case LED_PIN_BASE:
-//            tinycmd_pwm(PWM_CHANNEL_0, PWM_ON, PWM_DUTY_MAX-1);
-            timer1PWMASet(PWM_DUTY_MAX-1);
             timer1PWMAOn();
             PORTB |= (1<<PB1);
             break;
         case LED_PIN_WASD:
-//            tinycmd_pwm(PWM_CHANNEL_1, PWM_ON, PWM_DUTY_MAX-1);
-            timer1PWMBSet(PWM_DUTY_MAX-1);
             timer1PWMBOn();
             PORTB |= (1<<PB4);
             break;
@@ -523,12 +589,10 @@ void tiny_led_wave_off(LED_BLOCK block)
     switch(block)
     {
         case LED_PIN_BASE:
-//            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
             timer1PWMASet(PWM_DUTY_MIN);
             timer1PWMAOff();
             break;
         case LED_PIN_WASD:
-//            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
             timer1PWMBSet(PWM_DUTY_MIN);
             timer1PWMBOff();
             break;
@@ -545,11 +609,9 @@ void tiny_led_wave_set(LED_BLOCK block, uint16_t duty)
     switch(block)
     {
         case LED_PIN_BASE:
-//            tinycmd_pwm(PWM_CHANNEL_0, PWM_ON, duty);
             timer1PWMASet(duty);
             break;
         case LED_PIN_WASD:
-//            tinycmd_pwm(PWM_CHANNEL_1, PWM_ON, duty);
             timer1PWMBSet(duty);
             break;
        default:
@@ -570,17 +632,14 @@ void tiny_blink(int matrixState)
 
                 case LED_EFFECT_FADING_PUSH_ON:
                 case LED_EFFECT_PUSH_ON:
-                    led_array_on(TRUE, 100, 0, 0);
                     tiny_led_on(ledblock);
                     break;
                 case LED_EFFECT_PUSH_OFF:
-                    led_array_on(TRUE, 0, 100, 0);
                     tiny_led_wave_off(ledblock);
                     tiny_led_wave_set(ledblock, 0);
                     tiny_led_off(ledblock);
                     break;
                 default :
-                    led_array_on(TRUE, 0, 0, 100);
                     break;
             }             
         }
@@ -590,15 +649,12 @@ void tiny_blink(int matrixState)
             {
                 case LED_EFFECT_FADING_PUSH_ON:
                 case LED_EFFECT_PUSH_ON:
-                    led_array_on(TRUE, 100, 0, 0);
                     tiny_led_off(ledblock);
                     break;
                 case LED_EFFECT_PUSH_OFF:
-                    led_array_on(TRUE, 0, 100, 0);
                     tiny_led_on(ledblock);
                     break;
                 default :
-                    led_array_on(TRUE, 0, 0, 100);
                     break;
             }
         }
@@ -617,15 +673,19 @@ void tiny_fader(void)
             {
                 tiny_led_wave_set(ledblock, ((uint16_t)(pwmCounter[ledblock]/brigspeed[ledblock])));        // brighter
                 if(pwmCounter[ledblock]>=255*brigspeed[ledblock])
+                {
                     pwmDir[ledblock] = 1;
-                    
+                    DEBUG_LED_ON(0, 1, 50, 50, 0);
+                }
             }
             else if(pwmDir[ledblock]==2)
             {
                 tiny_led_wave_set(ledblock, ((uint16_t)(255-pwmCounter[ledblock]/speed[ledblock])));    // darker
                 if(pwmCounter[ledblock]>=255*speed[ledblock])
+                {
                     pwmDir[ledblock] = 3;
-
+                    DEBUG_LED_ON(1, 1, 50, 50, 0);
+                }
             }
             else if(pwmDir[ledblock]==1)
             {
@@ -633,6 +693,7 @@ void tiny_fader(void)
                 {
                     pwmCounter[ledblock] = 0;
                     pwmDir[ledblock] = 2;
+                    DEBUG_LED_ON(2, 1, 50, 50, 0);
                 }
             }
             else if(pwmDir[ledblock]==3)
@@ -641,6 +702,7 @@ void tiny_fader(void)
                 {
                     pwmCounter[ledblock] = 0;
                     pwmDir[ledblock] = 0;
+                    DEBUG_LED_ON(3, 1, 50, 50, 0);
                 }
             }
 
@@ -690,17 +752,15 @@ void tiny_fader(void)
             tiny_led_wave_off(ledblock);
             pwmCounter[ledblock]=0;
             pwmDir[ledblock]=0;
+
+            DEBUG_LED_ON(7, 1, 50, 50, 50);
         }
     }
 }
 #endif
 
-int main(void)
+void TinyInitHW(void)
 {
-    uint8_t i = 0;
-    uint8_t *pTmp;
-    uint8_t rcvlen;
-    
     CLKPR=_BV(CLKPCE);  // Clock Prescaler Change Enable
     CLKPR=0;			// set clock prescaler to 1 (attiny 25/45/85/24/44/84/13/13A)
 
@@ -709,31 +769,43 @@ int main(void)
     //DDRB |= (1<<PB4) | (1<<PB1);    // PB1 and PB4 is LED0 and LED1 driver.
     PORTB |= (1<<PB4) | (1<<PB1);
 
-    count = 0;
 
     // port output
     //DDRB |= (1<<ws2812_pin)|(1<<ws2812_pin2)|(1<<ws2812_pin3);
 
-    i2c_initialize( LOCAL_ADDR );
+    i2c_initialize( SLAVE_ADDR );
 
     initWs2812(ws2812_pin);
+}
 
+void TinyInitTimer(void)
+{
     timer1Init();
     timer1SetPrescaler(TIMER_CLK_DIV8);
     timer1PWMInit(0);
 
-    led_array_on(TRUE, 0, 150, 0);
-    
-    pwmState = 0;
+    // Enable PWM
+    timer1PWMAOn();
+    timer1PWMBOn();
+}
 
-    //_lkh test
-    pwm_on(0);
+int main(void)
+{
+    uint8_t i = 0;
+    uint8_t *pTmp;
+    uint8_t rcvlen;
+
+    uint16_t count = 0;
+
+    sysConfig.comm_init = 0;
     
+    TinyInitHW();
+    TinyInitTimer();
+
     sei();
 
     for(;;)
     {
-        count++;
         rcvlen = i2c_message_ready();
 
         if(rcvlen != 0)
@@ -746,48 +818,18 @@ int main(void)
             }
             i2c_message_done();
             
-            tinycmd_pkt_req_type *p_req = (tinycmd_pkt_req_type *)cmdBuffer;
-            // handle command
-            if(handle_cmd_func[p_req->cmd_code] != 0)
-            {
-                handle_cmd_func[p_req->cmd_code](p_req);
-            }
+            handlecmd((tinycmd_pkt_req_type *)cmdBuffer);
         }
         else
         {
-            if(count%5000 == 0)
+            if(sysConfig.comm_init)
             {
-#if 0
-                switch(i++%3)
+                if(++count%250 == 0)
                 {
-                    case 0:
-                        led_array_on(TRUE, 100, 100, 0);
-                        break;
-                    case 1:
-                        led_array_on(TRUE, 0, 100, 100);
-                        break;
-                    case 2:
-                        led_array_on(TRUE, 100, 0, 100);
-                        break;
+                    tiny_blink(0);
+                    tiny_fader();
                 }
-#endif
-                tiny_blink(0);
-                tiny_fader();
             }
-#if 0
-            if(count%50000 == 0)
-            {
-                pTmp = localBuffer;
-                for(i = 0; i < 20; i++)
-                {
-                    *(pTmp++) = 50;
-                    *(pTmp++) = 50;
-                    *(pTmp++) = 50;
-                }
-                
-                ws2812_sendarray(localBuffer, 15*3);
-            }
-#endif
         }
         //PORTB |= (1<<PB4);
         //blink();

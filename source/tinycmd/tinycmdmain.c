@@ -4,23 +4,35 @@
 #include "tinycmd.h"
 #include "tinycmdpkt.h"
 #include "i2c.h"
+#include "led.h"
 
 extern uint8_t tinyExist;           // 1 : attiny85 is exist, 0 : not
-extern unsigned char localBuffer[0x60];
+extern unsigned char localBuffer[0x50];
 extern unsigned char localBufferLength;
 
-#define LOCAL_ADDR      0xA0
 #define TARGET_ADDR     0xB0
 
 #if 1//def SUPPORT_TINY_CMD
-void tinycmd_ver(void)
+void tinycmd_ver(uint8_t rsp)
 {
     tinycmd_ver_req_type *p_ver_req = (tinycmd_ver_req_type *)localBuffer;
     
     p_ver_req->cmd_code = TINY_CMD_VER_F;
+    if(rsp)
+    {
+        p_ver_req->cmd_code |= TINY_CMD_RSP_MASK;
+    }
     p_ver_req->pkt_len = sizeof(tinycmd_ver_req_type);
 
+
     i2cMasterSend(TARGET_ADDR, p_ver_req->pkt_len, (uint8_t *)p_ver_req);
+
+    // If need to wait response from the slave
+    if(rsp)
+    {
+    	// then read n byte(s) from the selected MegaIO register
+    	i2cMasterReceive(TARGET_ADDR, sizeof(tinycmd_ver_rsp_type), (uint8_t*)localBuffer);
+    }
 }
 
 void tinycmd_reset(uint8_t type)
@@ -172,52 +184,18 @@ void tinycmd_set_led_mode_all(uint8_t *p_led_mode_array)
     uint8_t i;
     tinycmd_set_led_mode_all_req_type *p_set_led_mode_all = (tinycmd_set_led_mode_all_req_type *)localBuffer;
 
-    p_set_led_mode_all->cmd_code = TINY_CMD_SET_LED_MODE_ALL_F;
+    p_set_led_mode_all->cmd_code = TINY_CMD_SET_LED_MODE_ALL_F | TINY_CMD_RSP_MASK;
     p_set_led_mode_all->pkt_len = sizeof(tinycmd_set_led_mode_all_req_type);
 
-    for(i = 0; i < 15; i++)
+    for(i = 0; i < LEDMODE_ARRAY_SIZE; i++)
     {
         p_set_led_mode_all->data[i] = p_led_mode_array[i];
     }
 
     i2cMasterSend(TARGET_ADDR, p_set_led_mode_all->pkt_len, (uint8_t *)p_set_led_mode_all);
-}
 
-#if 0
-void testI2C(uint8_t count, uint8_t duty)
-{
-    switch(count % 8)
-    {
-    case 0:
-        tinycmd_ver();
-        break;
-    case 1:
-        tinycmd_pwm(TRUE, duty);
-        break;
-    case 2:
-        //tinycmd_reset(TINY_RESET_SOFT);
-        break;
-    case 3:
-        //tinycmd_three_lock(1, 1, 1);
-        break;
-    case 4:
-        break;
-    case 5:
-        //tinycmd_led_on(0, 255, 255);
-        break;
-    case 6:
-        tinycmd_pwm(FALSE, duty);
-        break;
-    case 7:
-        break;
-    case 8:
-        //tinycmd_led_on(255, 255, 0);
-        break;
-    default:
-        break;
-    }
+    i2cMasterReceive(TARGET_ADDR, sizeof(tinycmd_ver_rsp_type), (uint8_t*)localBuffer);
 }
-#endif
 
 #endif // SUPPORT_TINY_CMD
 

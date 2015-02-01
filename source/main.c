@@ -26,10 +26,11 @@
 
 #ifdef SUPPORT_I2C
 #include "i2c.h"        // include i2c support
+#include "tinycmdapi.h"
 
 // local data buffer
-uint8_t tinyExist = 1;
-unsigned char localBuffer[0x60];
+uint8_t tinyExist = 0;
+unsigned char localBuffer[0x50];
 unsigned char localBufferLength;
 #endif // SUPPORT_I2C
 
@@ -229,8 +230,43 @@ int8_t checkInterface(void)
             cur_usbmode = 1;    //default USB
     }
     return cur_usbmode;
-}        
+}       
+
+uint8_t establishSlaveComm(void)
+{
+    uint8_t ret = 0;
     
+#ifdef SUPPORT_TINY_CMD
+    uint8_t retry = 0;
+
+    initI2C();
+
+    // Establish a communication with tiny slave
+    while(ret == 0 && retry++ < 1000)
+    {
+        uint16_t count = 0;
+        // proving
+        tinycmd_ver(TRUE);
+
+        tinycmd_ver_rsp_type *p_ver_rsp = (tinycmd_ver_rsp_type*)localBuffer;
+        if(p_ver_rsp->cmd_code == TINY_CMD_VER_F)
+        {
+            if(p_ver_rsp->version == 0xA5)
+            {
+                ret = 1;
+                break;
+            }
+        }
+        
+        while(++count != 0);
+
+        tinycmd_bl_led_all(FALSE, 0, 0, 0);
+
+    }
+
+#endif // SUPPORT_TINY_CMD
+    return ret;    
+}    
 
 int main(void)
 {
@@ -246,13 +282,10 @@ int main(void)
 //   timer2PWMInit(8);
    timer0Init();
    timer0SetPrescaler(TIMER_CLK_DIV8);
-      
 
    keymap_init();
 
-#ifdef SUPPORT_I2C
-   initI2C();
-#endif // SUPPORT_I2C
+   tinyExist = establishSlaveComm();
 
    if(usbmode)
    {

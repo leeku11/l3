@@ -35,7 +35,7 @@ typedef enum
 
 #define LEDMODE_INDEX_MAX       3
 #define LED_BLOCK_MAX           5
-#define LEDMODE_ARRAY_SIZE LEDMODE_INDEX_MAX*LED_BLOCK_MAX
+#define LEDMODE_ARRAY_SIZE      (LEDMODE_INDEX_MAX*LED_BLOCK_MAX)
 
 #define PUSHED_LEVEL_MAX        20
 

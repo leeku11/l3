@@ -27,8 +27,11 @@ static uint8_t const ledpin[] = {LED_NUM_PIN, LED_CAP_PIN, LED_SCR_PIN};
 uint8_t ledmodeIndex;
 
 
-uint8_t ledmode[LEDMODE_INDEX_MAX][LED_BLOCK_MAX] ={};
-
+uint8_t ledmode[LEDMODE_INDEX_MAX][LED_BLOCK_MAX] = {
+    { 0, 0, 0, LED_EFFECT_FADING, LED_EFFECT_FADING },
+    { 0, 0, 0, LED_EFFECT_PUSH_ON, LED_EFFECT_PUSH_ON },
+    { 0, 0, 0, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS },
+};
 
 static uint8_t speed[LED_BLOCK_MAX] = {0, 0, 0, 5, 5};
 static uint8_t brigspeed[LED_BLOCK_MAX] = {0, 0, 0, 3, 3};
@@ -311,17 +314,18 @@ void led_mode_init(void)
     ledmodeIndex = eeprom_read_byte(EEPADDR_LEDMODE_INDEX); 
     if (ledmodeIndex >= LEDMODE_INDEX_MAX)
         ledmodeIndex = 0;
+/*
     buf = ledmode;
     for (i = 0; i < LEDMODE_ARRAY_SIZE; i++)
     {
         *buf++ = pgm_read_byte(LEDMODE_ADDRESS+i);
 //        *buf++ = eeprom_read_byte(EEPADDR_LED_MODE+i);
     }
-
+*/
     for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
     {
-      pwmDir[ledblock ] = 0;
-      pwmCounter[ledblock] = 0;
+        pwmDir[ledblock ] = 0;
+        pwmCounter[ledblock] = 0;
         led_mode_change(ledblock, ledmode[ledmodeIndex][ledblock]);
     }
     

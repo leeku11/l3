@@ -1,6 +1,9 @@
 #ifndef TINYCMD_H
 #define TINYCMD_H
 
+#define TINY_CMD_CMD_MASK               0x7F
+#define TINY_CMD_RSP_MASK               0x80
+
 #define TINY_CMD_VER_F                  0
 
 #define TINY_CMD_RESET_F                1

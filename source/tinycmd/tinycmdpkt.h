@@ -143,5 +143,28 @@ typedef union
   tinycmd_set_led_mode_all_req_type    set_led_mode_all;
 } tinycmd_pkt_req_type;
 
+
+// Response type
+typedef struct
+{
+  uint8_t cmd_code;
+  uint8_t pkt_len;
+} tinycmd_rsp_type;
+
+
+typedef struct
+{
+  uint8_t cmd_code;
+  uint8_t pkt_len;
+  uint8_t version;
+} tinycmd_ver_rsp_type;
+
+typedef union
+{
+  uint8_t cmd_code;
+  tinycmd_rsp_type gen;
+  tinycmd_ver_rsp_type ver;
+} tinycmd_pkt_rsp_type;
+
 #endif // TINYCMDPKT_H
 

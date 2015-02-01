@@ -561,7 +561,6 @@ uint8_t usbmain(void) {
 	interfaceReady = 0;
 
     DEBUG_PRINT(("USB\n"));
-    
 
     cli();
     usbInit();
