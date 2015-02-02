@@ -42,7 +42,7 @@ uint16_t macroresetcnt;
 uint16_t winkeylockcnt;
 uint16_t keylockcnt;
 uint8_t keylock = 0;
-#define SWAP_TIMER  0x100
+#define SWAP_TIMER  0x400
 #define KEYLOCK_TIMER  0x600
 #define KEYLOCK_COUNTER_START 0x8000
 
@@ -194,8 +194,8 @@ uint8_t processReleasedFNkeys(uint8_t keyidx)
         
     if(keyidx >= K_LED0 && keyidx <= K_LED3)
     {
-        ledmodeIndex = keyidx-K_LED0;
-        led_mode_change(ledblock, ledmode[ledmodeIndex][ledblock]);
+        kbdConf.led_preset_index = keyidx-K_LED0;
+        led_mode_change(ledblock, ledmode[kbdConf.led_preset_index][ledblock]);
         led_mode_save();
         retVal = 1;
     }else if(keyidx >= K_LFX && keyidx <= K_LARR)
@@ -517,7 +517,7 @@ uint8_t scankey(void)
                     continue;
             }else if (prevBit && !curBit)  //released
             {
-                cntKey(keyidx, 0x00);
+                cntKey(keyidx, 0x0000);
                 if (processReleasedFNkeys(keyidx))
                     continue;
             }

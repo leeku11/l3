@@ -1,7 +1,7 @@
 #ifndef TINYCMDPKT_H
 #define TINYCMDPKT_H
 
-#define TINYCMD_LED_MAX               15
+#define TINYCMD_LED_MAX               20
 #define TINYCMD_THREE_LOCK_NUM        3
 #define TINYCMD_TEST_DATA_LEN         (TINYCMD_LED_MAX * 3 + TINYCMD_THREE_LOCK_NUM)
 
@@ -81,7 +81,29 @@ typedef struct
   uint8_t effect;
 } tinycmd_bl_led_effect_req_type;
 
-// TINY_CMD_SET_LED_MODE_F
+typedef struct
+{
+  uint8_t cmd_code;
+  uint8_t pkt_len;
+  uint8_t enable;
+  uint8_t duty;
+} tinycmd_pwm_req_type;
+
+typedef struct
+{
+  uint8_t cmd_code;
+  uint8_t pkt_len;
+  uint8_t ch_mode;
+} tinycmd_k_led_ch_mode_req_type;
+
+typedef struct
+{
+  uint8_t cmd_code;
+  uint8_t pkt_len;
+  uint8_t channel;
+  uint8_t level;
+} tinycmd_k_led_level_req_type;
+
 typedef struct
 {
   uint8_t cmd_code;
@@ -91,22 +113,13 @@ typedef struct
   uint8_t mode;
 } tinycmd_set_led_mode_req_type;
 
-// TINY_CMD_SET_LED_MODE_ALL_F
+// TINY_CMD_CONFIG_LED_MODE_F
 typedef struct
 {
   uint8_t cmd_code;
   uint8_t pkt_len;
   uint8_t data[15];
-} tinycmd_set_led_mode_all_req_type;
-
-typedef struct
-{
-  uint8_t cmd_code;
-  uint8_t pkt_len;
-  uint8_t channel;
-  uint8_t enable;
-  uint8_t duty;
-} tinycmd_pwm_req_type;
+} tinycmd_config_led_mode_req_type;
 
 typedef struct
 {
@@ -130,17 +143,18 @@ typedef struct
 typedef union
 {
   uint8_t cmd_code;
-  tinycmd_ver_req_type                 ver;
-  tinycmd_three_lock_req_type          three_lock;
-  tinycmd_bl_led_all_req_type          bl_led_all;
-  tinycmd_bl_led_pos_req_type          bl_led_pos;
-  tinycmd_bl_led_range_req_type        bl_led_range;
-  tinycmd_bl_led_effect_req_type       bl_led_effect;
-  tinycmd_pwm_req_type                 pwm;
-  tinycmd_config_req_type              config;
-  tinycmd_test_req_type                test;
-  tinycmd_set_led_mode_req_type        set_led_mode;
-  tinycmd_set_led_mode_all_req_type    set_led_mode_all;
+  tinycmd_ver_req_type                 ver;                      // TINY_CMD_VER_F
+  tinycmd_reset_req_type               reset;                    // TINY_CMD_RESET_F
+  tinycmd_three_lock_req_type          three_lock;               // TINY_CMD_THREE_LOCK_F
+  tinycmd_bl_led_all_req_type          bl_led_all;               // TINY_CMD_BL_LED_ALL_F
+  tinycmd_bl_led_pos_req_type          bl_led_pos;               // TINY_CMD_BL_LED_POS_F
+  tinycmd_bl_led_range_req_type        bl_led_range;             // TINY_CMD_BL_LED_RANGE_F
+  tinycmd_bl_led_effect_req_type       bl_led_effect;            // TINY_CMD_BL_LED_EFFECT_F
+  tinycmd_k_led_level_req_type         key_led_level;            // TINY_CMD_K_LED_LEVEL_F
+  tinycmd_set_led_mode_req_type        set_led_mode;             // TINY_CMD_SET_LED_MODE_F
+  tinycmd_config_led_mode_req_type     set_led_mode_all;         // TINY_CMD_SET_LED_MODE_ALL_F
+  tinycmd_config_req_type              config;                   // TINY_CMD_CONFIG_F
+  tinycmd_test_req_type                test;                     // TINY_CMD_TEST_F
 } tinycmd_pkt_req_type;
 
 

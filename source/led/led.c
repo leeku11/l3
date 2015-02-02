@@ -15,6 +15,9 @@
 #include "hwaddress.h"
 #include "macro.h"
 
+#undef LED_CONTROL_MASTER
+#define LED_CONTROL_SLAVE
+
 #define PWM_OFF                 0
 #define PWM_ON                  1
 
@@ -33,6 +36,8 @@ uint8_t ledmode[LEDMODE_INDEX_MAX][LED_BLOCK_MAX] = {
     { 0, 0, 0, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS },
 };
 
+uint8_t LEDstate;     ///< current state of the LEDs
+
 static uint8_t speed[LED_BLOCK_MAX] = {0, 0, 0, 5, 5};
 static uint8_t brigspeed[LED_BLOCK_MAX] = {0, 0, 0, 3, 3};
 static uint8_t pwmDir[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
@@ -41,7 +46,6 @@ static uint16_t pwmCounter[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 static uint16_t pushedLevelStay[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 static uint8_t pushedLevel[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 static uint16_t pushedLevelDuty[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
-uint8_t LEDstate = 0;     ///< current state of the LEDs
 
 extern uint16_t scankeycntms;
 
@@ -49,6 +53,7 @@ extern uint16_t scankeycntms;
 
 void led_off(LED_BLOCK block)
 {
+#ifdef LED_CONTROL_MASTER
     uint8_t i;
     switch(block)
     {
@@ -58,18 +63,20 @@ void led_off(LED_BLOCK block)
 //            *(ledport[block]) |= BV(ledpin[block]);
             break;
         case LED_PIN_BASE:
-            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
+            tinycmd_key_led_level(PWM_CHANNEL_0, PWM_DUTY_MIN);
             break;
         case LED_PIN_WASD:
-            tinycmd_pwm(PWM_CHANNEL_1, PWM_OFF, PWM_DUTY_MIN);
+            tinycmd_key_led_level(PWM_CHANNEL_1, PWM_DUTY_MIN);
             break;                    
         default:
             return;
     }
+#endif // LED_CONTROL_MASTER
 }
 
 void led_on(LED_BLOCK block)
 {
+#ifdef LED_CONTROL_MASTER
     uint8_t i;
     switch(block)
     {
@@ -79,46 +86,50 @@ void led_on(LED_BLOCK block)
 //            *(ledport[block]) |= BV(ledpin[block]);
             break;
         case LED_PIN_BASE:
-            tinycmd_pwm(PWM_CHANNEL_0, PWM_ON, PWM_DUTY_MAX);
+            tinycmd_key_led_level(PWM_CHANNEL_0, PWM_DUTY_MAX);
             break;
         case LED_PIN_WASD:
-            tinycmd_pwm(PWM_CHANNEL_1, PWM_ON, PWM_DUTY_MAX);
+            tinycmd_key_led_level(PWM_CHANNEL_1, PWM_DUTY_MAX);
             break;
         default:
             return;
     }
-    
+#endif // LED_CONTROL_MASTER    
 }
 
 
 void led_wave_on(LED_BLOCK block)
 {
+#ifdef LED_CONTROL_MASTER
     switch(block)
     {
         case LED_PIN_BASE:
-            tinycmd_pwm(PWM_CHANNEL_0, PWM_ON, PWM_DUTY_MAX-1);
+            tinycmd_key_led_level(PWM_CHANNEL_0, PWM_DUTY_MAX-1);
             break;
         case LED_PIN_WASD:
-            tinycmd_pwm(PWM_CHANNEL_1, PWM_ON, PWM_DUTY_MAX-1);
+            tinycmd_key_led_level(PWM_CHANNEL_1, PWM_DUTY_MAX-1);
             break;
         default:
             break;
     }
+#endif // LED_CONTROL_MASTER
 }
 
 void led_wave_off(LED_BLOCK block)
 {
+#ifdef LED_CONTROL_MASTER
     switch(block)
     {
         case LED_PIN_BASE:
-            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
+            tinycmd_key_led_level(PWM_CHANNEL_0, PWM_DUTY_MIN);
             break;
         case LED_PIN_WASD:
-            tinycmd_pwm(PWM_CHANNEL_0, PWM_OFF, PWM_DUTY_MIN);
+            tinycmd_key_led_level(PWM_CHANNEL_0, PWM_DUTY_MIN);
             break;
         default:
             break;
     }
+#endif // LED_CONTROL_MASTER
 }
 
 
@@ -126,17 +137,19 @@ void led_wave_off(LED_BLOCK block)
 
 void led_wave_set(LED_BLOCK block, uint16_t duty)
 {
+#ifdef LED_CONTROL_MASTER
     switch(block)
     {
         case LED_PIN_BASE:
-            tinycmd_pwm(PWM_CHANNEL_0, PWM_ON, duty);
+            tinycmd_key_led_level(PWM_CHANNEL_0, duty);
             break;
         case LED_PIN_WASD:
-            tinycmd_pwm(PWM_CHANNEL_1, PWM_ON, duty);
+            tinycmd_key_led_level(PWM_CHANNEL_1, duty);
             break;
        default:
             break;
     }
+#endif // LED_CONTROL_MASTER
 }
 
 
@@ -144,6 +157,7 @@ void led_wave_set(LED_BLOCK block, uint16_t duty)
 
 void led_blink(int matrixState)
 {
+#ifdef LED_CONTROL_MASTER
     LED_BLOCK ledblock;
 
     for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
@@ -181,11 +195,12 @@ void led_blink(int matrixState)
                  }
         }
     }
+#endif // LED_CONTROL_MASTER
 }
 
 void led_fader(void)
 {
-    
+#ifdef LED_CONTROL_MASTER    
     uint8_t ledblock;
     for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
     {
@@ -266,6 +281,7 @@ void led_fader(void)
             pwmDir[ledblock]=0;
         }
     }
+#endif // LED_CONTROL_MASTER
 }
 
 void led_check(uint8_t forward)
@@ -281,59 +297,76 @@ void led_check(uint8_t forward)
 
 void led_3lockupdate(uint8_t LEDstate)
 {
-   if (tinyExist)
-   {
+    if (tinyExist)
+    {
         tinycmd_three_lock((LEDstate & LED_NUM), (LEDstate & LED_CAPS), (LEDstate & LED_SCROLL));
-   }else
-   {
-       if (LEDstate & LED_NUM) { // light up caps lock
-           led_on(LED_PIN_NUMLOCK);
-       } else {
-           led_off(LED_PIN_NUMLOCK);
-       }
-        if (LEDstate & LED_CAPS) { // light up caps lock
-            led_on(LED_PIN_CAPSLOCK);
-        } else {
-            led_off(LED_PIN_CAPSLOCK);
-       if (LEDstate & LED_SCROLL) { // light up caps lock
-           led_on(LED_PIN_SCROLLOCK);
-       } else {
-           led_off(LED_PIN_SCROLLOCK);
+    }
+#ifdef LED_CONTROL_MASTER
+    else
+    {
+        if (LEDstate & LED_NUM)
+        { // light up caps lock
+            led_on(LED_PIN_NUMLOCK);
         }
-   }
-         
-   }
+        else
+        {
+            led_off(LED_PIN_NUMLOCK);
+        }
+        if (LEDstate & LED_CAPS)
+        { // light up caps lock
+            led_on(LED_PIN_CAPSLOCK);
+        }
+        else
+        {
+            led_off(LED_PIN_CAPSLOCK);
+            if (LEDstate & LED_SCROLL)
+            { // light up caps lock
+                led_on(LED_PIN_SCROLLOCK);
+            }
+            else
+            {
+                led_off(LED_PIN_SCROLLOCK);
+            }
+        }
+    }
+#endif // LED_CONTROL_MASTER
 }
 
 
 void led_mode_init(void)
 {
     LED_BLOCK ledblock;
+#if 0
     int16_t i;
     uint8_t *buf;
+    
     ledmodeIndex = eeprom_read_byte(EEPADDR_LEDMODE_INDEX); 
     if (ledmodeIndex >= LEDMODE_INDEX_MAX)
         ledmodeIndex = 0;
-/*
     buf = ledmode;
     for (i = 0; i < LEDMODE_ARRAY_SIZE; i++)
     {
         *buf++ = pgm_read_byte(LEDMODE_ADDRESS+i);
 //        *buf++ = eeprom_read_byte(EEPADDR_LED_MODE+i);
     }
-*/
+#else
+    ledmodeIndex = 0;
+#endif
+
     for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
     {
+#ifdef LED_CONTROL_MASTER
         pwmDir[ledblock ] = 0;
         pwmCounter[ledblock] = 0;
+#endif // LED_CONTROL_MASTER
         led_mode_change(ledblock, ledmode[ledmodeIndex][ledblock]);
     }
     
     led_3lockupdate(LEDstate);
 
-#if 1//def SUPPORT_TINY_CMD
-    tinycmd_set_led_mode_all((uint8_t*)ledmode);
-#endif
+#ifdef LED_CONTROL_SLAVE
+    tinycmd_config_led_mode((uint8_t*)ledmode);
+#endif // LED_CONTROL_SLAVE
 }
 
 void led_mode_change (LED_BLOCK ledblock, int mode)
@@ -369,8 +402,8 @@ void led_mode_save(void)
 void led_pushed_level_cal(void)
 {
     LED_BLOCK ledblock;
-	// update pushed level
-	
+    // update pushed level
+
     for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
     { 
         if(pushedLevel[ledblock] < PUSHED_LEVEL_MAX)
@@ -379,7 +412,7 @@ void led_pushed_level_cal(void)
             pushedLevel[ledblock]++;
             pushedLevelDuty[ledblock] = (255 * pushedLevel[ledblock]) / PUSHED_LEVEL_MAX;
         }
-	}
+    }
 }
 
 uint8_t PROGMEM ledstart[32] = "LED record mode - push any key@";

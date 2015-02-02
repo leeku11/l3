@@ -28,6 +28,16 @@
 #define CLED_ELEMENT       3
 #define CLED_ARRAY_SIZE    (CLED_NUM*CLED_ELEMENT)
 
+#define CHANNEL_MODE_SYNC               0
+#define CHANNEL_MODE_ASYNC              1
+
+#define KEY_LED_CHANNEL_A               0
+#define KEY_LED_CHANNEL_B               1
+#define KEY_LED_CHANNEL_ALL             0xFF
+
+#define OFF                             0
+#define ON                              1
+
 #define ws2812_pin2  1
 #define ws2812_pin3  4	// PB4 -> OC1B
 //#define ws2812_pin4  5 //reset... do not use!!
@@ -45,7 +55,7 @@ typedef struct {
     uint8_t led_max;
     uint8_t level_max;
     uint8_t comm_init;
-} sys_config_type;
+} tiny_config_type;
 
 // local data buffer
 uint8_t localBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
@@ -68,9 +78,12 @@ static uint8_t pushedLevel[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 static uint16_t pushedLevelDuty[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 uint8_t LEDstate;     ///< current state of the LEDs
 
-sys_config_type sysConfig;
+tiny_config_type tinyConfig;
 
 void i2cSlaveReceiveService(uint8_t receiveDataLength, uint8_t* receiveData);
+void key_led_control(uint8_t ch, uint8_t on);
+void key_led_pwm_on(uint8_t channel, uint8_t on);
+void key_led_pwm_duty(uint8_t channel, uint8_t duty);
 
 
 #ifdef SUPPORT_TINY_CMD
@@ -81,26 +94,26 @@ uint8_t handlecmd_bl_led_all(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_bl_led_pos(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_bl_led_range(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_bl_led_effect(tinycmd_pkt_req_type *p_req);
-uint8_t handlecmd_pwm(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_k_led_level(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_set_led_mode(tinycmd_pkt_req_type *p_req);
-uint8_t handlecmd_set_led_mode_all(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_config_led_mode(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_test(tinycmd_pkt_req_type *p_req);
 
 const tinycmd_handler_func handle_cmd_func[] = {
-    handlecmd_ver,
-    handlecmd_reset,
-    handlecmd_three_lock,
-    handlecmd_bl_led_all,
-    handlecmd_bl_led_pos,
-    handlecmd_bl_led_range,
-    handlecmd_bl_led_effect,
-    handlecmd_pwm,
-    handlecmd_config,
-    handlecmd_test,
-    handlecmd_set_led_mode,
-    handlecmd_set_led_mode_all,
-    0
+    handlecmd_ver,                    // TINY_CMD_VER_F
+    handlecmd_reset,                  // TINY_CMD_RESET_F
+    handlecmd_three_lock,             // TINY_CMD_THREE_LOCK_F
+    handlecmd_bl_led_all,             // TINY_CMD_BL_LED_ALL_F
+    handlecmd_bl_led_pos,             // TINY_CMD_BL_LED_POS_F
+    handlecmd_bl_led_range,           // TINY_CMD_BL_LED_RANGE_F
+    handlecmd_bl_led_effect,          // TINY_CMD_BL_LED_EFFECT_F
+    handlecmd_k_led_level,            // TINY_CMD_K_LED_SET_F
+    handlecmd_set_led_mode,           // TINY_CMD_SET_LED_MODE_F
+    handlecmd_config_led_mode,        // TINY_CMD_SET_LED_MODE_ALL_F
+    handlecmd_config,                 // TINY_CMD_CONFIG_F
+    handlecmd_test,                   // TINY_CMD_TEST_F
+    0                                 // TINY_CMD_MAX
 };
 #define CMD_HANDLER_TABLE_SIZE            (sizeof(handle_cmd_func)/sizeof(tinycmd_handler_func))
 
@@ -201,7 +214,7 @@ uint8_t handlecmd_ver(tinycmd_pkt_req_type *p_req)
 
         // debug
         led_array_on(TRUE, 100, 0, 0);
-        //sysConfig.comm_init = 1;
+        //tinyConfig.comm_init = 1;
     }
 
     return 0;
@@ -298,8 +311,11 @@ uint8_t handlecmd_bl_led_range(tinycmd_pkt_req_type *p_req)
     *(pTmp++) = threeLock[1];
     *(pTmp++) = threeLock[2];
 
+    pTmp+=(CLED_ELEMENT * p_bl_led_range->offset);
+    
+
     pLed = (uint8_t *)&p_bl_led_range->led;
-    for(i = 1; i < CLED_NUM; i++)
+    for(i = 0; i < p_bl_led_range->num; i++)
     {
         *(pTmp++) = *(pLed++);
         *(pTmp++) = *(pLed++);
@@ -317,8 +333,16 @@ uint8_t handlecmd_bl_led_effect(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
-uint8_t handlecmd_pwm(tinycmd_pkt_req_type *p_req)
+uint8_t handlecmd_k_led_level(tinycmd_pkt_req_type *p_req)
 {
+    tinycmd_k_led_level_req_type *p_led_level = (tinycmd_k_led_level_req_type *)p_req;
+    
+
+    if(p_led_level->pkt_len == sizeof(tinycmd_k_led_level_req_type))
+    {
+        key_led_control(p_led_level->channel, p_led_level->level);
+    }
+
     return 0;
 }
 
@@ -326,16 +350,17 @@ uint8_t handlecmd_set_led_mode(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_set_led_mode_req_type *p_ledmode = (tinycmd_set_led_mode_req_type *)p_req;
 
-    ledmode[p_ledmode->storage][p_ledmode->block] = p_ledmode->mode;
+    ledmodeIndex = p_ledmode->mode;
     
     return 0;
 }
 
-uint8_t handlecmd_set_led_mode_all(tinycmd_pkt_req_type *p_req)
+uint8_t handlecmd_config_led_mode(tinycmd_pkt_req_type *p_req)
 {
-    tinycmd_set_led_mode_all_req_type *p_ledmode_all_req = (tinycmd_set_led_mode_all_req_type *)p_req;
+    tinycmd_config_led_mode_req_type *p_ledmode_all_req = (tinycmd_config_led_mode_req_type *)p_req;
     uint16_t i = 0;
- 
+    LED_BLOCK ledblock;
+
     memcpy(ledmode, p_ledmode_all_req->data, sizeof(ledmode));
 
     if((p_ledmode_all_req->cmd_code & TINY_CMD_RSP_MASK) != 0)
@@ -355,86 +380,27 @@ uint8_t handlecmd_set_led_mode_all(tinycmd_pkt_req_type *p_req)
 
         // debug
         //led_array_on(TRUE, 0, 100, 0);
-        sysConfig.comm_init = 1;
 
-#if 0
-{
-    uint8_t i, j;
-    uint8_t *pTmp = localBuffer;
-    
-    // Three lock
-    *(pTmp++) = threeLock[0];
-    *(pTmp++) = threeLock[1];
-    *(pTmp++) = threeLock[2];
-
-    for(j = 0; j < 2; j++)
-    {
-        for(i = 0; i < 5; i++)
+        for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
         {
-            switch(ledmode[j][i])
-            {
-                case 0:
-                    *(pTmp++) = 0;
-                    *(pTmp++) = 0;
-                    *(pTmp++) = 0;
-                    break;
-                case 1:
-                    *(pTmp++) = 50;
-                    *(pTmp++) = 0;
-                    *(pTmp++) = 0;
-                    break;
-                case 2:
-                    *(pTmp++) = 0;
-                    *(pTmp++) = 50;
-                    *(pTmp++) = 0;
-                    break;
-                case 3:
-                    *(pTmp++) = 0;
-                    *(pTmp++) = 0;
-                    *(pTmp++) = 50;
-                    break;
-                case 4:
-                    *(pTmp++) = 50;
-                    *(pTmp++) = 50;
-                    *(pTmp++) = 0;
-                    break;
-                case 5:
-                    *(pTmp++) = 0;
-                    *(pTmp++) = 50;
-                    *(pTmp++) = 50;
-                    break;
-                case 6:
-                    *(pTmp++) = 50;
-                    *(pTmp++) = 0;
-                    *(pTmp++) = 50;
-                    break;
-                default:
-                    *(pTmp++) = 50;
-                    *(pTmp++) = 50;
-                    *(pTmp++) = 50;
-                    break;
-            }
+            pwmDir[ledblock ] = 0;
+            pwmCounter[ledblock] = 0;
+            tiny_led_mode_change(ledblock, ledmode[ledmodeIndex][ledblock]);
         }
-    }
 
-    localBufferLength = CLED_ARRAY_SIZE;
-    ws2812_sendarray(localBuffer, localBufferLength);
-}
-#endif
-
+        tinyConfig.comm_init = 1;
     }
 
     return 0;
 }
-
 
 uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_config_req_type *p_config = (tinycmd_config_req_type *)p_req;
     //uint8_t *pTmp = (uint8_t *)localBuffer;
 
-    sysConfig.led_max = p_config->value.led_max;
-    sysConfig.level_max = p_config->value.level_max;
+    tinyConfig.led_max = p_config->value.led_max;
+    tinyConfig.level_max = p_config->value.level_max;
 
     return 0;
 }
@@ -524,6 +490,89 @@ void i2cSlaveSend(uint8_t *pData, uint8_t len)
 }
 
 #define END_MARKER 255 // Signals the end of transmission
+int count;
+
+void key_led_control(uint8_t ch, uint8_t on)
+{
+    if(ch == KEY_LED_CHANNEL_ALL) // all
+    {
+        if(on)
+        {
+            PORTB |= ((1<<PB4) | (1<<PB1));
+        }
+        else
+        {
+            PORTB &= ~((1<<PB4) | (1<<PB1));
+        }
+    }
+    else
+    {
+        if(ch == KEY_LED_CHANNEL_A)
+        {
+            PORTB |= (1<<PB1);
+        }
+        else if(ch == KEY_LED_CHANNEL_B)
+        {
+            PORTB |= (1<<PB4);
+        }
+    }
+}
+
+void key_led_pwm_on(uint8_t channel, uint8_t on)
+{
+    if(channel == KEY_LED_CHANNEL_A)
+    {
+        if(on)
+        {
+            timer1PWMAOn();
+        }
+        else
+        {
+            timer1PWMAOff();
+        }
+    }
+    else if(channel == KEY_LED_CHANNEL_B)
+    {
+        if(on)
+        {
+            timer1PWMBOn();
+        }
+        else
+        {
+            timer1PWMBOff();
+        }
+    }
+    else if(channel == KEY_LED_CHANNEL_ALL)
+    {
+        if(on)
+        {
+            timer1PWMAOn();
+            timer1PWMBOn();
+        }
+        else
+        {
+            timer1PWMAOff();
+            timer1PWMBOff();
+        }
+    }
+}
+
+void key_led_pwm_duty(uint8_t channel, uint8_t duty)
+{
+    if(channel == KEY_LED_CHANNEL_A)
+    {
+        timer1PWMASet(duty);
+    }
+    else if(channel == KEY_LED_CHANNEL_B)
+    {
+        timer1PWMBSet(duty);
+    }
+    else if(channel == KEY_LED_CHANNEL_ALL)
+    {
+        timer1PWMASet(duty);
+        timer1PWMBSet(duty);
+    }
+}
 
 #if 1
 void tiny_led_off(LED_BLOCK block)
@@ -757,6 +806,31 @@ void tiny_fader(void)
         }
     }
 }
+
+void tiny_led_mode_change (LED_BLOCK ledblock, int mode)
+{
+    switch (mode)
+    {
+        case LED_EFFECT_FADING :
+        case LED_EFFECT_FADING_PUSH_ON :
+            break;
+        case LED_EFFECT_PUSH_OFF :
+        case LED_EFFECT_ALWAYS :
+            tiny_led_on(ledblock);
+            break;
+        case LED_EFFECT_PUSH_ON :
+        case LED_EFFECT_OFF :
+        case LED_EFFECT_PUSHED_LEVEL :
+        case LED_EFFECT_BASECAPS :
+            tiny_led_off(ledblock);
+            tiny_led_wave_set(ledblock,0);
+            tiny_led_wave_on(ledblock);
+            break;
+        default :
+            ledmode[ledmodeIndex][ledblock] = LED_EFFECT_FADING;
+            break;
+     }
+}
 #endif
 
 void TinyInitHW(void)
@@ -797,8 +871,7 @@ int main(void)
 
     uint16_t count = 0;
 
-    sysConfig.comm_init = 0;
-    
+    tinyConfig.comm_init = 0;
     TinyInitHW();
     TinyInitTimer();
 
@@ -822,13 +895,16 @@ int main(void)
         }
         else
         {
-            if(sysConfig.comm_init)
+            if(tinyConfig.comm_init)
             {
                 if(++count%250 == 0)
                 {
                     tiny_blink(0);
                     tiny_fader();
                 }
+            }
+            else
+            {
             }
         }
         //PORTB |= (1<<PB4);

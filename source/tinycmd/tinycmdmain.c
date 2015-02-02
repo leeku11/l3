@@ -133,17 +133,17 @@ void tinycmd_bl_led_range(uint8_t num, uint8_t offset, uint8_t r, uint8_t g, uin
     i2cMasterSendNI(TARGET_ADDR, p_bl_led_range_req->pkt_len, (uint8_t *)p_bl_led_range_req);
 }
 
-void tinycmd_pwm(uint8_t channel, uint8_t on, uint8_t duty)
+void tinycmd_key_led_level(uint8_t channel, uint8_t level)
 {
-    tinycmd_pwm_req_type *p_pwm_req = (tinycmd_pwm_req_type *)localBuffer;
+    tinycmd_k_led_level_req_type *p_led_level_req = (tinycmd_k_led_level_req_type *)localBuffer;
 
-    p_pwm_req->cmd_code = TINY_CMD_PWM_F;
-    p_pwm_req->pkt_len = sizeof(tinycmd_pwm_req_type);
-    p_pwm_req->channel = channel;
-    p_pwm_req->enable = on;
-    p_pwm_req->duty = duty;
+    p_led_level_req->cmd_code = TINY_CMD_K_LED_LEVEL_F;
+    p_led_level_req->pkt_len = sizeof(tinycmd_k_led_level_req_type);
 
-    i2cMasterSendNI(TARGET_ADDR, p_pwm_req->pkt_len, (uint8_t *)p_pwm_req);
+    p_led_level_req->channel = channel;
+    p_led_level_req->level = level;
+
+    i2cMasterSendNI(TARGET_ADDR, p_led_level_req->pkt_len, (uint8_t *)p_led_level_req);
 }
 
 void tinycmd_api_set_bl_color(uint8_t index, uint8_t level)
@@ -179,13 +179,13 @@ void tinycmd_set_led_mode(uint8_t storage, uint8_t block, uint8_t mode)
     i2cMasterSendNI(TARGET_ADDR, p_set_led_mode->pkt_len, (uint8_t *)p_set_led_mode);
 }
 
-void tinycmd_set_led_mode_all(uint8_t *p_led_mode_array)
+void tinycmd_config_led_mode(uint8_t *p_led_mode_array)
 {
     uint8_t i;
-    tinycmd_set_led_mode_all_req_type *p_set_led_mode_all = (tinycmd_set_led_mode_all_req_type *)localBuffer;
+    tinycmd_config_led_mode_req_type *p_set_led_mode_all = (tinycmd_config_led_mode_req_type *)localBuffer;
 
-    p_set_led_mode_all->cmd_code = TINY_CMD_SET_LED_MODE_ALL_F | TINY_CMD_RSP_MASK;
-    p_set_led_mode_all->pkt_len = sizeof(tinycmd_set_led_mode_all_req_type);
+    p_set_led_mode_all->cmd_code = TINY_CMD_CONFIG_LED_MODE_F | TINY_CMD_RSP_MASK;
+    p_set_led_mode_all->pkt_len = sizeof(tinycmd_config_led_mode_req_type);
 
     for(i = 0; i < LEDMODE_ARRAY_SIZE; i++)
     {
