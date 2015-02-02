@@ -525,8 +525,11 @@ uint8_t usbFunctionWrite(uchar *data, uchar len)
 {
     uint8_t result;
     if (expectReport && (len == 1)) {
-        LEDstate = data[0]; // Get the state of all 5 LEDs
-        led_3lockupdate(LEDstate);
+        if(LEDstate != data[0])
+        {
+            LEDstate = data[0]; // Get the state of all 5 LEDs
+            led_3lockupdate(data[0]);
+        }
         expectReport = 0;
         result = 1;     // last block received
     }else if (expectReport == 2)

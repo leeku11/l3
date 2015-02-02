@@ -41,7 +41,7 @@ static uint16_t pwmCounter[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 static uint16_t pushedLevelStay[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 static uint8_t pushedLevel[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 static uint16_t pushedLevelDuty[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
-uint8_t LEDstate;     ///< current state of the LEDs
+uint8_t LEDstate = 0;     ///< current state of the LEDs
 
 extern uint16_t scankeycntms;
 
@@ -283,7 +283,7 @@ void led_3lockupdate(uint8_t LEDstate)
 {
    if (tinyExist)
    {
-      tinycmd_three_lock((LEDstate & LED_NUM), (LEDstate & LED_CAPS), (LEDstate & LED_SCROLL));
+        tinycmd_three_lock((LEDstate & LED_NUM), (LEDstate & LED_CAPS), (LEDstate & LED_SCROLL));
    }else
    {
        if (LEDstate & LED_NUM) { // light up caps lock

@@ -42,7 +42,7 @@ uint16_t macroresetcnt;
 uint16_t winkeylockcnt;
 uint16_t keylockcnt;
 uint8_t keylock = 0;
-#define SWAP_TIMER  0x400
+#define SWAP_TIMER  0x100
 #define KEYLOCK_TIMER  0x600
 #define KEYLOCK_COUNTER_START 0x8000
 
@@ -517,7 +517,7 @@ uint8_t scankey(void)
                     continue;
             }else if (prevBit && !curBit)  //released
             {
-                cntKey(keyidx, 0x0000);
+                cntKey(keyidx, 0x00);
                 if (processReleasedFNkeys(keyidx))
                     continue;
             }
