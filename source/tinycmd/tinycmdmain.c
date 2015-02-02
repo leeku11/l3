@@ -25,13 +25,13 @@ void tinycmd_ver(uint8_t rsp)
     p_ver_req->pkt_len = sizeof(tinycmd_ver_req_type);
 
 
-    i2cMasterSend(TARGET_ADDR, p_ver_req->pkt_len, (uint8_t *)p_ver_req);
+    i2cMasterSendNI(TARGET_ADDR, p_ver_req->pkt_len, (uint8_t *)p_ver_req);
 
     // If need to wait response from the slave
     if(rsp)
     {
     	// then read n byte(s) from the selected MegaIO register
-    	i2cMasterReceive(TARGET_ADDR, sizeof(tinycmd_ver_rsp_type), (uint8_t*)localBuffer);
+    	i2cMasterReceiveNI(TARGET_ADDR, sizeof(tinycmd_ver_rsp_type), (uint8_t*)localBuffer);
     }
 }
 
@@ -43,7 +43,7 @@ void tinycmd_reset(uint8_t type)
     p_reset_req->pkt_len = sizeof(tinycmd_reset_req_type);
     p_reset_req->type = TINY_RESET_HARD;
 
-    i2cMasterSend(TARGET_ADDR, p_reset_req->pkt_len, (uint8_t *)p_reset_req);
+    i2cMasterSendNI(TARGET_ADDR, p_reset_req->pkt_len, (uint8_t *)p_reset_req);
 }
 
 void tinycmd_three_lock(uint8_t num, uint8_t caps, uint8_t scroll)
@@ -67,7 +67,7 @@ void tinycmd_three_lock(uint8_t num, uint8_t caps, uint8_t scroll)
     }
     p_three_lock_req->lock = lock;
 
-    i2cMasterSend(TARGET_ADDR, p_three_lock_req->pkt_len, (uint8_t *)p_three_lock_req);
+    i2cMasterSendNI(TARGET_ADDR, p_three_lock_req->pkt_len, (uint8_t *)p_three_lock_req);
 }
 
 void tinycmd_bl_led_all(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
@@ -86,7 +86,7 @@ void tinycmd_bl_led_all(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
     p_bl_led_all_req->led.r = MAX_LEVEL_MASK(r);
     p_bl_led_all_req->led.b = MAX_LEVEL_MASK(b);
 
-    i2cMasterSend(TARGET_ADDR, p_bl_led_all_req->pkt_len, (uint8_t *)p_bl_led_all_req);
+    i2cMasterSendNI(TARGET_ADDR, p_bl_led_all_req->pkt_len, (uint8_t *)p_bl_led_all_req);
 }
 
 void tinycmd_bl_led_pos(uint8_t pos, uint8_t r, uint8_t g, uint8_t b)
@@ -105,7 +105,7 @@ void tinycmd_bl_led_pos(uint8_t pos, uint8_t r, uint8_t g, uint8_t b)
     p_bl_led_pos_req->led.r = MAX_LEVEL_MASK(r);
     p_bl_led_pos_req->led.b = MAX_LEVEL_MASK(b);
 
-    i2cMasterSend(TARGET_ADDR, p_bl_led_pos_req->pkt_len, (uint8_t *)p_bl_led_pos_req);
+    i2cMasterSendNI(TARGET_ADDR, p_bl_led_pos_req->pkt_len, (uint8_t *)p_bl_led_pos_req);
 }
 
 void tinycmd_bl_led_range(uint8_t num, uint8_t offset, uint8_t r, uint8_t g, uint8_t b)
@@ -130,7 +130,7 @@ void tinycmd_bl_led_range(uint8_t num, uint8_t offset, uint8_t r, uint8_t g, uin
        p_bl_led_range_req->led[i] = led;
     }
 
-    i2cMasterSend(TARGET_ADDR, p_bl_led_range_req->pkt_len, (uint8_t *)p_bl_led_range_req);
+    i2cMasterSendNI(TARGET_ADDR, p_bl_led_range_req->pkt_len, (uint8_t *)p_bl_led_range_req);
 }
 
 void tinycmd_pwm(uint8_t channel, uint8_t on, uint8_t duty)
@@ -143,7 +143,7 @@ void tinycmd_pwm(uint8_t channel, uint8_t on, uint8_t duty)
     p_pwm_req->enable = on;
     p_pwm_req->duty = duty;
 
-    i2cMasterSend(TARGET_ADDR, p_pwm_req->pkt_len, (uint8_t *)p_pwm_req);
+    i2cMasterSendNI(TARGET_ADDR, p_pwm_req->pkt_len, (uint8_t *)p_pwm_req);
 }
 
 void tinycmd_api_set_bl_color(uint8_t index, uint8_t level)
@@ -176,7 +176,7 @@ void tinycmd_set_led_mode(uint8_t storage, uint8_t block, uint8_t mode)
     p_set_led_mode->block = block;
     p_set_led_mode->mode = mode;
 
-    i2cMasterSend(TARGET_ADDR, p_set_led_mode->pkt_len, (uint8_t *)p_set_led_mode);
+    i2cMasterSendNI(TARGET_ADDR, p_set_led_mode->pkt_len, (uint8_t *)p_set_led_mode);
 }
 
 void tinycmd_set_led_mode_all(uint8_t *p_led_mode_array)
@@ -192,9 +192,9 @@ void tinycmd_set_led_mode_all(uint8_t *p_led_mode_array)
         p_set_led_mode_all->data[i] = p_led_mode_array[i];
     }
 
-    i2cMasterSend(TARGET_ADDR, p_set_led_mode_all->pkt_len, (uint8_t *)p_set_led_mode_all);
+    i2cMasterSendNI(TARGET_ADDR, p_set_led_mode_all->pkt_len, (uint8_t *)p_set_led_mode_all);
 
-    i2cMasterReceive(TARGET_ADDR, sizeof(tinycmd_ver_rsp_type), (uint8_t*)localBuffer);
+    i2cMasterReceiveNI(TARGET_ADDR, sizeof(tinycmd_ver_rsp_type), (uint8_t*)localBuffer);
 }
 
 #endif // SUPPORT_TINY_CMD

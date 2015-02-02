@@ -223,15 +223,15 @@ uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
     
     if(p_three_lock->lock & (1<<2))
     {
-        threeLock[0] = 50;
+        threeLock[0] = 150;
     }
     if(p_three_lock->lock & (1<<1))
     {
-        threeLock[1] = 50;
+        threeLock[1] = 150;
     }
     if(p_three_lock->lock & (1<<0))
     {
-        threeLock[2] = 50;
+        threeLock[2] = 150;
     }
 
     pTmp = (uint8_t *)localBuffer;

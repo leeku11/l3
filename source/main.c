@@ -264,6 +264,12 @@ uint8_t establishSlaveComm(void)
     return ret;    
 }    
 
+int8_t updateConf(void)
+{
+    eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
+}
+
+
 int8_t kbd_init(void)
 {
     
@@ -295,13 +301,10 @@ int8_t kbd_init(void)
     keymap_init();
     tinyExist = establishSlaveComm();
 
-    eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
+    updateConf();
 }
 
-int8_t updateConf(void)
-{
-    eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
-}
+
 
 int main(void)
 {
