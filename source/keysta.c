@@ -85,7 +85,7 @@ static volatile unsigned char	tx_shift;
 static volatile unsigned char	parity;
 
 void
-kbd_init(void)
+kbd_init_ps2(void)
 {
 	kbd_state = IDLE_START;
 	kbd_flags = FLA_CLOCK_HIGH | FLA_TX_OK;

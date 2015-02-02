@@ -34,9 +34,11 @@ unsigned char localBuffer[0x50];
 unsigned char localBufferLength;
 #endif // SUPPORT_I2C
 
-int8_t usbmode;
 extern uint8_t usbmain(void);
 extern uint8_t ps2main(void);
+
+
+kbd_configuration_t kbdConf;
 
 
 #ifdef DEBUG
@@ -58,33 +60,6 @@ void enable_printf(void)
 }
 #endif
 
-
-
-
-
-/* control zener diode for level shift signal line
-    1 : TR on - 3v level
-    0 : TR off - 5v level
-*/
-void DPpullEn(uint8_t enable)
-{
-    if (enable)
-    {
-        sbi(USB_LEVEL_SHIFT_PORT, USB_LEVEL_SHIFT_PIN);     // pullup
-        cbi(USB_LEVEL_SHIFT_DDR, USB_LEVEL_SHIFT_PIN);      // INPUT
-
-        sbi(PS2_CLK_PULLUP_DDR, PS2_CLK_PULLUP_PIN);      // OUT
-        cbi(PS2_CLK_PULLUP_PORT, PS2_CLK_PULLUP_PIN);     // drive 0
-    }
-    else
-    {
-        sbi(USB_LEVEL_SHIFT_DDR, USB_LEVEL_SHIFT_PIN);      // OUTPUT
-        cbi(USB_LEVEL_SHIFT_PORT, USB_LEVEL_SHIFT_PIN);     // drive 0
-        
-        sbi(PS2_CLK_PULLUP_PORT, PS2_CLK_PULLUP_PIN);     // pullup
-        cbi(PS2_CLK_PULLUP_DDR, PS2_CLK_PULLUP_PIN);      // INPUT
-    }
-}
 
 
 
@@ -207,9 +182,9 @@ void initI2C(void)
 }
 #endif // SUPPORT_I2C
 
-int8_t checkInterface(void)
+int8_t setPS2USB(void)
 {
-    uint8_t cur_usbmode = 0;
+    uint8_t cur_usbmode = kbdConf.ps2usb_mode;
     DDRC  |= BV(4);        //  col2
     PORTC &= ~BV(4);       //
 
@@ -218,19 +193,40 @@ int8_t checkInterface(void)
     if (CHECK_U)   
     {
         cur_usbmode = 1;
-        eeprom_write_byte(EEPADDR_USBPS2_MODE, cur_usbmode);
     }else if (CHECK_P)
     {
         cur_usbmode = 0;
-        eeprom_write_byte(EEPADDR_USBPS2_MODE, cur_usbmode);
     }else
     {
-        cur_usbmode = eeprom_read_byte(EEPADDR_USBPS2_MODE);
         if (cur_usbmode > 1)
             cur_usbmode = 1;    //default USB
     }
+
+    /* control zener diode for level shift signal line
+        1 : TR on - 3v level
+        0 : TR off - 5v level
+        */
+    
+    if (cur_usbmode)
+    {
+        sbi(USB_LEVEL_SHIFT_PORT, USB_LEVEL_SHIFT_PIN);     // pullup
+        cbi(USB_LEVEL_SHIFT_DDR, USB_LEVEL_SHIFT_PIN);      // INPUT
+
+        sbi(PS2_CLK_PULLUP_DDR, PS2_CLK_PULLUP_PIN);      // OUT
+        cbi(PS2_CLK_PULLUP_PORT, PS2_CLK_PULLUP_PIN);     // drive 0
+    }
+    else
+    {
+        sbi(USB_LEVEL_SHIFT_DDR, USB_LEVEL_SHIFT_PIN);      // OUTPUT
+        cbi(USB_LEVEL_SHIFT_PORT, USB_LEVEL_SHIFT_PIN);     // drive 0
+        
+        sbi(PS2_CLK_PULLUP_PORT, PS2_CLK_PULLUP_PIN);     // pullup
+        cbi(PS2_CLK_PULLUP_DDR, PS2_CLK_PULLUP_PIN);      // INPUT
+    }
+    
+    kbdConf.ps2usb_mode = cur_usbmode;    
     return cur_usbmode;
-}       
+}        
 
 uint8_t establishSlaveComm(void)
 {
@@ -268,26 +264,50 @@ uint8_t establishSlaveComm(void)
     return ret;    
 }    
 
-int main(void)
+int8_t kbd_init(void)
 {
     
-   enable_printf();
-   portInit();
-   usbmode = checkInterface();
-   DPpullEn(usbmode);
-//   led_off(LED_PIN_Fx);
-   
-//   timerInit();
-//   timer1PWMInit(8);
-//   timer2PWMInit(8);
-   timer0Init();
-   timer0SetPrescaler(TIMER_CLK_DIV8);
+    portInit();
+    enable_printf();
+    eeprom_read_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
 
-   keymap_init();
+    if(kbdConf.swapAltGui != 1)
+        kbdConf.swapAltGui = 0;    
+    if(kbdConf.swapCtrlCaps != 1)
+        kbdConf.swapCtrlCaps = 0; 
+    if(kbdConf.keymapLayerIndex >= MAX_LAYER)
+        kbdConf.keymapLayerIndex = 1;
+    
+    setPS2USB();
 
-   tinyExist = establishSlaveComm();
+    //   led_off(LED_PIN_Fx);
+    //   timerInit();
+    //   timer1PWMInit(8);
+    //   timer2PWMInit(8);
 
-   if(usbmode)
+    timer0Init();
+    timer0SetPrescaler(TIMER_CLK_DIV8);
+
+#ifdef SUPPORT_I2C
+    initI2C();
+#endif // SUPPORT_I2C
+
+    keymap_init();
+    tinyExist = establishSlaveComm();
+
+    eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
+}
+
+int8_t updateConf(void)
+{
+    eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
+}
+
+int main(void)
+{
+   kbd_init();   
+    
+   if(kbdConf.ps2usb_mode)
    {
       led_check(1);
 

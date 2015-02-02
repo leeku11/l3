@@ -16,7 +16,7 @@
 #include "matrix.h"
 #include "usbmain.h"
 #include "hwport.h"
-
+#include "hwaddress.h"
 #ifdef SUPPORT_TINY_CMD
 #include "tinycmdapi.h"
 #endif
@@ -46,7 +46,6 @@ uint8_t expectReport = 0;       ///< flag to indicate if we expect an USB-report
 AppPtr_t Bootloader = (void *)BOOTLOADER_ADDRESS; 
 
 
-extern uint8_t swapAltGui;
 
 #define MOUSE_ENABLE 1
 
@@ -365,6 +364,20 @@ MODIFIERS modifierBitmap[] = {
 #define HID_REPORT_BOOT     (0x0300 | REPORT_ID_BOOT)
 #define HID_REPORT_OPTION   (0x0300 | REPORT_ID_INFO)
 
+#define HID_BOOT_DATA_LEN   0x83
+uint8_t bootRxRemains;
+uint8_t bootRxBuffer[HID_BOOT_DATA_LEN];
+uint8_t bootRxIndex;
+
+
+typedef enum
+{
+    SET_OPTOIN,
+    SET_MACROS,
+    SET_KEYMAP,
+    SET_RGB,
+}BOOT_RX_CMD;
+    
 
 /**
  * This function is called whenever we receive a setup request via USB.
@@ -398,33 +411,54 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
 
 
             }
+        }
 
 
 
-        } else if (rq->bRequest == USBRQ_HID_SET_REPORT) {
-            if (rq->wValue.word == 0x0200 && rq->wIndex.word == 0) {
+        else if (rq->bRequest == USBRQ_HID_SET_REPORT) {
+            if (rq->wValue.word == HID_REPORT_KEBOARD && rq->wIndex.word == 0) {
                 // We expect one byte reports
                 expectReport = 1;
+            }else if (rq->wValue.word == HID_REPORT_BOOT)
+            {
+                expectReport = 2;
+                bootRxRemains = HID_BOOT_DATA_LEN;
+
+            }else if (rq->wValue.word == HID_REPORT_OPTION)
+            {
+
+
             }
-            return 0xff; // Call usbFunctionWrite with data
-        } else if (rq->bRequest == USBRQ_HID_GET_IDLE) {
+            return USB_NO_MSG; // Call usbFunctionWrite with data
+            }
+
+
+        else if (rq->bRequest == USBRQ_HID_GET_IDLE) {
             usbMsgPtr = (usbMsgPtr_t)&idleRate;
             return 1;
-        } else if (rq->bRequest == USBRQ_HID_SET_IDLE) {
+        }
+
+
+        else if (rq->bRequest == USBRQ_HID_SET_IDLE) {
             idleRate = rq->wValue.bytes[1];
             if(idleRate > 0)    // not windows
             {
-               swapAltGui = 1;
+               kbdConf.swapAltGui = 1;
             }else
             {
-               swapAltGui = 0;
+               kbdConf.swapAltGui = 0;
             }
             DEBUG_PRINT(("idleRate = %2x\n", idleRate));
-        } else if (rq->bRequest == USBRQ_HID_GET_PROTOCOL) {
+        } 
+
+
+        else if (rq->bRequest == USBRQ_HID_GET_PROTOCOL) {
             if (rq->wValue.bytes[1] < 1) {
                 protocolVer = rq->wValue.bytes[1];
             }
-        } else if(rq->bRequest == USBRQ_HID_SET_PROTOCOL) {
+        } 
+
+        else if(rq->bRequest == USBRQ_HID_SET_PROTOCOL) {
             usbMsgPtr = (usbMsgPtr_t)&protocolVer;
             return 1;
         }
@@ -434,6 +468,52 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
     return 0;
 }
 
+typedef struct bootCmd{
+    uint8_t reportId;
+    uint8_t cmd;
+    uint8_t index;
+    uint8_t rsvd;   
+    uint8_t data[128];
+}bootCmd_t;
+
+bootCmd_t gbootCmd;
+uint8_t gbootCmdoffset;
+
+
+uint8_t processbootCmd(void)
+{
+    tinycmd_three_lock(0,0,1);
+    switch(gbootCmd.cmd)
+    {
+        case SET_OPTOIN :
+            {
+
+
+            }
+            break;
+
+        case SET_MACROS :
+            {
+
+
+            }
+            break;
+        case SET_KEYMAP :
+            {
+
+
+            }
+            break;
+        case SET_RGB :
+            {
+
+
+            }
+            break;
+    }
+}
+
+    
 /**
  * The write function is called when LEDs should be set. Normally, we get only
  * one byte that contains info about the LED states.
@@ -441,13 +521,43 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
  * \param len number ob bytes received
  * \return 0x01
  */
-uint8_t usbFunctionWrite(uchar *data, uchar len) {
+uint8_t usbFunctionWrite(uchar *data, uchar len) 
+{
+    uint8_t result;
     if (expectReport && (len == 1)) {
         LEDstate = data[0]; // Get the state of all 5 LEDs
         led_3lockupdate(LEDstate);
+        expectReport = 0;
+        result = 1;     // last block received
+    }else if (expectReport == 2)
+    {
+        if(bootRxRemains == HID_BOOT_DATA_LEN)
+        {
+            gbootCmd.cmd = data[1];
+            gbootCmd.index = data[2];
+            gbootCmd.rsvd = data[3];
+            bootRxRemains -=4;
+            len -=4;
+            gbootCmdoffset = 0;
     }
+        
+        for(;len>0; len--)
+        {
+            gbootCmd.data[gbootCmdoffset++] = data++;
+            bootRxRemains--;
+        }
+
+        if(!bootRxRemains)
+        {
+            processbootCmd();
     expectReport = 0;
-    return 0x01;
+            result = 1;     // last block received
+        }else
+        {
+            result = 0;
+        }
+    }
+    return result;
 }
 
 
@@ -579,6 +689,7 @@ uint8_t usbmain(void) {
 	interfaceReady = 0;
 
     DEBUG_PRINT(("USB\n"));
+
 
     cli();
     usbInit();

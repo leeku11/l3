@@ -33,9 +33,6 @@ const char PROGMEM mresetstart[20] = "MACRO erase";
 const char PROGMEM macroresetdone[20]  = "done@";
 
 
-extern int8_t usbmode;
-
-
 /**
  * Send a single report to the computer. This function is not used during
  * normal typing, it is only used to send non-pressed keys to simulate input.
@@ -202,7 +199,7 @@ Key charToKey(char character) {
 void sendKey(Key keytosend) 
 {
     uint8_t keyval = 0;
-    if(usbmode)
+    if(kbdConf.ps2usb_mode)
     {
         usbSendReport(keytosend.mode, keytosend.key);
     }else
@@ -295,7 +292,7 @@ void printModifier(uint8_t keytosend, uint8_t open)
 
 void clearKey(void)
 {
-    if(usbmode)
+    if(kbdConf.ps2usb_mode)
     {
         usbSendReport(0, 0);
     }
@@ -622,7 +619,7 @@ void recordMacro(uint8_t macrokey)
       wdt_reset();
       matrixState = scanmatrix();
       
-      t_layer = layer;
+      t_layer = kbdConf.keymapLayerIndex;
 
       // debounce cleared => compare last matrix and current matrix
       for(col = 0; col < MAX_COL; col++)

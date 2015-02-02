@@ -33,7 +33,7 @@ uint8_t svkeyidx[MAX_COL][MAX_ROW];
 uint8_t  currentLayer[MAX_COL][MAX_ROW];
 
 uint8_t matrixFN[MAX_LAYER];           // (col << 4 | row)
-uint8_t layer = 0;
+//uint8_t layer = 0;
 uint8_t kbdsleepmode = 0;
 uint8_t ledPortBackup = 0;
 uint16_t macrokeypushedcnt;
@@ -46,8 +46,7 @@ uint8_t keylock = 0;
 #define KEYLOCK_TIMER  0x600
 #define KEYLOCK_COUNTER_START 0x8000
 
-uint8_t swapCtrlCaps = 0x80;
-uint8_t swapAltGui =  0x80;
+
 uint16_t cntLcaps = 0;
 uint16_t cntLctrl = 0;
 uint16_t cntLAlt = 0;
@@ -56,18 +55,7 @@ uint16_t cntLGui = 0;
 uint8_t isLED3000 = 0;
 
 int8_t isFNpushed = 0;
-extern int8_t usbmode;
 
-
-static void swap_load(void)
-{
-    swapAltGui = eeprom_read_byte(EEPADDR_SWAPALTGUI);
-    if(swapAltGui != 1)
-        swapAltGui = 0;     
-    swapCtrlCaps = eeprom_read_byte(EEPADDR_SWAPCTRLCAPS);
-    if(swapCtrlCaps != 1)
-        swapCtrlCaps = 0; 
-}
 
 static uint8_t findFNkey(void)
 {
@@ -145,18 +133,16 @@ void keymap_init(void)
         }
         curMATRIX[i] = 0;
 	}
-   layer = eeprom_read_byte(EEPADDR_KEYLAYER);
-    if (layer >= MAX_LAYER)
-        layer = 0;
+//   kbdConf.keymapLayerIndex = eeprom_read_byte(EEPADDR_KEYLAYER);
+//    if (kbdConf.keymapLayerIndex >= MAX_LAYER)
+//        kbdConf.keymapLayerIndex = 0;
 
       pBuf = &currentLayer[0][0];
 
     for(i = 0; i < MAX_ROW*MAX_COL; i++)
     {
-        *pBuf++ = pgm_read_byte(keylayer(layer) + i);
+        *pBuf++ = pgm_read_byte(keylayer(kbdConf.keymapLayerIndex) + i);
     }
-
-   swap_load();
 }
 
 
@@ -173,8 +159,8 @@ uint8_t processPushedFNkeys(uint8_t keyidx)
         retVal = 1;
     }else if(keyidx >= K_L0 && keyidx <= K_L6)
     {
-        layer = keyidx - K_L0;
-        eeprom_write_byte(EEPADDR_KEYLAYER, layer);
+        kbdConf.keymapLayerIndex = keyidx - K_L0;
+        updateConf();
         keymap_init();
         led_mode_init();
         retVal = 1;
@@ -217,7 +203,7 @@ uint8_t processReleasedFNkeys(uint8_t keyidx)
         retVal = 1;
     }else if(keyidx >= K_M01 && keyidx <= K_M52)
     {
-        if(usbmode)
+        if(kbdConf.ps2usb_mode)
              playMacroUSB(keyidx);
          else
              playMacroPS2(keyidx);
@@ -267,7 +253,7 @@ uint8_t getLayer(uint8_t FNcolrow)
          return 3;        // FN layer or beyondFN layer
       }else
       {
-         return layer;                   // Normal layer
+         return kbdConf.keymapLayerIndex;                   // Normal layer
       }
     }
 }
@@ -326,11 +312,6 @@ uint8_t scanmatrix(void)
     return matrixState;
 }
 
-void swap_save(void)
-{
-   eeprom_write_byte(EEPADDR_SWAPALTGUI, swapAltGui);
-   eeprom_write_byte(EEPADDR_SWAPCTRLCAPS, swapCtrlCaps);
-}
 
 uint8_t cntKey(uint8_t keyidx, uint8_t clearmask)
 {
@@ -339,7 +320,7 @@ uint8_t cntKey(uint8_t keyidx, uint8_t clearmask)
         case K_CAPS:
             if (clearmask == 0)
             {
-                swapCtrlCaps |= 0x80;
+                kbdConf.swapCtrlCaps |= 0x80;
                 cntLcaps = 0;
             }
             if (cntLcaps++ >= SWAP_TIMER)
@@ -348,7 +329,7 @@ uint8_t cntKey(uint8_t keyidx, uint8_t clearmask)
         case K_LCTRL:
             if (clearmask == 0)
             {
-                swapCtrlCaps |= 0x80;
+                kbdConf.swapCtrlCaps |= 0x80;
                 cntLctrl = 0;
             }
             if (cntLctrl++ >= SWAP_TIMER)
@@ -357,7 +338,7 @@ uint8_t cntKey(uint8_t keyidx, uint8_t clearmask)
         case K_LALT:
             if (clearmask == 0)
             {
-                swapAltGui |= 0x80;
+                kbdConf.swapAltGui |= 0x80;
                 cntLAlt = 0;
             }
             if (cntLAlt++ >= SWAP_TIMER)
@@ -366,24 +347,24 @@ uint8_t cntKey(uint8_t keyidx, uint8_t clearmask)
         case K_LGUI:
             if (clearmask == 0)
             {
-                swapAltGui |= 0x80;
+                kbdConf.swapAltGui |= 0x80;
                 cntLGui = 0;
             }
             if (cntLGui++ >= SWAP_TIMER)
                 cntLGui = SWAP_TIMER;
             break;
     }
-    if((cntLcaps == SWAP_TIMER) && (cntLctrl == SWAP_TIMER) && (swapCtrlCaps & 0x80))
+    if((cntLcaps == SWAP_TIMER) && (cntLctrl == SWAP_TIMER) && (kbdConf.swapCtrlCaps & 0x80))
     {
-        swapCtrlCaps ^= 1;
-        swapCtrlCaps &= 0x7F;
-        swap_save();
+        kbdConf.swapCtrlCaps ^= 1;
+        kbdConf.swapCtrlCaps &= 0x7F;
+        updateConf();
     }
-    if((cntLGui == SWAP_TIMER) && (cntLAlt == SWAP_TIMER) && (swapAltGui & 0x80))
+    if((cntLGui == SWAP_TIMER) && (cntLAlt == SWAP_TIMER) && (kbdConf.swapAltGui & 0x80))
     {
-        swapAltGui ^= 1;
-        swapAltGui &= 0x7F;
-        swap_save();
+        kbdConf.swapAltGui ^= 1;
+        kbdConf.swapAltGui &= 0x7F;
+        updateConf();
     }
     if(keyidx >= K_M01 && keyidx <= K_M48)
     {
@@ -431,7 +412,7 @@ uint8_t swap_key(uint8_t keyidx)
       keyidx = K_NONE;
       return keyidx;
     }
-    if(swapCtrlCaps & 0x01)
+    if(kbdConf.swapCtrlCaps & 0x01)
     {
         if(keyidx == K_CAPS)
         {
@@ -442,7 +423,7 @@ uint8_t swap_key(uint8_t keyidx)
             keyidx = K_CAPS;
         }
     }
-    if(swapAltGui & 0x01)
+    if(kbdConf.swapAltGui & 0x01)
     {
         if(keyidx == K_LALT)
         {
@@ -490,7 +471,7 @@ uint8_t scankey(void)
 
     clearReportBuffer();
    
-	uint8_t t_layer = getLayer(matrixFN[layer]);
+	uint8_t t_layer = getLayer(matrixFN[kbdConf.keymapLayerIndex]);
 
 	// debounce cleared => compare last matrix and current matrix
 	for(col = 0; col < MAX_COL; col++)
@@ -546,7 +527,7 @@ uint8_t scankey(void)
             if ((K_L0 <= keyidx && keyidx <= K_L6) || (K_LED0 <= keyidx && keyidx <= K_FN) || (K_M01 <= keyidx) || (keyidx == K_NONE))
                continue;
             
-            if(usbmode)
+            if(kbdConf.ps2usb_mode)
             {
                 if(curBit)
                 {

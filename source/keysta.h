@@ -34,8 +34,7 @@
 #define KEYB_DATA_PIN		3
 #define KEYB_DATA_BIT		0x08
 
-void
-kbd_init(void);
+void kbd_init_ps2(void);
 
 /* request to transmit a character when possible. Care should be
    taken to not call this routine in the middle of already transmitting

@@ -385,7 +385,7 @@ uint8_t ps2main(void)
     DEBUG_PRINT(("PS/2\n"));
  
 
-	kbd_init();
+	kbd_init_ps2();
     
     wdt_enable(WDTO_2S);
     sei();
