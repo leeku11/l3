@@ -377,7 +377,22 @@ typedef enum
     SET_KEYMAP,
     SET_RGB,
 }BOOT_RX_CMD;
-    
+
+
+typedef struct bootCmd{
+    uint8_t reportId;
+    uint8_t cmd;
+    uint8_t index;
+    uint8_t rsvd;   
+    uint8_t data[128];
+}bootCmd_t;
+
+bootCmd_t gbootCmd;
+uint8_t gbootCmdoffset;
+
+
+
+#define DEBUG_LED   tinycmd_bl_led_pos
 
 /**
  * This function is called whenever we receive a setup request via USB.
@@ -404,7 +419,14 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
                 return sizeof(keyboardReport);
             }else if (rq->wValue.word == HID_REPORT_BOOT)
             {
-
+                gbootCmd.reportId = 2;
+                gbootCmd.cmd = SET_KEYMAP;
+                gbootCmd.index = 0;
+                gbootCmd.rsvd = MAX_COL<<4 | MAX_ROW;
+                memcpy(gbootCmd.data, &currentLayer[0][0], sizeof(currentLayer));
+                
+                usbMsgPtr = (usbMsgPtr_t)&gbootCmd;
+                return sizeof(gbootCmd);
 
             }else if (rq->wValue.word == HID_REPORT_OPTION)
             {
@@ -423,20 +445,19 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
             {
                 expectReport = 2;
                 bootRxRemains = HID_BOOT_DATA_LEN;
-
             }else if (rq->wValue.word == HID_REPORT_OPTION)
             {
 
 
             }
-            return USB_NO_MSG; // Call usbFunctionWrite with data
+                return USB_NO_MSG; // Call usbFunctionWrite with data
             }
 
 
         else if (rq->bRequest == USBRQ_HID_GET_IDLE) {
             usbMsgPtr = (usbMsgPtr_t)&idleRate;
             return 1;
-        }
+            }
 
 
         else if (rq->bRequest == USBRQ_HID_SET_IDLE) {
@@ -467,17 +488,6 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
     }
     return 0;
 }
-
-typedef struct bootCmd{
-    uint8_t reportId;
-    uint8_t cmd;
-    uint8_t index;
-    uint8_t rsvd;   
-    uint8_t data[128];
-}bootCmd_t;
-
-bootCmd_t gbootCmd;
-uint8_t gbootCmdoffset;
 
 
 uint8_t processbootCmd(void)
@@ -534,6 +544,7 @@ uint8_t usbFunctionWrite(uchar *data, uchar len)
         result = 1;     // last block received
     }else if (expectReport == 2)
     {
+        
         if(bootRxRemains == HID_BOOT_DATA_LEN)
         {
             gbootCmd.cmd = data[1];
@@ -541,8 +552,11 @@ uint8_t usbFunctionWrite(uchar *data, uchar len)
             gbootCmd.rsvd = data[3];
             bootRxRemains -=4;
             len -=4;
+            data += 4;
             gbootCmdoffset = 0;
-    }
+            
+            DEBUG_LED(1, 200, 0, 0);
+        }
         
         for(;len>0; len--)
         {
@@ -550,11 +564,13 @@ uint8_t usbFunctionWrite(uchar *data, uchar len)
             bootRxRemains--;
         }
 
-        if(!bootRxRemains)
+        if(bootRxRemains < 8)
         {
             processbootCmd();
-    expectReport = 0;
+            expectReport = 0;
             result = 1;     // last block received
+            
+            DEBUG_LED(1, 0, 0, 200);
         }else
         {
             result = 0;
@@ -655,9 +671,6 @@ uint8_t buildHIDreports(uint8_t keyidx)
         {
             keyboardReport[reportIndex] = keyidx; // set next available entry
             reportIndex++;
-#ifdef SUPPORT_TINY_CMD
-            tinycmd_api_set_bl_color(keyidx, 70);
-#endif // SUPPORT_TINY_CMD
         }
         
     }    

@@ -178,93 +178,94 @@ typedef struct deviceData{
     char    data[128];
 }deviceData_t;
 
-static int uploadData(char *dataBuffer)
-{
-usbDevice_t *dev = NULL;
-int         err = 0, len, mask, pageSize, deviceSize, i;
-union{
-    char            bytes[1];
-    deviceInfo_t    info;
-    deviceData_t    data;
-}           buffer;
 
-    if((err = usbOpenDevice(&dev, IDENT_VENDOR_NUM, IDENT_VENDOR_STRING, IDENT_PRODUCT_NUM, IDENT_PRODUCT_STRING, 1)) != 0){
-        fprintf(stderr, "Error opening HIDBoot device: %s\n", usbErrorMessage(err));
-        goto errorOccurred;
-    }
-    len = sizeof(buffer);
-    if(endAddress[addressIndex] > startAddress[0]){    // we need to upload data
-        if((err = usbGetReport(dev, USB_HID_REPORT_TYPE_FEATURE, 1, buffer.bytes, &len)) != 0){
-            fprintf(stderr, "Error reading page size: %s\n", usbErrorMessage(err));
-            goto errorOccurred;
-        }
-        if(len < sizeof(buffer.info)){
-            fprintf(stderr, "Not enough bytes in device info report (%d instead of %d)\n", len, (int)sizeof(buffer.info));
-            err = -1;
-            goto errorOccurred;
-        }
-        pageSize = getUsbInt(buffer.info.pageSize, 2);
-        deviceSize = getUsbInt(buffer.info.flashSize, 4);
-        printf("Page size   = %d (0x%x)\n", pageSize, pageSize);
-        printf("Device size = %d (0x%x); %d bytes remaining\n", deviceSize, deviceSize, deviceSize - 2048);
-        if(endAddress[addressIndex] > deviceSize - 2048){
-            fprintf(stderr, "Data (%d bytes) exceeds remaining flash size!\n", endAddress[addressIndex]);
-            err = -1;
-            goto errorOccurred;
-        }
-        if(pageSize < 128){
-            mask = 127;
-        }else{
-            mask = pageSize - 1;
-        }
-        for (i = 0; i <= addressIndex; i++)
-        {
-           startAddress[i] &= ~mask;                  /* round down */
-           endAddress[i] = (endAddress[i] + mask) & ~mask;  /* round up */
-           printf("Uploading %d (0x%x) bytes starting at %d (0x%x)\n", endAddress[i] - startAddress[i], endAddress[i] - startAddress[i], startAddress[i], startAddress[i]);
-           while(startAddress[i] < endAddress[i]){
-               buffer.data.reportId = 2;
-               memcpy(buffer.data.data, dataBuffer + startAddress[i], 128);
-               setUsbInt(buffer.data.address, startAddress[i], 3);
-               printf("\r0x%05x ... 0x%05x", startAddress[i], startAddress[i] + (int)sizeof(buffer.data.data));
-               fflush(stdout);
-               if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, buffer.bytes, sizeof(buffer.data))) != 0){
-                   //fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
-                   continue;
-                   goto errorOccurred;
-               }
-               startAddress[i] += sizeof(buffer.data.data);
-           }
-           printf("\n");
-        }
-    }
-    if(leaveBootLoader){
-        /* and now leave boot loader: */
-        buffer.info.reportId = 1;
-        usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, buffer.bytes, sizeof(buffer.info));
-        /* Ignore errors here. If the device reboots before we poll the response,
-         * this request fails.
-         */
-    }
-errorOccurred:
-    if(dev != NULL)
-        usbCloseDevice(dev);
-    return err;
-}
+char    command[3]={1,2,3};
+
 
 typedef struct bootCmd{
     char reportId;
     char cmd;
     char index;
-    char rsvd;   
-    char data[128];
+    char length;   
+    unsigned char data[128];
 }bootCmd_t;
 
 
 bootCmd_t cmdData;
 
 
-static int sendCmd(char *dataBuffer)
+static int sendCmd(bootCmd_t *cmdBuffer)
+{
+usbDevice_t *dev = NULL;
+int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
+
+    if((err = usbOpenDevice(&dev, IDENT_VENDOR_NUM, IDENT_VENDOR_STRING, IDENT_PRODUCT_NUM, IDENT_PRODUCT_STRING, 1)) != 0){
+        fprintf(stderr, "Error opening HIDBoot device: %s\n", usbErrorMessage(err));
+        goto errorOccurred;
+    }
+    len = sizeof(bootCmd_t);
+
+    if((err = usbGetReport(dev, USB_HID_REPORT_TYPE_FEATURE, 2, cmdBuffer, &len)) != 0){
+        fprintf(stderr, "Error reading page size: %s\n", usbErrorMessage(err));
+        goto errorOccurred;
+        }
+    if(len < sizeof(cmdBuffer)){
+        //fprintf(stderr, "Not enough bytes in device info report (%d instead of %d)\n", len, (int)sizeof(cmdBuffer->cmd));
+        err = -1;
+        goto errorOccurred;
+        }
+    fprintf(stderr, "received length: %d\n", len);
+//    pageSize = getUsbInt(buffer.info.pageSize, 2);
+//    deviceSize = getUsbInt(buffer.info.flashSize, 4);
+    offset = 0;
+
+    printf("report ID   : %d \n", cmdBuffer->reportId);
+    printf("cmd         : %d \n", cmdBuffer->cmd);
+    printf("index       : %d \n", cmdBuffer->index);
+    printf("length      : %x \n", cmdBuffer->length);
+
+    for (i = 0; i < 6; i++)
+    {
+        printf("\n");
+        for(j = 0; j <20; j++)
+            {
+            printf("0x%2x|", cmdBuffer->data[offset++]);
+        }
+    }
+    printf("\n");
+//    printf("Page size   = %d (0x%x)\n", pageSize, pageSize);
+//    printf("Device size = %d (0x%x); %d bytes remaining\n", deviceSize, deviceSize, deviceSize - 2048);
+
+    printf("Uploading....\n");
+
+    cmdBuffer->reportId = 2;
+  
+//    setUsbInt(buffer.data.address, command, 3);
+    printf("set address \n");
+    fflush(stdout);
+    if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, cmdBuffer, sizeof(bootCmd_t))) != 0){
+        fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
+        goto errorOccurred;
+        }
+
+    printf("\n");
+    if(leaveBootLoader){
+        /* and now leave boot loader: */
+        cmdBuffer->reportId = 1;
+        usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, cmdBuffer, sizeof(cmdBuffer));
+        /* Ignore errors here. If the device reboots before we poll the response,
+         * this request fails.
+         */
+        }
+errorOccurred:
+    if(dev != NULL)
+        usbCloseDevice(dev);
+    return err;
+}
+
+
+
+static int uploadData(bootCmd_t *dataBuffer)
 {
 usbDevice_t *dev = NULL;
 int         err = 0, len, mask, pageSize, deviceSize, i;
@@ -402,7 +403,7 @@ return 0;
     // if no file was given, endAddress is less than startAddress and no data is uploaded
 #endif
 
-    if(uploadData(dataBuffer))
+    if(sendCmd(&cmdData))
         return 1;
     return 0;
 }
