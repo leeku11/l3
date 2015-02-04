@@ -24,9 +24,9 @@
 #define I2C_SEND_DATA_BUFFER_SIZE		I2C_RDSIZE	//0x5A
 #define I2C_RECEIVE_DATA_BUFFER_SIZE	I2C_WRSIZE	//0x5A	//30 led
 
-#define CLED_NUM           21
+#define CLED_NUM           20
 #define CLED_ELEMENT       3
-#define CLED_ARRAY_SIZE    (CLED_NUM*CLED_ELEMENT)
+#define CLED_ARRAY_SIZE    ((CLED_NUM+1)*CLED_ELEMENT)
 
 #define CHANNEL_MODE_SYNC               0
 #define CHANNEL_MODE_ASYNC              1
@@ -52,9 +52,9 @@
 #define DEBUG_LED_ON(p, o, r, g, b)     led_pos_on(p, o, r, g, b)
 
 typedef struct {
-    uint8_t led_max;
-    uint8_t level_max;
     uint8_t comm_init;
+    uint8_t rgb_num;
+    uint8_t led_preset_num;
 } tiny_config_type;
 
 // local data buffer
@@ -78,41 +78,50 @@ static uint8_t pushedLevel[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 static uint16_t pushedLevelDuty[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 uint8_t LEDstate;     ///< current state of the LEDs
 
+uint8_t rgbmodeIndex = 0;
+uint8_t rgbmode[CLED_NUM][CLED_ELEMENT];
+
 tiny_config_type tinyConfig;
 
 void i2cSlaveReceiveService(uint8_t receiveDataLength, uint8_t* receiveData);
 void key_led_control(uint8_t ch, uint8_t on);
 void key_led_pwm_on(uint8_t channel, uint8_t on);
 void key_led_pwm_duty(uint8_t channel, uint8_t duty);
+void tiny_led_mode_change (LED_BLOCK ledblock, int mode);
 
 
-#ifdef SUPPORT_TINY_CMD
 uint8_t handlecmd_ver(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_reset(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req);
-uint8_t handlecmd_bl_led_all(tinycmd_pkt_req_type *p_req);
-uint8_t handlecmd_bl_led_pos(tinycmd_pkt_req_type *p_req);
-uint8_t handlecmd_bl_led_range(tinycmd_pkt_req_type *p_req);
-uint8_t handlecmd_bl_led_effect(tinycmd_pkt_req_type *p_req);
-uint8_t handlecmd_k_led_level(tinycmd_pkt_req_type *p_req);
-uint8_t handlecmd_set_led_mode(tinycmd_pkt_req_type *p_req);
-uint8_t handlecmd_config_led_mode(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_rgb_all(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_rgb_pos(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_rgb_range(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_rgb_set_effect(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_rgb_set_preset(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_led_level(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_led_set_effect(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_led_set_preset(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_led_config_preset(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req);
-uint8_t handlecmd_test(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_dirty(tinycmd_pkt_req_type *p_req);
+
+
 
 const tinycmd_handler_func handle_cmd_func[] = {
+    handlecmd_config,                 // TINY_CMD_CONFIG
     handlecmd_ver,                    // TINY_CMD_VER_F
     handlecmd_reset,                  // TINY_CMD_RESET_F
     handlecmd_three_lock,             // TINY_CMD_THREE_LOCK_F
-    handlecmd_bl_led_all,             // TINY_CMD_BL_LED_ALL_F
-    handlecmd_bl_led_pos,             // TINY_CMD_BL_LED_POS_F
-    handlecmd_bl_led_range,           // TINY_CMD_BL_LED_RANGE_F
-    handlecmd_bl_led_effect,          // TINY_CMD_BL_LED_EFFECT_F
-    handlecmd_k_led_level,            // TINY_CMD_K_LED_SET_F
-    handlecmd_set_led_mode,           // TINY_CMD_SET_LED_MODE_F
-    handlecmd_config_led_mode,        // TINY_CMD_SET_LED_MODE_ALL_F
-    handlecmd_config,                 // TINY_CMD_CONFIG_F
-    handlecmd_test,                   // TINY_CMD_TEST_F
+    handlecmd_rgb_all,                // TINY_CMD_RGB_ALL_F
+    handlecmd_rgb_pos,                // TINY_CMD_RGB_POS_F
+    handlecmd_rgb_range,              // TINY_CMD_RGB_RANGE_F
+    handlecmd_rgb_set_effect,         // TINY_CMD_RGB_SET_EFFECT_F
+    handlecmd_rgb_set_preset,         // TINY_CMD_RGB_SET_PRESET_F
+    handlecmd_led_level,              // TINY_CMD_LED_LEVEL_F
+    handlecmd_led_set_effect,         // TINY_CMD_LED_SET_EFFECT_F
+    handlecmd_led_set_preset,         // TINY_CMD_LED_SET_PRESET_F
+    handlecmd_led_config_preset,      // TINY_CMD_LED_CONFIG_PRESET_F
+    handlecmd_dirty,                  // TINY_CMD_DIRTY_F
     0                                 // TINY_CMD_MAX
 };
 #define CMD_HANDLER_TABLE_SIZE            (sizeof(handle_cmd_func)/sizeof(tinycmd_handler_func))
@@ -155,7 +164,7 @@ void led_array_on(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
     *(pTmp++) = threeLock[1];
     *(pTmp++) = threeLock[2];
     
-    for(i = 1; i < CLED_NUM; i++)
+    for(i = 0; i < CLED_NUM; i++)
     {
         *(pTmp++) = g;
         *(pTmp++) = r;
@@ -167,7 +176,6 @@ void led_array_on(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
 
 void led_pos_on(uint8_t pos, uint8_t on, uint8_t r, uint8_t g, uint8_t b)
 {
-    uint8_t i;
     uint8_t *pTmp = localBuffer;
 
     led_array_clear(pTmp);
@@ -190,6 +198,19 @@ void led_pos_on(uint8_t pos, uint8_t on, uint8_t r, uint8_t g, uint8_t b)
 
     localBufferLength = CLED_ARRAY_SIZE;
     ws2812_sendarray(localBuffer, localBufferLength);
+}
+
+uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req)
+{
+    tinycmd_config_req_type *p_config_req = (tinycmd_config_req_type *)p_req;
+
+    tinyConfig.rgb_num = p_config_req->rgb_num;
+    tinyConfig.led_preset_num = p_config_req->led_preset_num;
+
+    ledmodeIndex = p_config_req->led_preset_index;
+    rgbmodeIndex = p_config_req->rgb_preset_index;
+    
+    return 0;
 }
 
 uint8_t handlecmd_ver(tinycmd_pkt_req_type *p_req)
@@ -227,22 +248,22 @@ uint8_t handlecmd_reset(tinycmd_pkt_req_type *p_req)
 
 uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
 {
-    tinycmd_three_lock_req_type *p_three_lock = (tinycmd_three_lock_req_type *)p_req;
+    tinycmd_three_lock_req_type *p_three_lock_req = (tinycmd_three_lock_req_type *)p_req;
     uint8_t *pTmp;
 
     threeLock[0] = 0;
     threeLock[1] = 0;
     threeLock[2] = 0;
     
-    if(p_three_lock->lock & (1<<2))
+    if(p_three_lock_req->lock & (1<<2))
     {
         threeLock[0] = 150;
     }
-    if(p_three_lock->lock & (1<<1))
+    if(p_three_lock_req->lock & (1<<1))
     {
         threeLock[1] = 150;
     }
-    if(p_three_lock->lock & (1<<0))
+    if(p_three_lock_req->lock & (1<<0))
     {
         threeLock[2] = 150;
     }
@@ -258,18 +279,18 @@ uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
-uint8_t handlecmd_bl_led_all(tinycmd_pkt_req_type *p_req)
+uint8_t handlecmd_rgb_all(tinycmd_pkt_req_type *p_req)
 {
-    tinycmd_bl_led_all_req_type *p_bl_led_all = (tinycmd_bl_led_all_req_type *)p_req;
+    tinycmd_rgb_all_req_type *p_rgb_all_req = (tinycmd_rgb_all_req_type *)p_req;
 
-    led_array_on(p_bl_led_all->on, p_bl_led_all->led.r, p_bl_led_all->led.g, p_bl_led_all->led.b);
+    led_array_on(p_rgb_all_req->on, p_rgb_all_req->led.r, p_rgb_all_req->led.g, p_rgb_all_req->led.b);
     
     return 0;
 }
 
-uint8_t handlecmd_bl_led_pos(tinycmd_pkt_req_type *p_req)
+uint8_t handlecmd_rgb_pos(tinycmd_pkt_req_type *p_req)
 {
-    tinycmd_bl_led_pos_req_type *p_bl_led_pos = (tinycmd_bl_led_pos_req_type *)p_req;
+    tinycmd_rgb_pos_req_type *p_rgb_pos_req = (tinycmd_rgb_pos_req_type *)p_req;
     uint8_t *pTmp;
 
     // clear buffer
@@ -282,22 +303,21 @@ uint8_t handlecmd_bl_led_pos(tinycmd_pkt_req_type *p_req)
     *(pTmp++) = threeLock[1];
     *(pTmp++) = threeLock[2];
 
-    pTmp += CLED_ELEMENT*p_bl_led_pos->pos;
+    pTmp += CLED_ELEMENT*p_rgb_pos_req->pos;
     
-    *(pTmp++) = p_bl_led_pos->led.b;
-    *(pTmp++) = p_bl_led_pos->led.r;
-    *(pTmp++) = p_bl_led_pos->led.g;
+    *(pTmp++) = p_rgb_pos_req->led.b;
+    *(pTmp++) = p_rgb_pos_req->led.r;
+    *(pTmp++) = p_rgb_pos_req->led.g;
     
     localBufferLength = CLED_ARRAY_SIZE;
-
     ws2812_sendarray(localBuffer,localBufferLength);        // output message data to port D
 
     return 0;
 }
 
-uint8_t handlecmd_bl_led_range(tinycmd_pkt_req_type *p_req)
+uint8_t handlecmd_rgb_range(tinycmd_pkt_req_type *p_req)
 {
-    tinycmd_bl_led_range_req_type *p_bl_led_range = (tinycmd_bl_led_range_req_type *)p_req;
+    tinycmd_rgb_range_req_type *p_rgb_range_req = (tinycmd_rgb_range_req_type *)p_req;
     uint8_t *pTmp, *pLed;
     uint8_t i;
 
@@ -311,59 +331,77 @@ uint8_t handlecmd_bl_led_range(tinycmd_pkt_req_type *p_req)
     *(pTmp++) = threeLock[1];
     *(pTmp++) = threeLock[2];
 
-    pTmp+=(CLED_ELEMENT * p_bl_led_range->offset);
+    pTmp+=(CLED_ELEMENT * p_rgb_range_req->offset);
     
-
-    pLed = (uint8_t *)&p_bl_led_range->led;
-    for(i = 0; i < p_bl_led_range->num; i++)
+    pLed = (uint8_t *)&p_rgb_range_req->led;
+    for(i = 0; i < p_rgb_range_req->num; i++)
     {
         *(pTmp++) = *(pLed++);
         *(pTmp++) = *(pLed++);
         *(pTmp++) = *(pLed++);
     }
-    localBufferLength = CLED_ARRAY_SIZE;
 
+    localBufferLength = CLED_ARRAY_SIZE;
     ws2812_sendarray(localBuffer,localBufferLength);        // output message data to port D
     
     return 0;
 }
 
-uint8_t handlecmd_bl_led_effect(tinycmd_pkt_req_type *p_req)
+uint8_t handlecmd_rgb_set_effect(tinycmd_pkt_req_type *p_req)
 {
-    return 0;
-}
+    tinycmd_rgb_set_effect_req_type *p_set_effect_req = (tinycmd_rgb_set_effect_req_type *)p_req;
+    rgbmodeIndex = p_set_effect_req->preset;
 
-uint8_t handlecmd_k_led_level(tinycmd_pkt_req_type *p_req)
-{
-    tinycmd_k_led_level_req_type *p_led_level = (tinycmd_k_led_level_req_type *)p_req;
-    
-
-    if(p_led_level->pkt_len == sizeof(tinycmd_k_led_level_req_type))
-    {
-        key_led_control(p_led_level->channel, p_led_level->level);
-    }
-
-    return 0;
-}
-
-uint8_t handlecmd_set_led_mode(tinycmd_pkt_req_type *p_req)
-{
-    tinycmd_set_led_mode_req_type *p_ledmode = (tinycmd_set_led_mode_req_type *)p_req;
-
-    ledmodeIndex = p_ledmode->mode;
+    // Do something here
     
     return 0;
 }
 
-uint8_t handlecmd_config_led_mode(tinycmd_pkt_req_type *p_req)
+uint8_t handlecmd_rgb_set_preset(tinycmd_pkt_req_type *p_req)
 {
-    tinycmd_config_led_mode_req_type *p_ledmode_all_req = (tinycmd_config_led_mode_req_type *)p_req;
-    uint16_t i = 0;
+    tinycmd_rgb_set_preset_req_type *pset_preset_req = (tinycmd_rgb_set_preset_req_type *)p_req;
+
+    memset(rgbmode, 0, sizeof(CLED_NUM * CLED_ELEMENT));
+    memcpy(rgbmode, pset_preset_req->data, tinyConfig.rgb_num);
+
+    return 0;
+}
+
+uint8_t handlecmd_led_level(tinycmd_pkt_req_type *p_req)
+{
+    tinycmd_led_level_req_type *p_led_level_req = (tinycmd_led_level_req_type *)p_req;
+    
+    key_led_control(p_led_level_req->channel, p_led_level_req->level);
+
+    return 0;
+}
+
+uint8_t handlecmd_led_set_effect(tinycmd_pkt_req_type *p_req)
+{
+    tinycmd_led_set_effect_req_type *p_set_effect_req = (tinycmd_led_set_effect_req_type *)p_req;
+
+    ledmodeIndex = p_set_effect_req->preset;
+    
+    return 0;
+}
+
+uint8_t handlecmd_led_set_preset(tinycmd_pkt_req_type *p_req)
+{
+    tinycmd_led_set_preset_req_type *p_set_preset_req = (tinycmd_led_set_preset_req_type *)p_req;
+
+    ledmode[p_set_preset_req->preset][p_set_preset_req->block] = p_set_preset_req->effect;
+    
+    return 0;
+}
+
+uint8_t handlecmd_led_config_preset(tinycmd_pkt_req_type *p_req)
+{
+    tinycmd_led_config_preset_req_type *p_cfg_preset_req = (tinycmd_led_config_preset_req_type *)p_req;
     LED_BLOCK ledblock;
 
-    memcpy(ledmode, p_ledmode_all_req->data, sizeof(ledmode));
+    memcpy(ledmode, p_cfg_preset_req->data, sizeof(ledmode));
 
-    if((p_ledmode_all_req->cmd_code & TINY_CMD_RSP_MASK) != 0)
+    if((p_cfg_preset_req->cmd_code & TINY_CMD_RSP_MASK) != 0)
     {
          /*
          * To set response data, wait until i2c_reply_ready() returns nonzero,
@@ -394,20 +432,8 @@ uint8_t handlecmd_config_led_mode(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
-uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req)
+uint8_t handlecmd_dirty(tinycmd_pkt_req_type *p_req)
 {
-    tinycmd_config_req_type *p_config = (tinycmd_config_req_type *)p_req;
-    //uint8_t *pTmp = (uint8_t *)localBuffer;
-
-    tinyConfig.led_max = p_config->value.led_max;
-    tinyConfig.level_max = p_config->value.level_max;
-
-    return 0;
-}
-
-uint8_t handlecmd_test(tinycmd_pkt_req_type *p_req)
-{
-    //tinycmd_test_data_type *p_data = (tinycmd_test_data_type *)&p_req->test.data;
 
     return 0;
 }
@@ -427,8 +453,6 @@ uint8_t handlecmd(tinycmd_pkt_req_type *p_req)
 
     return ret;
 }
-
-#endif // SUPPORT_TINY_CMD
 
 // slave operations
 void i2cSlaveReceiveService(uint8_t receiveDataLength, uint8_t* receiveData)
@@ -574,7 +598,6 @@ void key_led_pwm_duty(uint8_t channel, uint8_t duty)
     }
 }
 
-#if 1
 void tiny_led_off(LED_BLOCK block)
 {
     switch(block)
@@ -807,6 +830,10 @@ void tiny_fader(void)
     }
 }
 
+void tiny_rgb_effector(void)
+{
+}
+
 void tiny_led_mode_change (LED_BLOCK ledblock, int mode)
 {
     switch (mode)
@@ -831,7 +858,6 @@ void tiny_led_mode_change (LED_BLOCK ledblock, int mode)
             break;
      }
 }
-#endif
 
 void TinyInitHW(void)
 {
@@ -901,6 +927,7 @@ int main(void)
                 {
                     tiny_blink(0);
                     tiny_fader();
+                    tiny_rgb_effector();
                 }
             }
             else

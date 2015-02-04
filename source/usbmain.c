@@ -392,7 +392,7 @@ uint8_t gbootCmdoffset;
 
 
 
-#define DEBUG_LED   tinycmd_bl_led_pos
+#define DEBUG_LED   tinycmd_rgb_all
 
 /**
  * This function is called whenever we receive a setup request via USB.

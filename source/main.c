@@ -256,7 +256,7 @@ uint8_t establishSlaveComm(void)
         
         while(++count != 0);
 
-        tinycmd_bl_led_all(FALSE, 0, 0, 0);
+        tinycmd_rgb_all(FALSE, 0, 0, 0);
 
     }
 

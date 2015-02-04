@@ -70,75 +70,87 @@ void tinycmd_three_lock(uint8_t num, uint8_t caps, uint8_t scroll)
     i2cMasterSendNI(TARGET_ADDR, p_three_lock_req->pkt_len, (uint8_t *)p_three_lock_req);
 }
 
-void tinycmd_bl_led_all(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
+void tinycmd_rgb_all(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
 {
-#define MAX_LEVEL_MASK(a)               (a & 0x5F) // below 95
-    uint8_t i;
-    tinycmd_led_type led;
-    tinycmd_bl_led_all_req_type *p_bl_led_all_req = (tinycmd_bl_led_all_req_type *)localBuffer;
+    tinycmd_rgb_all_req_type *p_rgb_all_req = (tinycmd_rgb_all_req_type *)localBuffer;
     
-    p_bl_led_all_req->cmd_code = TINY_CMD_BL_LED_ALL_F;
-    p_bl_led_all_req->pkt_len = sizeof(tinycmd_bl_led_all_req_type);
+    p_rgb_all_req->cmd_code = TINY_CMD_RGB_ALL_F;
+    p_rgb_all_req->pkt_len = sizeof(tinycmd_rgb_all_req_type);
 
-    p_bl_led_all_req->on = on;
+    p_rgb_all_req->on = on;
     
-    p_bl_led_all_req->led.g = MAX_LEVEL_MASK(g);
-    p_bl_led_all_req->led.r = MAX_LEVEL_MASK(r);
-    p_bl_led_all_req->led.b = MAX_LEVEL_MASK(b);
+    p_rgb_all_req->led.g = g;
+    p_rgb_all_req->led.r = r;
+    p_rgb_all_req->led.b = b;
 
-    i2cMasterSendNI(TARGET_ADDR, p_bl_led_all_req->pkt_len, (uint8_t *)p_bl_led_all_req);
+    i2cMasterSendNI(TARGET_ADDR, p_rgb_all_req->pkt_len, (uint8_t *)p_rgb_all_req);
 }
 
-void tinycmd_bl_led_pos(uint8_t pos, uint8_t r, uint8_t g, uint8_t b)
+void tinycmd_rgb_pos(uint8_t pos, uint8_t r, uint8_t g, uint8_t b)
 {
-#define MAX_LEVEL_MASK(a)               (a & 0x5F) // below 95
-    uint8_t i;
-    tinycmd_led_type led;
-    tinycmd_bl_led_pos_req_type *p_bl_led_pos_req = (tinycmd_bl_led_pos_req_type *)localBuffer;
+    tinycmd_rgb_pos_req_type *p_rgb_pos_req = (tinycmd_rgb_pos_req_type *)localBuffer;
     
-    p_bl_led_pos_req->cmd_code = TINY_CMD_BL_LED_POS_F;
-    p_bl_led_pos_req->pkt_len = sizeof(tinycmd_bl_led_all_req_type);
+    p_rgb_pos_req->cmd_code = TINY_CMD_RGB_POS_F;
+    p_rgb_pos_req->pkt_len = sizeof(tinycmd_rgb_pos_req_type);
 
-    p_bl_led_pos_req->pos = pos;
+    p_rgb_pos_req->pos = pos;
     
-    p_bl_led_pos_req->led.g = MAX_LEVEL_MASK(g);
-    p_bl_led_pos_req->led.r = MAX_LEVEL_MASK(r);
-    p_bl_led_pos_req->led.b = MAX_LEVEL_MASK(b);
+    p_rgb_pos_req->led.g = g;
+    p_rgb_pos_req->led.r = r;
+    p_rgb_pos_req->led.b = b;
 
-    i2cMasterSendNI(TARGET_ADDR, p_bl_led_pos_req->pkt_len, (uint8_t *)p_bl_led_pos_req);
+    i2cMasterSendNI(TARGET_ADDR, p_rgb_pos_req->pkt_len, (uint8_t *)p_rgb_pos_req);
 }
 
-void tinycmd_bl_led_range(uint8_t num, uint8_t offset, uint8_t r, uint8_t g, uint8_t b)
+void tinycmd_rgb_range(uint8_t num, uint8_t offset, uint8_t r, uint8_t g, uint8_t b)
 {
-#define MAX_LEVEL_MASK(a)               (a & 0x5F) // below 95
     uint8_t i;
     tinycmd_led_type led;
-    tinycmd_bl_led_range_req_type *p_bl_led_range_req = (tinycmd_bl_led_range_req_type *)localBuffer;
+    tinycmd_rgb_range_req_type *p_rgb_range_req = (tinycmd_rgb_range_req_type *)localBuffer;
     
-    p_bl_led_range_req->cmd_code = TINY_CMD_BL_LED_RANGE_F;
-    p_bl_led_range_req->pkt_len = sizeof(tinycmd_bl_led_range_req_type);
+    p_rgb_range_req->cmd_code = TINY_CMD_RGB_RANGE_F;
+    p_rgb_range_req->pkt_len = sizeof(tinycmd_rgb_range_req_type);
 
-    p_bl_led_range_req->num = num;
-    p_bl_led_range_req->offset = offset;
+    p_rgb_range_req->num = num;
+    p_rgb_range_req->offset = offset;
     
-    led.g = MAX_LEVEL_MASK(g);
-    led.r = MAX_LEVEL_MASK(r);
-    led.b = MAX_LEVEL_MASK(b);
+    led.g = g;
+    led.r = r;
+    led.b = b;
 
-    for(i = 0; i < p_bl_led_range_req->num; i++)
+    for(i = 0; i < p_rgb_range_req->num; i++)
     {
-       p_bl_led_range_req->led[i] = led;
+       p_rgb_range_req->led[i] = led;
     }
 
-    i2cMasterSendNI(TARGET_ADDR, p_bl_led_range_req->pkt_len, (uint8_t *)p_bl_led_range_req);
+    i2cMasterSendNI(TARGET_ADDR, p_rgb_range_req->pkt_len, (uint8_t *)p_rgb_range_req);
 }
 
-void tinycmd_key_led_level(uint8_t channel, uint8_t level)
+void tinycmd_rgb_set_effect(uint8_t index)
 {
-    tinycmd_k_led_level_req_type *p_led_level_req = (tinycmd_k_led_level_req_type *)localBuffer;
+    tinycmd_rgb_set_effect_req_type *p_rgb_set_effect = (tinycmd_rgb_set_effect_req_type *)localBuffer;
+    p_rgb_set_effect->cmd_code = TINY_CMD_RGB_SET_EFFECT_F;
+    p_rgb_set_effect->pkt_len = sizeof(tinycmd_rgb_set_effect_req_type);
+    p_rgb_set_effect->preset = index;
 
-    p_led_level_req->cmd_code = TINY_CMD_K_LED_LEVEL_F;
-    p_led_level_req->pkt_len = sizeof(tinycmd_k_led_level_req_type);
+    i2cMasterSendNI(TARGET_ADDR, p_rgb_set_effect->pkt_len, (uint8_t *)p_rgb_set_effect);
+}
+
+void tinycmd_rgb_set_preset(uint8_t preset, uint8_t effect)
+{
+    tinycmd_rgb_set_preset_req_type *p_rgb_set_preset = (tinycmd_rgb_set_preset_req_type *)localBuffer;
+    p_rgb_set_preset->cmd_code = TINY_CMD_RGB_SET_PRESET_F;
+    p_rgb_set_preset->pkt_len = sizeof(tinycmd_rgb_set_preset_req_type);
+    p_rgb_set_preset->preset = preset;
+    
+}
+
+void tinycmd_led_level(uint8_t channel, uint8_t level)
+{
+    tinycmd_led_level_req_type *p_led_level_req = (tinycmd_led_level_req_type *)localBuffer;
+
+    p_led_level_req->cmd_code = TINY_CMD_LED_LEVEL_F;
+    p_led_level_req->pkt_len = sizeof(tinycmd_led_level_req_type);
 
     p_led_level_req->channel = channel;
     p_led_level_req->level = level;
@@ -146,53 +158,43 @@ void tinycmd_key_led_level(uint8_t channel, uint8_t level)
     i2cMasterSendNI(TARGET_ADDR, p_led_level_req->pkt_len, (uint8_t *)p_led_level_req);
 }
 
-void tinycmd_api_set_bl_color(uint8_t index, uint8_t level)
+void tinycmd_led_set_effect(uint8_t index)
 {
-    tinycmd_led_type led;
-    uint8_t r = 0, g = 0, b = 0;
-    if(index & 0x1)
-    {
-        r = level;
-    }
-    if(index & 0x2)
-    {
-        g = level;
-    }
-    if(index & 0x4)
-    {
-        b = level;
-    }
+    tinycmd_led_set_effect_req_type *p_rgb_set_effect = (tinycmd_led_set_effect_req_type *)localBuffer;
+    p_rgb_set_effect->cmd_code = TINY_CMD_LED_SET_EFFECT_F;
+    p_rgb_set_effect->pkt_len = sizeof(tinycmd_led_set_effect_req_type);
+    p_rgb_set_effect->preset = index;
 
-    tinycmd_bl_led_all(1, r, g, b);
+    i2cMasterSendNI(TARGET_ADDR, p_rgb_set_effect->pkt_len, (uint8_t *)p_rgb_set_effect);
 }
 
-void tinycmd_set_led_mode(uint8_t storage, uint8_t block, uint8_t mode)
+void tinycmd_led_set_preset(uint8_t preset, uint8_t block, uint8_t effect)
 {
-    tinycmd_set_led_mode_req_type *p_set_led_mode = (tinycmd_set_led_mode_req_type *)localBuffer;
+    tinycmd_led_set_preset_req_type *p_led_set_preset_mode = (tinycmd_led_set_preset_req_type *)localBuffer;
 
-    p_set_led_mode->cmd_code = TINY_CMD_SET_LED_MODE_F;
-    p_set_led_mode->pkt_len = sizeof(tinycmd_set_led_mode_req_type);
-    p_set_led_mode->storage = storage;
-    p_set_led_mode->block = block;
-    p_set_led_mode->mode = mode;
+    p_led_set_preset_mode->cmd_code = TINY_CMD_LED_SET_PRESET_F;
+    p_led_set_preset_mode->pkt_len = sizeof(tinycmd_led_set_preset_req_type);
+    p_led_set_preset_mode->preset = preset;
+    p_led_set_preset_mode->block = block;
+    p_led_set_preset_mode->effect = effect;
 
-    i2cMasterSendNI(TARGET_ADDR, p_set_led_mode->pkt_len, (uint8_t *)p_set_led_mode);
+    i2cMasterSendNI(TARGET_ADDR, p_led_set_preset_mode->pkt_len, (uint8_t *)p_led_set_preset_mode);
 }
 
-void tinycmd_config_led_mode(uint8_t *p_led_mode_array)
+void tinycmd_led_preset_config(uint8_t *p_led_mode_array)
 {
     uint8_t i;
-    tinycmd_config_led_mode_req_type *p_set_led_mode_all = (tinycmd_config_led_mode_req_type *)localBuffer;
+    tinycmd_led_config_preset_req_type *p_led_cfg_preset = (tinycmd_led_config_preset_req_type *)localBuffer;
 
-    p_set_led_mode_all->cmd_code = TINY_CMD_CONFIG_LED_MODE_F | TINY_CMD_RSP_MASK;
-    p_set_led_mode_all->pkt_len = sizeof(tinycmd_config_led_mode_req_type);
+    p_led_cfg_preset->cmd_code = TINY_CMD_LED_CONFIG_PRESET_F | TINY_CMD_RSP_MASK;
+    p_led_cfg_preset->pkt_len = sizeof(tinycmd_led_config_preset_req_type);
 
     for(i = 0; i < LEDMODE_ARRAY_SIZE; i++)
     {
-        p_set_led_mode_all->data[i] = p_led_mode_array[i];
+        p_led_cfg_preset->data[i] = p_led_mode_array[i];
     }
 
-    i2cMasterSendNI(TARGET_ADDR, p_set_led_mode_all->pkt_len, (uint8_t *)p_set_led_mode_all);
+    i2cMasterSendNI(TARGET_ADDR, p_led_cfg_preset->pkt_len, (uint8_t *)p_led_cfg_preset);
 
     i2cMasterReceiveNI(TARGET_ADDR, sizeof(tinycmd_ver_rsp_type), (uint8_t*)localBuffer);
 }

@@ -63,10 +63,10 @@ void led_off(LED_BLOCK block)
 //            *(ledport[block]) |= BV(ledpin[block]);
             break;
         case LED_PIN_BASE:
-            tinycmd_key_led_level(PWM_CHANNEL_0, PWM_DUTY_MIN);
+            tinycmd_led_level(PWM_CHANNEL_0, PWM_DUTY_MIN);
             break;
         case LED_PIN_WASD:
-            tinycmd_key_led_level(PWM_CHANNEL_1, PWM_DUTY_MIN);
+            tinycmd_led_level(PWM_CHANNEL_1, PWM_DUTY_MIN);
             break;                    
         default:
             return;
@@ -86,10 +86,10 @@ void led_on(LED_BLOCK block)
 //            *(ledport[block]) |= BV(ledpin[block]);
             break;
         case LED_PIN_BASE:
-            tinycmd_key_led_level(PWM_CHANNEL_0, PWM_DUTY_MAX);
+            tinycmd_led_level(PWM_CHANNEL_0, PWM_DUTY_MAX);
             break;
         case LED_PIN_WASD:
-            tinycmd_key_led_level(PWM_CHANNEL_1, PWM_DUTY_MAX);
+            tinycmd_led_level(PWM_CHANNEL_1, PWM_DUTY_MAX);
             break;
         default:
             return;
@@ -104,10 +104,10 @@ void led_wave_on(LED_BLOCK block)
     switch(block)
     {
         case LED_PIN_BASE:
-            tinycmd_key_led_level(PWM_CHANNEL_0, PWM_DUTY_MAX-1);
+            tinycmd_led_level(PWM_CHANNEL_0, PWM_DUTY_MAX-1);
             break;
         case LED_PIN_WASD:
-            tinycmd_key_led_level(PWM_CHANNEL_1, PWM_DUTY_MAX-1);
+            tinycmd_led_level(PWM_CHANNEL_1, PWM_DUTY_MAX-1);
             break;
         default:
             break;
@@ -121,10 +121,10 @@ void led_wave_off(LED_BLOCK block)
     switch(block)
     {
         case LED_PIN_BASE:
-            tinycmd_key_led_level(PWM_CHANNEL_0, PWM_DUTY_MIN);
+            tinycmd_led_level(PWM_CHANNEL_0, PWM_DUTY_MIN);
             break;
         case LED_PIN_WASD:
-            tinycmd_key_led_level(PWM_CHANNEL_0, PWM_DUTY_MIN);
+            tinycmd_led_level(PWM_CHANNEL_0, PWM_DUTY_MIN);
             break;
         default:
             break;
@@ -141,10 +141,10 @@ void led_wave_set(LED_BLOCK block, uint16_t duty)
     switch(block)
     {
         case LED_PIN_BASE:
-            tinycmd_key_led_level(PWM_CHANNEL_0, duty);
+            tinycmd_led_level(PWM_CHANNEL_0, duty);
             break;
         case LED_PIN_WASD:
-            tinycmd_key_led_level(PWM_CHANNEL_1, duty);
+            tinycmd_led_level(PWM_CHANNEL_1, duty);
             break;
        default:
             break;
@@ -365,7 +365,7 @@ void led_mode_init(void)
     led_3lockupdate(LEDstate);
 
 #ifdef LED_CONTROL_SLAVE
-    tinycmd_config_led_mode((uint8_t*)ledmode);
+    tinycmd_led_preset_config((uint8_t*)ledmode);
 #endif // LED_CONTROL_SLAVE
 }
 

@@ -21,9 +21,13 @@ typedef struct
 
 typedef struct
 {
-  uint8_t led_max;
-  uint8_t level_max;
-} tinycmd_config_type;
+  uint8_t cmd_code;
+  uint8_t pkt_len;
+  uint8_t rgb_num;
+  uint8_t rgb_preset_index;
+  uint8_t led_preset_num;
+  uint8_t led_preset_index;
+} tinycmd_config_req_type;
 
 typedef struct
 {
@@ -45,25 +49,25 @@ typedef struct
   uint8_t lock;
 } tinycmd_three_lock_req_type;
 
-// TINY_CMD_BL_LED_ALL_F
+// TINY_CMD_RGB_ALL_F
 typedef struct
 {
   uint8_t cmd_code;
   uint8_t pkt_len;
   uint8_t on; // on or off
   tinycmd_led_type led;
-} tinycmd_bl_led_all_req_type;
+} tinycmd_rgb_all_req_type;
 
-// TINY_CMD_BL_LED_POS_F
+// TINY_CMD_RGB_POS_F
 typedef struct
 {
   uint8_t cmd_code;
   uint8_t pkt_len;
   uint8_t pos; // position
   tinycmd_led_type led;
-} tinycmd_bl_led_pos_req_type;
+} tinycmd_rgb_pos_req_type;
 
-// TINY_CMD_BL_LED_RANGE_F
+// TINY_CMD_RGB_RANGE_F
 typedef struct
 {
   uint8_t cmd_code;
@@ -71,90 +75,84 @@ typedef struct
   uint8_t num;
   uint8_t offset;
   tinycmd_led_type led[TINYCMD_LED_MAX];
-} tinycmd_bl_led_range_req_type;
+} tinycmd_rgb_range_req_type;
 
-// TINY_CMD_BL_LED_EFFECT_F
+// TINY_CMD_RGB_SET_EFFECT_F
 typedef struct
 {
   uint8_t cmd_code;
   uint8_t pkt_len;
-  uint8_t effect;
-} tinycmd_bl_led_effect_req_type;
+  uint8_t preset;
+} tinycmd_rgb_set_effect_req_type;
 
+// TINY_CMD_RGB_SET_PRESET_F
 typedef struct
 {
   uint8_t cmd_code;
   uint8_t pkt_len;
-  uint8_t enable;
-  uint8_t duty;
-} tinycmd_pwm_req_type;
+  uint8_t preset;
+  uint8_t data[TINYCMD_LED_MAX*3];
+} tinycmd_rgb_set_preset_req_type;
 
-typedef struct
-{
-  uint8_t cmd_code;
-  uint8_t pkt_len;
-  uint8_t ch_mode;
-} tinycmd_k_led_ch_mode_req_type;
-
+// TINY_CMD_LED_LEVEL_F
 typedef struct
 {
   uint8_t cmd_code;
   uint8_t pkt_len;
   uint8_t channel;
   uint8_t level;
-} tinycmd_k_led_level_req_type;
+} tinycmd_led_level_req_type;
 
+// TINY_CMD_LED_SET_EFFECT_F
 typedef struct
 {
   uint8_t cmd_code;
   uint8_t pkt_len;
-  uint8_t storage;
-  uint8_t block;
-  uint8_t mode;
-} tinycmd_set_led_mode_req_type;
+  uint8_t preset;
+} tinycmd_led_set_effect_req_type;
 
-// TINY_CMD_CONFIG_LED_MODE_F
+// TINY_CMD_LED_SET_PRESET_F
+typedef struct
+{
+  uint8_t cmd_code;
+  uint8_t pkt_len;
+  uint8_t preset;
+  uint8_t block;
+  uint8_t effect;
+} tinycmd_led_set_preset_req_type;
+
+// TINY_CMD_LED_CONFIG_PRESET_F
 typedef struct
 {
   uint8_t cmd_code;
   uint8_t pkt_len;
   uint8_t data[15];
-} tinycmd_config_led_mode_req_type;
+} tinycmd_led_config_preset_req_type;
 
+// TINY_CMD_DIRTY
 typedef struct
 {
   uint8_t cmd_code;
-  uint8_t pkt_len;
-  tinycmd_config_type value;
-} tinycmd_config_req_type;
-
-typedef union
-{
-  uint8_t cmd;
-} tinycmd_test_data_type;
-
-typedef struct
-{
-  uint8_t cmd_code;
-  uint8_t pkt_len;
-  tinycmd_test_data_type data;
-} tinycmd_test_req_type;
+  uint8_t dirty;
+} tinycmd_dirty_req_type;
 
 typedef union
 {
   uint8_t cmd_code;
+  tinycmd_config_req_type              config;                   // TINY_CMD_CONFIG_F
   tinycmd_ver_req_type                 ver;                      // TINY_CMD_VER_F
   tinycmd_reset_req_type               reset;                    // TINY_CMD_RESET_F
   tinycmd_three_lock_req_type          three_lock;               // TINY_CMD_THREE_LOCK_F
-  tinycmd_bl_led_all_req_type          bl_led_all;               // TINY_CMD_BL_LED_ALL_F
-  tinycmd_bl_led_pos_req_type          bl_led_pos;               // TINY_CMD_BL_LED_POS_F
-  tinycmd_bl_led_range_req_type        bl_led_range;             // TINY_CMD_BL_LED_RANGE_F
-  tinycmd_bl_led_effect_req_type       bl_led_effect;            // TINY_CMD_BL_LED_EFFECT_F
-  tinycmd_k_led_level_req_type         key_led_level;            // TINY_CMD_K_LED_LEVEL_F
-  tinycmd_set_led_mode_req_type        set_led_mode;             // TINY_CMD_SET_LED_MODE_F
-  tinycmd_config_led_mode_req_type     set_led_mode_all;         // TINY_CMD_SET_LED_MODE_ALL_F
-  tinycmd_config_req_type              config;                   // TINY_CMD_CONFIG_F
-  tinycmd_test_req_type                test;                     // TINY_CMD_TEST_F
+  tinycmd_rgb_all_req_type             rgb_all;                  // TINY_CMD_RGB_ALL_F
+  tinycmd_rgb_pos_req_type             rgb_pos;                  // TINY_CMD_RGB_POS_F
+  tinycmd_rgb_range_req_type           rgb_range;                // TINY_CMD_RGB_RANGE_F
+  tinycmd_rgb_set_effect_req_type      rgb_set_effect;           // TINY_CMD_RGB_SET_EFFECT_F
+  tinycmd_rgb_set_preset_req_type      rgb_set_preset;           // TINY_CMD_RGB_SET_PRESET_F
+  tinycmd_led_level_req_type           led_level;                // TINY_CMD_LED_LEVEL_F
+  tinycmd_led_set_effect_req_type      led_set_effect;           // TINY_CMD_LED_SET_EFFECT_F
+  tinycmd_led_set_preset_req_type      led_set_preset;           // TINY_CMD_LED_SET_PRESET_F
+  tinycmd_led_config_preset_req_type   led_cfg_preset;           // TINY_CMD_LED_CONFIG_PRESET_F
+  tinycmd_dirty_req_type               dirty;                    // TINY_CMD_DIRTY
 } tinycmd_pkt_req_type;
 
 
