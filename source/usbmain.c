@@ -555,7 +555,9 @@ uint8_t usbFunctionWrite(uchar *data, uchar len)
             data += 4;
             gbootCmdoffset = 0;
             
-            DEBUG_LED(1, 200, 0, 0);
+            DEBUG_LED(gbootCmd.cmd, gbootCmd.index , gbootCmd.rsvd, gbootCmd.data[0]);
+            //DEBUG_LED(gbootCmd.index, 0,200, 0);
+            //DEBUG_LED(gbootCmd.rsvd,  0, 0, 200);
         }
         
         for(;len>0; len--)
@@ -570,7 +572,7 @@ uint8_t usbFunctionWrite(uchar *data, uchar len)
             expectReport = 0;
             result = 1;     // last block received
             
-            DEBUG_LED(1, 0, 0, 200);
+            //DEBUG_LED(gbootCmd.cmd, 0, 0, 200);
         }else
         {
             result = 0;

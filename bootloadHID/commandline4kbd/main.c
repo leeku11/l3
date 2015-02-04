@@ -19,6 +19,7 @@
 #define IDENT_PRODUCT_NUM       16967
 #define IDENT_PRODUCT_STRING    "L3"
 
+#define DBG_PRINTF printf
 /* ------------------------------------------------------------------------- */
 
 static char dataBuffer[131072 + 256];    /* buffer for file data */
@@ -194,7 +195,7 @@ typedef struct bootCmd{
 bootCmd_t cmdData;
 
 
-static int sendCmd(bootCmd_t *cmdBuffer)
+static int receiveCmd(bootCmd_t *cmdBuffer)
 {
 usbDevice_t *dev = NULL;
 int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
@@ -210,7 +211,7 @@ int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
         goto errorOccurred;
         }
     if(len < sizeof(cmdBuffer)){
-        //fprintf(stderr, "Not enough bytes in device info report (%d instead of %d)\n", len, (int)sizeof(cmdBuffer->cmd));
+        fprintf(stderr, "Not enough bytes in device info report (%d instead of %d)\n", len, (int)sizeof(cmdBuffer->cmd));
         err = -1;
         goto errorOccurred;
         }
@@ -232,31 +233,40 @@ int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
             printf("0x%2x|", cmdBuffer->data[offset++]);
         }
     }
-    printf("\n");
-//    printf("Page size   = %d (0x%x)\n", pageSize, pageSize);
-//    printf("Device size = %d (0x%x); %d bytes remaining\n", deviceSize, deviceSize, deviceSize - 2048);
-
-    printf("Uploading....\n");
-
-    cmdBuffer->reportId = 2;
-  
-//    setUsbInt(buffer.data.address, command, 3);
-    printf("set address \n");
+    printf("Receive Succeed\n");
+    
     fflush(stdout);
+errorOccurred:
+    if(dev != NULL)
+        usbCloseDevice(dev);
+    return err;
+}
+
+
+static int sendCmd(bootCmd_t *cmdBuffer)
+{
+usbDevice_t *dev = NULL;
+int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
+
+    if((err = usbOpenDevice(&dev, IDENT_VENDOR_NUM, IDENT_VENDOR_STRING, IDENT_PRODUCT_NUM, IDENT_PRODUCT_STRING, 1)) != 0){
+        fprintf(stderr, "Error opening HIDBoot device: %s\n", usbErrorMessage(err));
+        goto errorOccurred;
+    }
+
+    printf("Send Command ==============\n");
+    printf("report ID   : %d \n", cmdBuffer->reportId);
+    printf("cmd         : %d \n", cmdBuffer->cmd);
+    printf("index       : %d \n", cmdBuffer->index);
+    printf("length      : %d \n", cmdBuffer->length);
+    printf("data[0]     : %d \n", cmdBuffer->data[0]);
+    
     if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, cmdBuffer, sizeof(bootCmd_t))) != 0){
         fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
         goto errorOccurred;
         }
 
-    printf("\n");
-    if(leaveBootLoader){
-        /* and now leave boot loader: */
-        cmdBuffer->reportId = 1;
-        usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, cmdBuffer, sizeof(cmdBuffer));
-        /* Ignore errors here. If the device reboots before we poll the response,
-         * this request fails.
-         */
-        }
+    printf("Send Succeed !\n");
+
 errorOccurred:
     if(dev != NULL)
         usbCloseDevice(dev);
@@ -358,6 +368,47 @@ static void printUsage(char *pname)
     fprintf(stderr, "usage: %s [-r] [<intel-hexfile>]\n", pname);
 }
 
+
+
+int strtoi(char *str, int nsystem)
+{
+    int i = 0;
+    int digit = 1;
+    int number;
+    int result = 0;
+    while (*(str+1) != 0)        // rewind to 1st digit
+    {
+        str++;
+        i++;
+    }
+    
+    while(*str != 'x' && *str != 'X' && i-- >= 0)
+    {
+        //DBG_PRINTF("%c", *str);
+        if('0' <= *str && *str <= '9')
+        {
+            number = *str -'0';
+        }else if ('a' <= *str && *str <= 'f')
+        {
+            number = 10 + *str -'a';
+        }else if ('A' <= *str && *str <= 'F')
+        {
+            number = 10 + *str -'A';
+        }else
+        {
+            DBG_PRINTF("Error : [%c] is not a Number \n", *str);
+            result = -1;
+            break;
+        }
+            
+        result += number * digit;
+        digit *= nsystem;                     // hexadecimal
+        str--;
+    }
+    return result;
+}
+
+
 int main(int argc, char **argv)
 {
 char    *file = NULL;
@@ -403,8 +454,59 @@ return 0;
     // if no file was given, endAddress is less than startAddress and no data is uploaded
 #endif
 
+    if(receiveCmd(&cmdData))
+        return 1;
+
+
+    cmdData.cmd = strtoi(argv[1], 10);
+    cmdData.index = strtoi(argv[2], 10);
+    cmdData.length = strtoi(argv[3], 10);
+    cmdData.data[0] = strtoi(argv[4], 10);
+                
     if(sendCmd(&cmdData))
         return 1;
+
+    
+    cmdData.cmd ++;
+     cmdData.index = strtoi(argv[2], 10);
+     cmdData.length = strtoi(argv[3], 10);
+     cmdData.data[0] = strtoi(argv[4], 10);
+                 
+     if(sendCmd(&cmdData))
+         return 1;
+
+
+    cmdData.cmd ++;
+
+     cmdData.index = strtoi(argv[2], 10);
+     cmdData.length = strtoi(argv[3], 10);
+     cmdData.data[0] = strtoi(argv[4], 10);
+                 
+     if(sendCmd(&cmdData))
+         return 1;
+
+
+    cmdData.cmd ++;
+
+     cmdData.index = strtoi(argv[2], 10);
+     cmdData.length = strtoi(argv[3], 10);
+     cmdData.data[0] = strtoi(argv[4], 10);
+                 
+     if(sendCmd(&cmdData))
+         return 1;
+
+
+    cmdData.cmd ++;
+
+     cmdData.index = strtoi(argv[2], 10);
+     cmdData.length = strtoi(argv[3], 10);
+     cmdData.data[0] = strtoi(argv[4], 10);
+                 
+     if(sendCmd(&cmdData))
+         return 1;
+
+
+        
     return 0;
 }
 
