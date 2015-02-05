@@ -29,8 +29,11 @@
 
 //#define I2C_DEBUG
 
+#define I2C_1BYTE_TIMEOUT       0x100
 // I2C state and address variables
 static volatile eI2cStateType I2cState;
+static volatile uint32_t I2cTimeout = I2C_1BYTE_TIMEOUT;   // default time out for 1Bytes transfer
+
 static u08 I2cDeviceAddrRW;
 // send/transmit buffer (outgoing data)
 static u08 I2cSendData[I2C_SEND_DATA_BUFFER_SIZE];
@@ -128,7 +131,8 @@ inline void i2cSendStop(void)
 inline void i2cWaitForComplete(void)
 {
 	// wait for i2c interface to complete operation
-	while( !(inb(TWCR) & BV(TWINT)) );
+	I2cTimeout = I2C_1BYTE_TIMEOUT;
+	while( !(inb(TWCR) & BV(TWINT)) && I2cTimeout-- );
 }
 
 inline void i2cSendByte(u08 data)
@@ -170,9 +174,10 @@ void i2cMasterSend(u08 deviceAddr, u08 length, u08* data)
 {
 	u08 i;
 	// wait for interface to be ready
-	while(I2cState);
+	while(I2cState && I2cTimeout--);
 	// set state
 	I2cState = I2C_MASTER_TX;
+    I2cTimeout = I2C_1BYTE_TIMEOUT * length;
 	// save data
 	I2cDeviceAddrRW = (deviceAddr & 0xFE);	// RW cleared: write operation
 	for(i=0; i<length; i++)
@@ -187,7 +192,7 @@ void i2cMasterReceive(u08 deviceAddr, u08 length, u08* data)
 {
 	u08 i;
 	// wait for interface to be ready
-	while(I2cState);
+	while(I2cState && I2cTimeout--);
 	// set state
 	I2cState = I2C_MASTER_RX;
 	// save data
@@ -197,7 +202,8 @@ void i2cMasterReceive(u08 deviceAddr, u08 length, u08* data)
 	// send start condition
 	i2cSendStart();
 	// wait for data
-	while(I2cState);
+    I2cTimeout = I2C_1BYTE_TIMEOUT * length;
+	while(I2cState && I2cTimeout--);
 	// return data
 	for(i=0; i<length; i++)
 		*data++ = I2cReceiveData[i];
@@ -240,7 +246,8 @@ u08 i2cMasterSendNI(u08 deviceAddr, u08 length, u08* data)
 	// transmit stop condition
 	// leave with TWEA on for slave receiving
 	i2cSendStop();
-	while( !(inb(TWCR) & BV(TWSTO)) );
+	I2cTimeout = I2C_1BYTE_TIMEOUT;
+	while( !(inb(TWCR) & BV(TWSTO)) && I2cTimeout--);
 
 	// enable TWI interrupt
 	sbi(TWCR, TWIE);

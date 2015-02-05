@@ -441,7 +441,7 @@ uint8_t gbootCmdoffset;
 uint8_t version[] = "L150205";          // must be length of 7 bytes    HID report size
 
 
-#define DEBUG_LED   tinycmd_bl_led_pos
+#define DEBUG_LED   tinycmd_rgb_pos
 
 
 uint8_t setCmdStatus()

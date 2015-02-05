@@ -233,14 +233,13 @@ uint8_t establishSlaveComm(void)
     uint8_t ret = 0;
     
 #ifdef SUPPORT_TINY_CMD
-    uint8_t retry = 0;
+    uint16_t retry = 0;
 
     initI2C();
 
     // Establish a communication with tiny slave
-    while(ret == 0 && retry++ < 1000)
+    while(ret == 0 && (retry++ < 1000))
     {
-        uint16_t count = 0;
         // proving
         tinycmd_ver(TRUE);
 
@@ -253,11 +252,7 @@ uint8_t establishSlaveComm(void)
                 break;
             }
         }
-        
-        while(++count != 0);
-
         tinycmd_rgb_all(FALSE, 0, 0, 0);
-
     }
 
 #endif // SUPPORT_TINY_CMD
