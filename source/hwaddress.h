@@ -38,7 +38,7 @@ typedef struct kbd_conf
     uint8_t led_preset[3][5];               // Block configuration for LED effect  preset
     uint8_t rgb_preset_index;               // RGB effect preset
     uint8_t rgb_chain;                      // RGB5050 numbers (H/W dependent)
-    uint8_t rgp_preset[MAX_RGB_CHAIN][3];   // Chain color
+    uint8_t rgb_preset[MAX_RGB_CHAIN][3];   // Chain color
 }kbd_configuration_t;
 
 

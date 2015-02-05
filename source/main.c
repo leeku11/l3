@@ -265,9 +265,38 @@ int8_t updateConf(void)
 }
 
 
+
+
+
+
+
+uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING, LED_EFFECT_FADING},
+                        {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING_PUSH_ON, LED_EFFECT_FADING_PUSH_ON},
+                        {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSH_OFF, LED_EFFECT_PUSH_OFF}};
+
+
+uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] = {{200,0,0},{200,0,0},{200,0,0},{200,0,0},{200,0,0},
+                        {200,0,0},{200,0,0},{200,0,0},{200,0,0},{200,0,0},
+                        {200,0,0},{200,0,0},{200,0,0},{200,0,0},{200,0,0},
+                        {200,0,0},{200,0,0},{200,0,0},{200,0,0},{200,0,0}};
+
 int8_t kbd_init(void)
 {
-    
+///////////////////SHOULD BE REMOVED ////////////////
+kbdConf.ps2usb_mode = 1;
+kbdConf.keymapLayerIndex = 0;
+kbdConf.swapCtrlCaps = 0;
+kbdConf.swapAltGui = 0;
+kbdConf.led_preset_index = 0;
+memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
+kbdConf.rgb_preset_index = 0;
+kbdConf.rgb_chain = 14;
+memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
+updateConf();       // should be removed
+///////////////////SHOULD BE REMOVED ////////////////
+
+
+
     portInit();
     enable_printf();
     eeprom_read_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
