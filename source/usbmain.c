@@ -435,7 +435,6 @@ typedef struct HIDdata{
 HIDcommand_t hidCmd;
 HIDData_t hidData;
 
-uint8_t curHIDCmd;
 uint8_t gbootCmdoffset;
 
 uint8_t version[] = "L150205";          // must be length of 7 bytes    HID report size
@@ -523,6 +522,8 @@ uint8_t rxHIDCmd(void)
         case SET_CONFIG:
             {
                 eeprom_update_block(&hidData.data[0], EEPADDR_KBD_CONF, sizeof(kbdConf));
+                tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (tinycmd_led_type *)kbdConf.rgb_preset);
+                tinycmd_rgb_set_effect(kbdConf.rgb_preset_index);
             }
             break;
         case SET_KEYMAP :
@@ -542,8 +543,6 @@ uint8_t rxHIDCmd(void)
             break;
 
     }
-    
-    DEBUG_LED(hidData.data[0], hidData.data[20], hidData.data[80], hidData.data[120]);
 }
 
 
@@ -660,7 +659,7 @@ uint8_t usbFunctionWrite(uchar *data, uchar len)
     }else if (expectReport == 2){
         
         memcpy(&hidCmd, &data[0], len);
-        curHIDCmd = hidCmd.config.cmd;
+        tinycmd_rgb_all(data[1], data[2], data[3], data[4]);
         result = 1;     // last block received
     }else if (expectReport == 3)
     {

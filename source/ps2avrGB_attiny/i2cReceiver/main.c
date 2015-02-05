@@ -105,23 +105,24 @@ uint8_t handlecmd_led_config_preset(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_dirty(tinycmd_pkt_req_type *p_req);
 
+const tinycmd_handler_func handle_cmd_func[][2] = {
+    {TINY_CMD_CONFIG, handlecmd_config},                 // TINY_CMD_CONFIG
+    {TINY_CMD_VER_F, handlecmd_ver},                    // TINY_CMD_VER_F
+    {TINY_CMD_RESET_F,handlecmd_reset},                  // TINY_CMD_RESET_F
+    {TINY_CMD_THREE_LOCK_F,handlecmd_three_lock},             // TINY_CMD_THREE_LOCK_F
+    {TINY_CMD_DIRTY,handlecmd_dirty},                  // TINY_CMD_DIRTY_F
 
+    {TINY_CMD_RGB_ALL_F,handlecmd_rgb_all},                // TINY_CMD_RGB_ALL_F
+    {TINY_CMD_RGB_POS_F,handlecmd_rgb_pos},                // TINY_CMD_RGB_POS_F
+    {TINY_CMD_RGB_RANGE_F,handlecmd_rgb_range},              // TINY_CMD_RGB_RANGE_F
+    {TINY_CMD_RGB_SET_EFFECT_F,handlecmd_rgb_set_effect},         // TINY_CMD_RGB_SET_EFFECT_F
+    {TINY_CMD_RGB_SET_PRESET_F,handlecmd_rgb_set_preset},         // TINY_CMD_RGB_SET_PRESET_F
 
-const tinycmd_handler_func handle_cmd_func[] = {
-    handlecmd_config,                 // TINY_CMD_CONFIG
-    handlecmd_ver,                    // TINY_CMD_VER_F
-    handlecmd_reset,                  // TINY_CMD_RESET_F
-    handlecmd_three_lock,             // TINY_CMD_THREE_LOCK_F
-    handlecmd_rgb_all,                // TINY_CMD_RGB_ALL_F
-    handlecmd_rgb_pos,                // TINY_CMD_RGB_POS_F
-    handlecmd_rgb_range,              // TINY_CMD_RGB_RANGE_F
-    handlecmd_rgb_set_effect,         // TINY_CMD_RGB_SET_EFFECT_F
-    handlecmd_rgb_set_preset,         // TINY_CMD_RGB_SET_PRESET_F
-    handlecmd_led_level,              // TINY_CMD_LED_LEVEL_F
-    handlecmd_led_set_effect,         // TINY_CMD_LED_SET_EFFECT_F
-    handlecmd_led_set_preset,         // TINY_CMD_LED_SET_PRESET_F
-    handlecmd_led_config_preset,      // TINY_CMD_LED_CONFIG_PRESET_F
-    handlecmd_dirty,                  // TINY_CMD_DIRTY_F
+    {TINY_CMD_LED_LEVEL_F,handlecmd_led_level},              // TINY_CMD_LED_LEVEL_F
+    {TINY_CMD_LED_SET_EFFECT_F,handlecmd_led_set_effect},         // TINY_CMD_LED_SET_EFFECT_F
+    {TINY_CMD_LED_SET_PRESET_F,handlecmd_led_set_preset},         // TINY_CMD_LED_SET_PRESET_F
+    {TINY_CMD_LED_CONFIG_PRESET_F,handlecmd_led_config_preset},      // TINY_CMD_LED_CONFIG_PRESET_F
+
     0                                 // TINY_CMD_MAX
 };
 #define CMD_HANDLER_TABLE_SIZE            (sizeof(handle_cmd_func)/sizeof(tinycmd_handler_func))
@@ -442,15 +443,18 @@ uint8_t handlecmd(tinycmd_pkt_req_type *p_req)
 {
     uint8_t ret = 0;
     uint8_t cmd;
-
+    uint8_t i;
     cmd = p_req->cmd_code & TINYCMD_CMD_MASK;
 
-    // handle command
-    if(handle_cmd_func[cmd] != 0)
+    for(i = 0; i < sizeof(handle_cmd_func) / 2; i++)    // scan command func array
     {
-        ret = handle_cmd_func[cmd](p_req);
+        // handle command
+        if(handle_cmd_func[i][0] != cmd)
+        {
+            ret = handle_cmd_func[cmd][1](p_req);
+            break;
+        }
     }
-
     return ret;
 }
 

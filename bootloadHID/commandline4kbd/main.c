@@ -201,6 +201,36 @@ typedef enum
     SET_MACRO  = 4
 }BOOT_HID_CMD;
 
+static int setreport(char a, char b,char c,char d )
+{
+usbDevice_t *dev = NULL;
+int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
+char buffer[8];
+    if((err = usbOpenDevice(&dev, IDENT_VENDOR_NUM, IDENT_VENDOR_STRING, IDENT_PRODUCT_NUM, IDENT_PRODUCT_STRING, 1)) != 0){
+        fprintf(stderr, "Error opening HIDBoot device: %s\n", usbErrorMessage(err));
+        goto errorOccurred;
+    }
+    len = sizeof(bootCmd_t);
+
+    buffer[0] = 1;
+    buffer[1] = a;
+    buffer[2] = b;
+    buffer[3] = c;
+    
+    if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, buffer, 8)) != 0){
+        fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
+        goto errorOccurred;
+        }
+    
+        fflush(stdout);
+    errorOccurred:
+        if(dev != NULL)
+            usbCloseDevice(dev);
+        return err;
+}
+
+    
+
 static int receiveCmd(bootCmd_t *cmdBuffer)
 {
 usbDevice_t *dev = NULL;
@@ -391,6 +421,10 @@ return 0;
 #endif
     // if no file was given, endAddress is less than startAddress and no data is uploaded
 #endif
+
+    setreport(strtoi(argv[1], 10), strtoi(argv[2], 10), strtoi(argv[3], 10), strtoi(argv[4], 10));
+
+    return 1;
 
     cmdData.cmd = strtoi(argv[1], 10);
     cmdData.index = strtoi(argv[2], 10);
