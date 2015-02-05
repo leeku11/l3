@@ -23,6 +23,14 @@
 #include "ps2main.h"
 
 #define STANDBY_LOOP    130000  // scan matix entry is 2.2msec @ 12Mh x-tal : 5min
+
+typedef enum KEY_LAYER_NUM{
+    KEY_LAYER_0,
+    KEY_LAYER_1,
+    KEY_LAYER_2,
+    KEY_LAYER_FN
+}KEY_LAYER_NUM_E;
+
 uint32_t scankeycntms = 0;
 	
 // 17*8 bit matrix
@@ -30,8 +38,7 @@ uint32_t MATRIX[MAX_COL];
 uint32_t curMATRIX[MAX_COL];
 int8_t debounceMATRIX[MAX_COL][MAX_ROW];
 uint8_t svkeyidx[MAX_COL][MAX_ROW];
-uint8_t  currentLayer[MAX_COL][MAX_ROW];
-
+uint8_t currentLayer[MAX_COL][MAX_ROW];
 uint8_t matrixFN[MAX_LAYER];           // (col << 4 | row)
 //uint8_t layer = 0;
 uint8_t kbdsleepmode = 0;
@@ -64,12 +71,13 @@ static uint8_t findFNkey(void)
     uint8_t i;
     for(i = 0; i < MAX_LAYER; i++)
     {
+        eeprom_read_block(currentLayer, EEP_KEYMAP_ADDR(i), sizeof(currentLayer));
         matrixFN[i] = 0x00;
     	for(col=0;col<MAX_COL;col++)
     	{
     		for(row=0;row<MAX_ROW;row++)
             {
-               keyidx = pgm_read_byte(keylayer(i)+(col*MAX_ROW)+row);
+                keyidx = currentLayer[col][row];
     			if(keyidx == K_FN)
     			{
                     matrixFN[i] = col << 5 | row;
@@ -82,6 +90,7 @@ static uint8_t findFNkey(void)
         }
         
     }
+    eeprom_read_block(currentLayer, EEP_KEYMAP_ADDR(kbdConf.keymapLayerIndex), sizeof(currentLayer));
     return 0;
 }
 
@@ -133,16 +142,15 @@ void keymap_init(void)
         }
         curMATRIX[i] = 0;
 	}
-//   kbdConf.keymapLayerIndex = eeprom_read_byte(EEPADDR_KEYLAYER);
-//    if (kbdConf.keymapLayerIndex >= MAX_LAYER)
-//        kbdConf.keymapLayerIndex = 0;
 
-      pBuf = &currentLayer[0][0];
+#ifdef FLASH_KEYMAP
+    pBuf = &currentLayer[0][0];
 
     for(i = 0; i < MAX_ROW*MAX_COL; i++)
     {
         *pBuf++ = pgm_read_byte(keylayer(kbdConf.keymapLayerIndex) + i);
     }
+#endif
 }
 
 
@@ -250,7 +258,7 @@ uint8_t getLayer(uint8_t FNcolrow)
     {
       if(isFNpushed)
       {
-         return 3;        // FN layer or beyondFN layer
+         return KEY_LAYER_FN;        // FN layer or beyondFN layer
       }else
       {
          return kbdConf.keymapLayerIndex;                   // Normal layer
@@ -498,10 +506,10 @@ uint8_t scankey(void)
  //           keyidx = pgm_read_byte(keyaddr); //keymap[t_layer]+(col*MAX_ROW)+row);
  //           keyidx = pgm_read_byte(keymap[t_layer]+(col*MAX_ROW)+row);
 
-            if(t_layer != 3)
+            if(t_layer != KEY_LAYER_FN)
                 keyidx = currentLayer[col][row];
             else
-                keyidx = pgm_read_byte(keylayer(t_layer)+(col*MAX_ROW)+row);
+                keyidx = eeprom_read_byte(EEP_KEYMAP_ADDR(t_layer)+(col*MAX_ROW)+row);
             
 
             if (keyidx == K_NONE)

@@ -16,6 +16,10 @@
 #define EEPADDR_KEYMAP_LAYER2       (void *)0x400    // 1024 - 1151
 #define EEPADDR_KEYMAP_LAYER3       (void *)0x480    // 1152 - 1279
 
+#define EEPSIZE_KEYMAP              0x80
+
+
+#define EEP_KEYMAP_ADDR(layer)  (EEPADDR_KEYMAP_LAYER0 + (EEPSIZE_KEYMAP * layer))
 
 
 

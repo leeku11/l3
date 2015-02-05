@@ -7,11 +7,13 @@ typedef struct report_extra{
 
 
 
-/* report id */
-#define REPORT_ID_INFO      1
-#define REPORT_ID_BOOT      2
+/* report id for Keyboard */
 #define REPORT_ID_SYSTEM    3
 #define REPORT_ID_CONSUMER  4
+
+/* report id for HID command */
+#define REPORT_ID_CMD       1
+#define REPORT_ID_DATA      2
 
 
 extern uint8_t clearReportBuffer(void);

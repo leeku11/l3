@@ -583,7 +583,6 @@ void recordMacro(uint8_t macrokey)
    int16_t index;
    uint8_t mIndex;
    long page;
-   uint8_t t_layer;
    Key key;
    uint16_t address;
    mIndex = macrokey - K_M01;
@@ -619,8 +618,6 @@ void recordMacro(uint8_t macrokey)
       wdt_reset();
       matrixState = scanmatrix();
       
-      t_layer = kbdConf.keymapLayerIndex;
-
       // debounce cleared => compare last matrix and current matrix
       for(col = 0; col < MAX_COL; col++)
       {
@@ -636,7 +633,7 @@ void recordMacro(uint8_t macrokey)
 
             row = i;
 
-            keyidx = pgm_read_byte(keylayer(t_layer)+(col*MAX_ROW)+row);
+            keyidx = currentLayer[col][row];
 
          if ((keyidx <= ErrorUndefined) || (K_Modifiers_end <= keyidx))
             continue;

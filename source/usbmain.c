@@ -165,15 +165,16 @@ PROGMEM uchar mouse_hid_report[] = {
     0x26, 0xff, 0x00,              //   LOGICAL_MAXIMUM (255)
     0x75, 0x08,                    //   REPORT_SIZE (8)
 
-    0x85, REPORT_ID_INFO,         //   REPORT_ID (1)
+    0x85, REPORT_ID_CMD,          //   REPORT_ID (1)
     0x95, 0x07,                    //   REPORT_COUNT (7)
     0x09, 0x00,                    //   USAGE (Undefined)
     0xb2, 0x02, 0x01,              //   FEATURE (Data,Var,Abs,Buf)
 
-    0x85, REPORT_ID_BOOT,          //   REPORT_ID (2)
+    0x85, REPORT_ID_DATA,          //   REPORT_ID (2)
     0x95, 0x83,              		//   REPORT_COUNT (131)
     0x09, 0x00,                    //   USAGE (Undefined)
     0xb2, 0x02, 0x01,              //   FEATURE (Data,Var,Abs,Buf)
+
     0xc0,                           // END_COLLECTION
 #endif
 
@@ -361,9 +362,9 @@ MODIFIERS modifierBitmap[] = {
 
 
 #define HID_REPORT_KEBOARD  0x0200
-#define HID_REPORT_BOOT     (0x0300 | REPORT_ID_BOOT)
-#define HID_REPORT_OPTION   (0x0300 | REPORT_ID_INFO)
 
+
+#define HID_BOOT_CMD_LEN    0x07
 #define HID_BOOT_DATA_LEN   0x83
 uint8_t bootRxRemains;
 uint8_t bootRxBuffer[HID_BOOT_DATA_LEN];
@@ -372,27 +373,179 @@ uint8_t bootRxIndex;
 
 typedef enum
 {
-    SET_OPTOIN,
-    SET_MACROS,
-    SET_KEYMAP,
-    SET_RGB,
-}BOOT_RX_CMD;
+    SET_CONFIG = 2,
+    SET_KEYMAP = 3,
+    SET_MACRO  = 4
+}BOOT_HID_CMD;
+
+#define HID_REPORT_CMD      (0x0300 | REPORT_ID_CMD)
+#define HID_REPORT_DATA     (0x0300 | REPORT_ID_DATA)
 
 
-typedef struct bootCmd{
-    uint8_t reportId;
+typedef struct HIDCMD_config{
+    uint8_t reportID;
+    uint8_t cmd;
+    uint8_t rsvd2;
+    uint8_t rsvd3;   
+    uint8_t rsvd4;
+    uint8_t rsvd5;
+    uint8_t rsvd6;
+    uint8_t rsvd7;
+}HIDCMD_config_t;
+
+
+typedef struct HIDCMD_keymap{
+    uint8_t reportID;
     uint8_t cmd;
     uint8_t index;
-    uint8_t rsvd;   
-    uint8_t data[128];
-}bootCmd_t;
+    uint8_t row;   
+    uint8_t col;
+    uint8_t rsvd4;
+    uint8_t rsvd5;
+    uint8_t rsvd6;
+}HIDCMD_keymap_t;
 
-bootCmd_t gbootCmd;
+typedef struct HIDCMD_macro{
+    uint8_t reportID;
+    uint8_t cmd;
+    uint8_t index;
+    uint8_t length;   
+    uint8_t rsvd4;
+    uint8_t rsvd5;
+    uint8_t rsvd6;
+    uint8_t rsvd7;
+}HIDCMD_macro_t;
+
+typedef union HIDcommand
+{
+  uint8_t   byte[8];
+  HIDCMD_config_t config;
+  HIDCMD_keymap_t keymap;
+  HIDCMD_macro_t macrodata;
+} HIDcommand_t;
+
+typedef struct HIDdata{
+    uint8_t reportID;
+    uint8_t cmd;
+    uint8_t parm0;
+    uint8_t parm1;   
+    uint8_t data[128];
+}HIDData_t;
+
+HIDcommand_t hidCmd;
+HIDData_t hidData;
+
+uint8_t curHIDCmd;
 uint8_t gbootCmdoffset;
 
+uint8_t version[] = "L150205";          // must be length of 7 bytes    HID report size
 
 
-#define DEBUG_LED   tinycmd_rgb_all
+#define DEBUG_LED   tinycmd_bl_led_pos
+
+
+uint8_t setCmdStatus()
+{
+    switch(hidCmd.config.cmd)
+    {
+        case SET_CONFIG:
+        {
+
+            break;
+        }
+        case SET_KEYMAP:
+        {
+
+            break;
+        }
+        case SET_MACRO:
+        {
+
+            break;
+        }
+
+
+
+
+    }
+
+
+}
+    
+
+uint8_t txHIDCmd(void)
+{
+    uint8_t *pBuf;
+    uint8_t i;
+    switch(hidCmd.config.cmd)
+    {
+        case SET_CONFIG:
+            {
+                hidData.reportID = 2;
+                hidData.cmd = hidCmd.keymap.cmd;
+                hidData.parm1 = sizeof(kbdConf);
+                eeprom_read_block(hidData.data, EEPADDR_KBD_CONF, sizeof(kbdConf));
+            }
+            break;
+        case SET_KEYMAP :
+            {
+                hidData.reportID = 2;
+                hidData.cmd = hidCmd.keymap.cmd;
+                hidData.parm0 = hidCmd.keymap.index;
+                hidData.parm1 = sizeof(currentLayer);
+#if 1      
+                eeprom_read_block(hidData.data, (void *)(0x300 + (0x80 * hidCmd.keymap.index)), sizeof(currentLayer));
+#else
+                pBuf = hidData.data;
+                for(i = 0; i < MAX_ROW*MAX_COL; i++)
+                {
+                *pBuf++ = pgm_read_byte(keylayer(hidCmd.keymap.index) + i);
+                }
+#endif
+
+ 
+            }
+            break;
+
+        case SET_MACRO :
+            {
+
+
+            }
+            break;
+    }
+}
+
+uint8_t rxHIDCmd(void)
+{
+    switch(hidCmd.config.cmd)
+    {
+        case SET_CONFIG:
+            {
+                eeprom_update_block(&hidData.data[0], EEPADDR_KBD_CONF, sizeof(kbdConf));
+            }
+            break;
+        case SET_KEYMAP :
+            {
+               eeprom_update_block(hidData.data, EEPADDR_KEYMAP_LAYER0 + (0x80 * hidCmd.keymap.index), sizeof(currentLayer));
+                // TO DO reload key map
+                //DEBUG_LED(6, 200, 0, 0);
+                
+            }
+            break;
+
+        case SET_MACRO :
+            {
+
+
+            }
+            break;
+
+    }
+    
+    DEBUG_LED(hidData.data[0], hidData.data[20], hidData.data[80], hidData.data[120]);
+}
+
 
 /**
  * This function is called whenever we receive a setup request via USB.
@@ -417,20 +570,16 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
             {
                 usbMsgPtr = (usbMsgPtr_t)keyboardReport;
                 return sizeof(keyboardReport);
-            }else if (rq->wValue.word == HID_REPORT_BOOT)
+            }else if (rq->wValue.word == HID_REPORT_CMD)
             {
-                gbootCmd.reportId = 2;
-                gbootCmd.cmd = SET_KEYMAP;
-                gbootCmd.index = 0;
-                gbootCmd.rsvd = MAX_COL<<4 | MAX_ROW;
-                memcpy(gbootCmd.data, &currentLayer[0][0], sizeof(currentLayer));
-                
-                usbMsgPtr = (usbMsgPtr_t)&gbootCmd;
-                return sizeof(gbootCmd);
-
-            }else if (rq->wValue.word == HID_REPORT_OPTION)
+                usbMsgPtr = (usbMsgPtr_t)version;
+                return sizeof(version);                
+            }else if (rq->wValue.word == HID_REPORT_DATA)
             {
 
+                txHIDCmd();
+                usbMsgPtr = (usbMsgPtr_t)&hidData;
+                return sizeof(hidData);
 
             }
         }
@@ -441,14 +590,14 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
             if (rq->wValue.word == HID_REPORT_KEBOARD && rq->wIndex.word == 0) {
                 // We expect one byte reports
                 expectReport = 1;
-            }else if (rq->wValue.word == HID_REPORT_BOOT)
+            }else if (rq->wValue.word == HID_REPORT_CMD)
             {
                 expectReport = 2;
-                bootRxRemains = HID_BOOT_DATA_LEN;
-            }else if (rq->wValue.word == HID_REPORT_OPTION)
+                bootRxRemains = HID_BOOT_CMD_LEN;
+            }else if (rq->wValue.word == HID_REPORT_DATA)
             {
-
-
+                expectReport = 3;
+                bootRxRemains = HID_BOOT_DATA_LEN;
             }
                 return USB_NO_MSG; // Call usbFunctionWrite with data
             }
@@ -490,40 +639,6 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
 }
 
 
-uint8_t processbootCmd(void)
-{
-    tinycmd_three_lock(0,0,1);
-    switch(gbootCmd.cmd)
-    {
-        case SET_OPTOIN :
-            {
-
-
-            }
-            break;
-
-        case SET_MACROS :
-            {
-
-
-            }
-            break;
-        case SET_KEYMAP :
-            {
-
-
-            }
-            break;
-        case SET_RGB :
-            {
-
-
-            }
-            break;
-    }
-}
-
-    
 /**
  * The write function is called when LEDs should be set. Normally, we get only
  * one byte that contains info about the LED states.
@@ -542,37 +657,42 @@ uint8_t usbFunctionWrite(uchar *data, uchar len)
         }
         expectReport = 0;
         result = 1;     // last block received
-    }else if (expectReport == 2)
+    }else if (expectReport == 2){
+        
+        memcpy(&hidCmd, &data[0], len);
+        curHIDCmd = hidCmd.config.cmd;
+        result = 1;     // last block received
+    }else if (expectReport == 3)
     {
         
         if(bootRxRemains == HID_BOOT_DATA_LEN)
         {
-            gbootCmd.cmd = data[1];
-            gbootCmd.index = data[2];
-            gbootCmd.rsvd = data[3];
+            hidData.cmd = data[1];
+            hidData.parm0 = data[2];
+            hidData.parm1 = data[3];
             bootRxRemains -=4;
             len -=4;
             data += 4;
             gbootCmdoffset = 0;
             
-            DEBUG_LED(gbootCmd.cmd, gbootCmd.index , gbootCmd.rsvd, gbootCmd.data[0]);
+            //DEBUG_LED(hidData.cmd, hidData.parm0 , hidData.parm1, hidData.data[0]);
             //DEBUG_LED(gbootCmd.index, 0,200, 0);
-            //DEBUG_LED(gbootCmd.rsvd,  0, 0, 200);
+            DEBUG_LED(hidData.cmd ,  0, 0, 200);
         }
         
         for(;len>0; len--)
         {
-            gbootCmd.data[gbootCmdoffset++] = data++;
+            hidData.data[gbootCmdoffset++] = *data++;
             bootRxRemains--;
         }
 
         if(bootRxRemains < 8)
         {
-            processbootCmd();
             expectReport = 0;
             result = 1;     // last block received
             
-            //DEBUG_LED(gbootCmd.cmd, 0, 0, 200);
+            DEBUG_LED(hidData.cmd+1,  200, 0, 0);
+            rxHIDCmd();
         }else
         {
             result = 0;

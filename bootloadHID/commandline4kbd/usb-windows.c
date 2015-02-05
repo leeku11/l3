@@ -24,7 +24,7 @@ hidsdi.h.
 
 #include "usbcalls.h"
 
-#define DEBUG
+//#define DEBUG
 #ifdef DEBUG
 #define DEBUG_PRINT(arg)    printf arg
 #else

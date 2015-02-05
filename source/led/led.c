@@ -479,7 +479,7 @@ void recordLED(uint8_t ledkey)
 
          row = i;
 
-        keyidx = pgm_read_byte(keylayer(kbdConf.keymapLayerIndex)+(col*MAX_ROW)+row);
+        keyidx = currentLayer[col][row];
 
          if (keyidx == K_NONE)
             continue;

@@ -5,8 +5,9 @@
 
 #define DEBOUNCE_MAX        4           // 10 is 5ms at 12MHz XTAL
 
+#ifdef FLASH_KEYMAP
 #define keylayer(layer)  (KEYMAP_LAYER0 + (0x100 * layer))
-
+#endif
 
 extern uint32_t MATRIX[MAX_COL];
 extern uint32_t curMATRIX[MAX_COL];

@@ -194,6 +194,12 @@ typedef struct bootCmd{
 
 bootCmd_t cmdData;
 
+typedef enum
+{
+    SET_CONFIG = 2,
+    SET_KEYMAP = 3,
+    SET_MACRO  = 4
+}BOOT_HID_CMD;
 
 static int receiveCmd(bootCmd_t *cmdBuffer)
 {
@@ -206,6 +212,14 @@ int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
     }
     len = sizeof(bootCmd_t);
 
+    cmdBuffer->reportId = 1;
+    
+    if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, cmdBuffer, 8)) != 0){
+        fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
+        goto errorOccurred;
+        }
+    
+    cmdBuffer->reportId = 2;
     if((err = usbGetReport(dev, USB_HID_REPORT_TYPE_FEATURE, 2, cmdBuffer, &len)) != 0){
         fprintf(stderr, "Error reading page size: %s\n", usbErrorMessage(err));
         goto errorOccurred;
@@ -223,7 +237,7 @@ int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
     printf("report ID   : %d \n", cmdBuffer->reportId);
     printf("cmd         : %d \n", cmdBuffer->cmd);
     printf("index       : %d \n", cmdBuffer->index);
-    printf("length      : %x \n", cmdBuffer->length);
+    printf("length      : %d \n", cmdBuffer->length);
 
     for (i = 0; i < 6; i++)
     {
@@ -234,7 +248,8 @@ int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
         }
     }
     printf("Receive Succeed\n");
-    
+
+
     fflush(stdout);
 errorOccurred:
     if(dev != NULL)
@@ -252,14 +267,24 @@ int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
         fprintf(stderr, "Error opening HIDBoot device: %s\n", usbErrorMessage(err));
         goto errorOccurred;
     }
-
+    
+    cmdBuffer->reportId = 2;
     printf("Send Command ==============\n");
     printf("report ID   : %d \n", cmdBuffer->reportId);
     printf("cmd         : %d \n", cmdBuffer->cmd);
     printf("index       : %d \n", cmdBuffer->index);
     printf("length      : %d \n", cmdBuffer->length);
     printf("data[0]     : %d \n", cmdBuffer->data[0]);
-    
+
+    for (i = 0; i < 6; i++)
+    {
+        printf("\n");
+        for(j = 0; j <20; j++)
+            {
+            printf("0x%2x|", cmdBuffer->data[offset++]);
+        }
+    }
+      
     if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, cmdBuffer, sizeof(bootCmd_t))) != 0){
         fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
         goto errorOccurred;
@@ -271,94 +296,6 @@ errorOccurred:
     if(dev != NULL)
         usbCloseDevice(dev);
     return err;
-}
-
-
-
-static int uploadData(bootCmd_t *dataBuffer)
-{
-usbDevice_t *dev = NULL;
-int         err = 0, len, mask, pageSize, deviceSize, i;
-union{
-    char            bytes[1];
-    deviceInfo_t    info;
-    deviceData_t    data;
-}           buffer;
-
-    if((err = usbOpenDevice(&dev, IDENT_VENDOR_NUM, IDENT_VENDOR_STRING, IDENT_PRODUCT_NUM, IDENT_PRODUCT_STRING, 1)) != 0){
-        fprintf(stderr, "Error opening HIDBoot device: %s\n", usbErrorMessage(err));
-        goto errorOccurred;
-    }
-    len = sizeof(cmdData);
-
-
-    if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, buffer.bytes, sizeof(buffer.data))) != 0){
-        //fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
-
-return 0;
-
-    
-    if(endAddress[addressIndex] > startAddress[0]){    // we need to upload data
-        if((err = usbGetReport(dev, USB_HID_REPORT_TYPE_FEATURE, 1, buffer.bytes, &len)) != 0){
-            fprintf(stderr, "Error reading page size: %s\n", usbErrorMessage(err));
-            goto errorOccurred;
-        }
-        if(len < sizeof(buffer.info)){
-            fprintf(stderr, "Not enough bytes in device info report (%d instead of %d)\n", len, (int)sizeof(buffer.info));
-            err = -1;
-            goto errorOccurred;
-        }
-        
-        pageSize = getUsbInt(buffer.info.pageSize, 2);
-        deviceSize = getUsbInt(buffer.info.flashSize, 4);
-
-        printf("Page size   = %d (0x%x)\n", pageSize, pageSize);
-        printf("Device size = %d (0x%x); %d bytes remaining\n", deviceSize, deviceSize, deviceSize - 2048);
-
-        if(endAddress[addressIndex] > deviceSize - 2048){
-            fprintf(stderr, "Data (%d bytes) exceeds remaining flash size!\n", endAddress[addressIndex]);
-            err = -1;
-            goto errorOccurred;
-        }
-        if(pageSize < 128){
-            mask = 127;
-        }else{
-            mask = pageSize - 1;
-        }
-        for (i = 0; i <= addressIndex; i++)
-        {
-           startAddress[i] &= ~mask;                  /* round down */
-           endAddress[i] = (endAddress[i] + mask) & ~mask;  /* round up */
-           printf("Uploading %d (0x%x) bytes starting at %d (0x%x)\n", endAddress[i] - startAddress[i], endAddress[i] - startAddress[i], startAddress[i], startAddress[i]);
-           while(startAddress[i] < endAddress[i]){
-               buffer.data.reportId = 2;
-               memcpy(buffer.data.data, dataBuffer + startAddress[i], 128);
-               setUsbInt(buffer.data.address, startAddress[i], 3);
-               printf("\r0x%05x ... 0x%05x", startAddress[i], startAddress[i] + (int)sizeof(buffer.data.data));
-               fflush(stdout);
-               if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, buffer.bytes, sizeof(buffer.data))) != 0){
-                   //fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
-                   continue;
-                   goto errorOccurred;
-               }
-               startAddress[i] += sizeof(buffer.data.data);
-           }
-           printf("\n");
-        }
-    }
-    if(leaveBootLoader){
-        /* and now leave boot loader: */
-        buffer.info.reportId = 1;
-        usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, buffer.bytes, sizeof(buffer.info));
-        /* Ignore errors here. If the device reboots before we poll the response,
-         * this request fails.
-         */
-    }
-errorOccurred:
-    if(dev != NULL)
-        usbCloseDevice(dev);
-    return err;
-}
 }
 
 /* ------------------------------------------------------------------------- */
@@ -412,7 +349,8 @@ int strtoi(char *str, int nsystem)
 int main(int argc, char **argv)
 {
 char    *file = NULL;
-
+char    a = 0, i = 0;
+volatile int     sleep = 0xFFFF;
 #if 0
     if(argc < 2){
         printUsage(argv[0]);
@@ -454,59 +392,18 @@ return 0;
     // if no file was given, endAddress is less than startAddress and no data is uploaded
 #endif
 
-    if(receiveCmd(&cmdData))
-        return 1;
-
-
     cmdData.cmd = strtoi(argv[1], 10);
     cmdData.index = strtoi(argv[2], 10);
     cmdData.length = strtoi(argv[3], 10);
     cmdData.data[0] = strtoi(argv[4], 10);
-                
-    if(sendCmd(&cmdData))
+
+    if(receiveCmd(&cmdData))
         return 1;
 
-    
-    cmdData.cmd ++;
-     cmdData.index = strtoi(argv[2], 10);
-     cmdData.length = strtoi(argv[3], 10);
-     cmdData.data[0] = strtoi(argv[4], 10);
-                 
-     if(sendCmd(&cmdData))
-         return 1;
-
-
-    cmdData.cmd ++;
-
-     cmdData.index = strtoi(argv[2], 10);
-     cmdData.length = strtoi(argv[3], 10);
-     cmdData.data[0] = strtoi(argv[4], 10);
-                 
-     if(sendCmd(&cmdData))
-         return 1;
-
-
-    cmdData.cmd ++;
-
-     cmdData.index = strtoi(argv[2], 10);
-     cmdData.length = strtoi(argv[3], 10);
-     cmdData.data[0] = strtoi(argv[4], 10);
-                 
-     if(sendCmd(&cmdData))
-         return 1;
-
-
-    cmdData.cmd ++;
-
-     cmdData.index = strtoi(argv[2], 10);
-     cmdData.length = strtoi(argv[3], 10);
-     cmdData.data[0] = strtoi(argv[4], 10);
-                 
-     if(sendCmd(&cmdData))
-         return 1;
-
-
         
+    if(sendCmd(&cmdData))
+        return 1;
+    
     return 0;
 }
 
