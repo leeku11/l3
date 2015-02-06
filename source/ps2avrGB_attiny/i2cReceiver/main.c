@@ -24,9 +24,9 @@
 #define I2C_SEND_DATA_BUFFER_SIZE		I2C_RDSIZE	//0x5A
 #define I2C_RECEIVE_DATA_BUFFER_SIZE	I2C_WRSIZE	//0x5A	//30 led
 
-#define CLED_NUM           20
+#define CLED_NUM           21           // (NCS)x1 + (RGB5050)x20
 #define CLED_ELEMENT       3
-#define CLED_ARRAY_SIZE    ((CLED_NUM+1)*CLED_ELEMENT)
+#define CLED_ARRAY_SIZE    ((CLED_NUM)*CLED_ELEMENT)
 
 #define CHANNEL_MODE_SYNC               0
 #define CHANNEL_MODE_ASYNC              1
@@ -59,11 +59,12 @@ typedef struct {
 
 // local data buffer
 uint8_t rgbBuffer[CLED_NUM][CLED_ELEMENT];
-uint8_t rgbBufferLength;
+uint8_t tmprgbBuffer[CLED_NUM][CLED_ELEMENT];
+uint8_t rgbBufferLength = CLED_ARRAY_SIZE;
 
 uint8_t cmdBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
 
-uint8_t threeLock[3] = { 0, 0, 0 }; // initial level
+uint8_t *NCSLock; // initial level
 
 uint8_t ledmodeIndex = 0;
 uint8_t ledmode[LEDMODE_INDEX_MAX][LED_BLOCK_MAX];
@@ -119,83 +120,61 @@ const tinycmd_handler_array_type cmdhandler[] = {
     {TINY_CMD_LED_LEVEL_F,handlecmd_led_level},              // TINY_CMD_LED_LEVEL_F
     {TINY_CMD_LED_SET_EFFECT_F,handlecmd_led_set_effect},         // TINY_CMD_LED_SET_EFFECT_F
     {TINY_CMD_LED_SET_PRESET_F,handlecmd_led_set_preset},         // TINY_CMD_LED_SET_PRESET_F
-    {TINY_CMD_LED_CONFIG_PRESET_F,handlecmd_led_config_preset},      // TINY_CMD_LED_CONFIG_PRESET_F
-
-    0                                 // TINY_CMD_MAX
+    {TINY_CMD_LED_CONFIG_PRESET_F,handlecmd_led_config_preset}      // TINY_CMD_LED_CONFIG_PRESET_F
+                                // TINY_CMD_MAX
 };
 #define CMD_HANDLER_TABLE_SIZE            (sizeof(handle_cmd_func)/sizeof(tinycmd_handler_func))
 
 void three_lock_state(uint8_t num, uint8_t caps, uint8_t scroll)
 {
-    threeLock[0] = num;
-    threeLock[1] = caps;
-    threeLock[2] = scroll;
+    NCSLock[0] = num;
+    NCSLock[1] = caps;
+    NCSLock[2] = scroll;
 }
 
-void three_lock_on(void)
+void three_lock_update(void)
 {
-    uint8_t *pTmp = rgbBuffer;
-    // Three lock
-    *(pTmp++) = threeLock[0];
-    *(pTmp++) = threeLock[1];
-    *(pTmp++) = threeLock[2];
-    rgbBufferLength = 3;
-    ws2812_sendarray(rgbBuffer, rgbBufferLength);
+    ws2812_sendarray(NCSLock , CLED_ELEMENT);
 }
 
-void led_array_clear(uint8_t *p_buf)
+void led_array_clear(void)
 {
-    memset(p_buf, 0, CLED_ARRAY_SIZE);
+    memset(rgbBuffer[1], 0, (CLED_ARRAY_SIZE - CLED_ELEMENT));
 }
 
 void led_array_on(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
 {
     uint8_t i;
-    uint8_t *pTmp = rgbBuffer;
     
     if(on == 0)
     {
         r = g = b = 0;
     }
 
-    // Three lock
-    *(pTmp++) = threeLock[0];
-    *(pTmp++) = threeLock[1];
-    *(pTmp++) = threeLock[2];
-    
-    for(i = 0; i < CLED_NUM; i++)
+    for(i = 1; i < CLED_NUM; i++)
     {
-        *(pTmp++) = g;
-        *(pTmp++) = r;
-        *(pTmp++) = b;
+        rgbBuffer[i][0] = g;
+        rgbBuffer[i][1] = r;
+        rgbBuffer[i][2] = b;
     }
-    rgbBufferLength = CLED_ARRAY_SIZE;
     ws2812_sendarray(rgbBuffer, rgbBufferLength);
 }
 
 void led_pos_on(uint8_t pos, uint8_t on, uint8_t r, uint8_t g, uint8_t b)
 {
-    uint8_t *pTmp = rgbBuffer;
-
-    led_array_clear(pTmp);
+    led_array_clear();
     
     if(on == 0)
     {
         r = g = b = 0;
     }
 
-    // Three lock
-    *(pTmp++) = threeLock[0];
-    *(pTmp++) = threeLock[1];
-    *(pTmp++) = threeLock[2];
-
-    pTmp += (pos * CLED_ELEMENT);
+    pos++;          // skip NCR indicator
     
-    *(pTmp++) = g;
-    *(pTmp++) = r;
-    *(pTmp++) = b;
+    rgbBuffer[pos][0] = g;
+    rgbBuffer[pos][1] = r;
+    rgbBuffer[pos][2] = b;
 
-    rgbBufferLength = CLED_ARRAY_SIZE;
     ws2812_sendarray(rgbBuffer, rgbBufferLength);
 }
 
@@ -214,6 +193,7 @@ uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req)
 
 uint8_t handlecmd_ver(tinycmd_pkt_req_type *p_req)
 {
+    volatile uint16_t i2cTimeout;
     tinycmd_ver_req_type *p_ver_req = (tinycmd_ver_req_type *)p_req;
 
     if((p_ver_req->cmd_code & TINY_CMD_RSP_MASK) != 0)
@@ -223,7 +203,8 @@ uint8_t handlecmd_ver(tinycmd_pkt_req_type *p_req)
          * then fill i2c_rdbuf with the data, finally call i2c_reply_done(n).
          * Interrupts are disabled while updating.
          */
-        while(i2c_reply_ready() == 0);
+        i2cTimeout = 0xFFFF;
+        while((i2c_reply_ready() == 0) && i2cTimeout--);
         
         tinycmd_ver_rsp_type *p_ver_rsp = (tinycmd_ver_rsp_type *)i2c_rdbuf;
 
@@ -250,31 +231,24 @@ uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
     tinycmd_three_lock_req_type *p_three_lock_req = (tinycmd_three_lock_req_type *)p_req;
     uint8_t *pTmp;
 
-    threeLock[0] = 0;
-    threeLock[1] = 0;
-    threeLock[2] = 0;
+    NCSLock[0] = 0;
+    NCSLock[1] = 0;
+    NCSLock[2] = 0;
     
     if(p_three_lock_req->lock & (1<<2))
     {
-        threeLock[0] = 150;
+        NCSLock[0] = 240;
     }
     if(p_three_lock_req->lock & (1<<1))
     {
-        threeLock[1] = 150;
+        NCSLock[1] = 240;
     }
     if(p_three_lock_req->lock & (1<<0))
     {
-        threeLock[2] = 150;
+        NCSLock[2] = 240;
     }
 
-    pTmp = (uint8_t *)rgbBuffer;
-    *(pTmp++) = threeLock[0];
-    *(pTmp++) = threeLock[1];
-    *(pTmp++) = threeLock[2];
-
-    rgbBufferLength = CLED_ELEMENT;
-    ws2812_sendarray(rgbBuffer,rgbBufferLength);        // output message data to port D
-
+    ws2812_sendarray(NCSLock,CLED_ELEMENT);        // output message data to port D
     return 0;
 }
 
@@ -290,25 +264,16 @@ uint8_t handlecmd_rgb_all(tinycmd_pkt_req_type *p_req)
 uint8_t handlecmd_rgb_pos(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_rgb_pos_req_type *p_rgb_pos_req = (tinycmd_rgb_pos_req_type *)p_req;
-    uint8_t *pTmp;
-
+    uint8_t tmpPos;
     // clear buffer
-    led_array_clear(rgbBuffer);
+    led_array_clear();
 
-    pTmp = (uint8_t *)rgbBuffer;
-
-    // Three lock
-    *(pTmp++) = threeLock[0];
-    *(pTmp++) = threeLock[1];
-    *(pTmp++) = threeLock[2];
-
-    pTmp += CLED_ELEMENT*p_rgb_pos_req->pos;
+    tmpPos = p_rgb_pos_req->pos + 1;          // skip NCR indicator
     
-    *(pTmp++) = p_rgb_pos_req->led.b;
-    *(pTmp++) = p_rgb_pos_req->led.r;
-    *(pTmp++) = p_rgb_pos_req->led.g;
-    
-    rgbBufferLength = CLED_ARRAY_SIZE;
+    rgbBuffer[tmpPos][0] = p_rgb_pos_req->led.b;
+    rgbBuffer[tmpPos][1] = p_rgb_pos_req->led.r;
+    rgbBuffer[tmpPos][2] = p_rgb_pos_req->led.g;
+        
     ws2812_sendarray(rgbBuffer,rgbBufferLength);        // output message data to port D
 
     return 0;
@@ -319,28 +284,21 @@ uint8_t handlecmd_rgb_range(tinycmd_pkt_req_type *p_req)
     tinycmd_rgb_range_req_type *p_rgb_range_req = (tinycmd_rgb_range_req_type *)p_req;
     uint8_t *pTmp, *pLed;
     uint8_t i;
+    uint8_t tmpPos;
 
     // clear buffer
-    led_array_clear(rgbBuffer);
+    led_array_clear();
 
-    pTmp = (uint8_t *)rgbBuffer;
-
-    // Three lock
-    *(pTmp++) = threeLock[0];
-    *(pTmp++) = threeLock[1];
-    *(pTmp++) = threeLock[2];
-
-    pTmp+=(CLED_ELEMENT * p_rgb_range_req->offset);
-    
+    tmpPos = p_rgb_range_req->offset + 1;
     pLed = (uint8_t *)&p_rgb_range_req->led;
+
     for(i = 0; i < p_rgb_range_req->num; i++)
     {
-        *(pTmp++) = *(pLed++);
-        *(pTmp++) = *(pLed++);
-        *(pTmp++) = *(pLed++);
+        rgbBuffer[tmpPos][0] = *(pLed++);
+        rgbBuffer[tmpPos][1] = *(pLed++);
+        rgbBuffer[tmpPos][2] = *(pLed++);
     }
 
-    rgbBufferLength = CLED_ARRAY_SIZE;
     ws2812_sendarray(rgbBuffer,rgbBufferLength);        // output message data to port D
     
     return 0;
@@ -360,8 +318,7 @@ uint8_t handlecmd_rgb_set_preset(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_rgb_set_preset_req_type *pset_preset_req = (tinycmd_rgb_set_preset_req_type *)p_req;
 
-    memset(rgbBuffer, 0, sizeof(CLED_NUM * CLED_ELEMENT));
-    memcpy(rgbBuffer, pset_preset_req->data, tinyConfig.rgb_num);
+    memcpy(rgbBuffer[1], pset_preset_req->data, tinyConfig.rgb_num);
 
     return 0;
 }
@@ -862,6 +819,7 @@ int main(void)
 
     tinyConfig.comm_init = 0;
     memset(rgbBuffer, 0, sizeof(CLED_NUM * CLED_ELEMENT));
+    NCSLock = rgbBuffer[0];           // 0'st RGB is NCR indicator 
 
     TinyInitHW();
     TinyInitTimer();
