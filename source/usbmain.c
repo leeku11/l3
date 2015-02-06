@@ -655,15 +655,17 @@ uint8_t usbFunctionWrite(uchar *data, uchar len)
 #ifdef HID_DEBUG_CMD
         if(hidCmd.debug.cmd == CMD_DEBUG)
         {
-            
             //tinycmd_rgb_all(6, 100, 100, 100);
             //do simple thig
-            if(hidCmd.debug.arg1 >= 20)
-            {
-                tinycmd_rgb_all(1, hidCmd.debug.arg2, hidCmd.debug.arg3, hidCmd.debug.arg4);
-            }else
+            if(hidCmd.debug.arg1 < 20)
             {
                 tinycmd_rgb_pos(hidCmd.debug.arg1, hidCmd.debug.arg2, hidCmd.debug.arg3, hidCmd.debug.arg4);
+            }else if(hidCmd.debug.arg1 == 21)
+            {
+                tinycmd_rgb_range(hidCmd.debug.arg2, hidCmd.debug.arg3, hidCmd.debug.arg4, 0, 0);
+            }else
+            {
+                tinycmd_rgb_all(1, hidCmd.debug.arg2, hidCmd.debug.arg3, hidCmd.debug.arg4);
             }
         }
 #endif

@@ -49,7 +49,7 @@
 #define TINYCMD_CMD_MASK                0x7F
 #define TINYCMD_RSP_MASK                0x80
 
-#define DEBUG_LED_ON(p, o, r, g, b)     led_pos_on(p, o, r, g, b)
+#define DEBUG_LED_ON(p, o, r, g, b)    // led_pos_on(p, o, r, g, b)
 
 typedef struct {
     uint8_t comm_init;
@@ -290,13 +290,13 @@ uint8_t handlecmd_rgb_range(tinycmd_pkt_req_type *p_req)
     led_array_clear();
 
     tmpPos = p_rgb_range_req->offset + 1;
-    pLed = (uint8_t *)&p_rgb_range_req->led;
+    pLed = (uint8_t *)p_rgb_range_req->led;
 
     for(i = 0; i < p_rgb_range_req->num; i++)
     {
-        rgbBuffer[tmpPos][0] = *(pLed++);
-        rgbBuffer[tmpPos][1] = *(pLed++);
-        rgbBuffer[tmpPos][2] = *(pLed++);
+        rgbBuffer[tmpPos+i][0] = *(pLed++);
+        rgbBuffer[tmpPos+i][1] = *(pLed++);
+        rgbBuffer[tmpPos+i][2] = *(pLed++);
     }
 
     ws2812_sendarray(rgbBuffer,rgbBufferLength);        // output message data to port D
@@ -353,6 +353,7 @@ uint8_t handlecmd_led_set_preset(tinycmd_pkt_req_type *p_req)
 uint8_t handlecmd_led_config_preset(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_led_config_preset_req_type *p_cfg_preset_req = (tinycmd_led_config_preset_req_type *)p_req;
+    volatile uint16_t i2cTimeout;
     LED_BLOCK ledblock;
 
     memcpy(ledmode, p_cfg_preset_req->data, sizeof(ledmode));
@@ -364,7 +365,8 @@ uint8_t handlecmd_led_config_preset(tinycmd_pkt_req_type *p_req)
          * then fill i2c_rdbuf with the data, finally call i2c_reply_done(n).
          * Interrupts are disabled while updating.
          */
-        while(i2c_reply_ready() == 0);
+        i2cTimeout = 0xFFFF;
+        while((i2c_reply_ready() == 0) && i2cTimeout--);
         
         tinycmd_rsp_type *p_gen_rsp = (tinycmd_ver_rsp_type *)i2c_rdbuf;
 
@@ -405,14 +407,9 @@ uint8_t handlecmd(tinycmd_pkt_req_type *p_req)
 
     for(i = 0; i < sizeof(cmdhandler)/sizeof(tinycmd_handler_array_type); i++)    // scan command func array
     {
-        //leeku debug
-        memcpy(&rgbBuffer[i][0], color, sizeof(color));
-        ws2812_sendarray(rgbBuffer, 20);        // output message data to port D
-
         // handle command
         if(cmdhandler[i].cmd == cmd)
         {
-
             ret = cmdhandler[i].p_func(p_req);
             break;
         }
@@ -423,13 +420,15 @@ uint8_t handlecmd(tinycmd_pkt_req_type *p_req)
 void i2cSlaveSend(uint8_t *pData, uint8_t len)
 {
     memcpy((uint8_t *)i2c_rdbuf, pData, len);
+    volatile uint16_t i2cTimeout;
 
     /*
     * To set response data, wait until i2c_reply_ready() returns nonzero,
     * then fill i2c_rdbuf with the data, finally call i2c_reply_done(n).
     * Interrupts are disabled while updating.
     */
-    while(i2c_reply_ready() != 0);
+    i2cTimeout = 0xFFFF;
+    while((i2c_reply_ready() == 0) && i2cTimeout--);
     i2c_reply_done(len);
 }
 

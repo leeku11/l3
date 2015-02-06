@@ -30,7 +30,7 @@
 
 // local data buffer
 uint8_t tinyExist = 0;
-unsigned char localBuffer[0x50];
+unsigned char localBuffer[0x40];
 unsigned char localBufferLength;
 #endif // SUPPORT_I2C
 
@@ -266,20 +266,22 @@ int8_t updateConf(void)
 
 
 
-uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING, LED_EFFECT_FADING},
-                        {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING_PUSH_ON, LED_EFFECT_FADING_PUSH_ON},
-                        {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSH_OFF, LED_EFFECT_PUSH_OFF}};
-
-
-uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] = {{200,0,0},{200,0,0},{200,0,0},{200,0,0},{200,0,0},
-                        {200,0,0},{200,0,0},{200,0,0},{200,0,0},{200,0,0},
-                        {200,0,0},{200,0,0},{200,0,0},{200,0,0},{200,0,0},
-                        {200,0,0},{200,0,0},{200,0,0},{200,0,0},{200,0,0}};
-
 int8_t kbd_init(void)
 {
 #if 0
 ///////////////////SHOULD BE REMOVED ////////////////
+
+static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING, LED_EFFECT_FADING},
+                        {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING_PUSH_ON, LED_EFFECT_FADING_PUSH_ON},
+                        {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSH_OFF, LED_EFFECT_PUSH_OFF}};
+
+
+static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] = {{200,0,0},{200,0,50},{200,0,100},{200,0,150},{200,0,200},
+                        {0,200,0},{0,200,50},{0,200,100},{0,200,150},{0,200,200},
+                        {0,0,200},{50,0,200},{100,0,200},{150,0,200},{200,0,200},
+                        {200,0,0},{200,50,0},{200,100,0},{200,150,0},{200,200,0}};
+
+
 kbdConf.ps2usb_mode = 1;
 kbdConf.keymapLayerIndex = 0;
 kbdConf.swapCtrlCaps = 0;
@@ -315,14 +317,10 @@ updateConf();       // should be removed
     timer0Init();
     timer0SetPrescaler(TIMER_CLK_DIV8);
 
-#ifdef SUPPORT_I2C
-    initI2C();
-#endif // SUPPORT_I2C
-
     keymap_init();
     tinyExist = establishSlaveComm();
     
-//    tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (tinycmd_led_type *)kbdConf.rgb_preset);
+    tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (tinycmd_led_type *)kbdConf.rgb_preset);
     
     updateConf();
 }

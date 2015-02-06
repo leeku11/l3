@@ -262,8 +262,7 @@ int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
         goto errorOccurred;
         }
     fprintf(stderr, "received length: %d\n", len);
-//    pageSize = getUsbInt(buffer.info.pageSize, 2);
-//    deviceSize = getUsbInt(buffer.info.flashSize, 4);
+
     offset = 0;
 
     printf("report ID   : %d \n", cmdBuffer->reportId);
@@ -316,7 +315,13 @@ int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
             printf("0x%2x|", cmdBuffer->data[offset++]);
         }
     }
-      
+
+    cmdBuffer->reportId = 1;
+    if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, cmdBuffer, 8)) != 0){
+    fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
+    goto errorOccurred;
+    }
+
     if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, cmdBuffer, sizeof(bootCmd_t))) != 0){
         fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
         goto errorOccurred;
@@ -377,12 +382,73 @@ int strtoi(char *str, int nsystem)
     return result;
 }
 
+typedef struct kbd_conf
+{
+    uint8_t ps2usb_mode;                    // 0: PS2, 1: USB
+    uint8_t keymapLayerIndex;                     // KEYMAP layer index;
+    uint8_t swapCtrlCaps;                   // 1: Swap Capslock <-> Left Ctrl
+    uint8_t swapAltGui;                     // 1: Swap Alt <-> GUI(WIN) 
+    uint8_t led_preset_index;               // LED effect  preset index
+    uint8_t led_preset[3][5];               // Block configuration for LED effect  preset
+    uint8_t rgb_preset_index;               // RGB effect preset
+    uint8_t rgb_chain;                      // RGB5050 numbers (H/W dependent)
+    uint8_t rgb_preset[MAX_RGB_CHAIN][3];   // Chain color
+}kbd_configuration_t;
+
+kbd_configuration_t kbdConf;
+
+#define MAX_RGB_CHAIN       20
+
+typedef enum
+{
+    LED_EFFECT_FADING          = 0,
+    LED_EFFECT_FADING_PUSH_ON  = 1,
+    LED_EFFECT_PUSHED_LEVEL    = 2,
+    LED_EFFECT_PUSH_ON         = 3,
+    LED_EFFECT_PUSH_OFF        = 4,
+    LED_EFFECT_ALWAYS          = 5,
+    LED_EFFECT_BASECAPS        = 6,
+    LED_EFFECT_OFF             = 7,
+    LED_EFFECT_NONE
+}LED_MODE;
+
+
+int setConfig(void)
+{
+    static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING, LED_EFFECT_FADING},
+                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING_PUSH_ON, LED_EFFECT_FADING_PUSH_ON},
+                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSH_OFF, LED_EFFECT_PUSH_OFF}};
+
+
+    static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] = {{200,0,0},{200,0,50},{200,0,100},{200,0,150},{200,0,200},
+                    {0,200,0},{0,200,50},{0,200,100},{0,200,150},{0,200,200},
+                    {0,0,200},{50,0,200},{100,0,200},{150,0,200},{200,0,200},
+                    {200,0,0},{200,50,0},{200,100,0},{200,150,0},{200,200,0}};
+
+
+    kbdConf.ps2usb_mode = 1;
+    kbdConf.keymapLayerIndex = 0;
+    kbdConf.swapCtrlCaps = 0;
+    kbdConf.swapAltGui = 0;
+    kbdConf.led_preset_index = 0;
+    memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
+    kbdConf.rgb_preset_index = 0;
+    kbdConf.rgb_chain = 14;
+    memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
+
+
+    memcpy(cmdData.data, &kbdConf, sizeof(kbdConf)); 
+
+    if(sendCmd(&cmdData))
+        return 1;
+}
 
 int main(int argc, char **argv)
 {
 char    *file = NULL;
 char    a = 0, i = 0;
 volatile int     sleep = 0xFFFF;
+
 #if 0
     if(argc < 2){
         printUsage(argv[0]);
@@ -424,10 +490,10 @@ return 0;
     // if no file was given, endAddress is less than startAddress and no data is uploaded
 #endif
 
+#ifdef HIDDEBUG
     setreport(strtoi(argv[1], 10), strtoi(argv[2], 10), strtoi(argv[3], 10), strtoi(argv[4], 10));
-
     return 1;
-
+#endif
     cmdData.cmd = strtoi(argv[1], 10);
     cmdData.index = strtoi(argv[2], 10);
     cmdData.length = strtoi(argv[3], 10);
