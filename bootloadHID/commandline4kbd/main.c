@@ -212,10 +212,12 @@ char buffer[8];
     }
     len = sizeof(bootCmd_t);
 
-    buffer[0] = 1;
-    buffer[1] = a;
-    buffer[2] = b;
-    buffer[3] = c;
+    buffer[0] = 1;      // Report ID
+    buffer[1] = 1;      // Command
+    buffer[2] = a;
+    buffer[3] = b;
+    buffer[4] = c;
+    buffer[5] = d;
     
     if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, buffer, 8)) != 0){
         fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));

@@ -115,5 +115,7 @@ prog: all
 	avrdude -c stk500v2 -P com3 -p atmega32 -U flash:w:main.hex:i
 	pause;
 
+all:
+	avr-size -C --mcu=attiny85 main.elf
 #rename: $(TRG).hex
 #	cp $(TRG).hex $(RESULT).hex

@@ -58,8 +58,8 @@ typedef struct {
 } tiny_config_type;
 
 // local data buffer
-uint8_t localBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
-uint8_t localBufferLength;
+uint8_t rgbBuffer[CLED_NUM][CLED_ELEMENT];
+uint8_t rgbBufferLength;
 
 uint8_t cmdBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
 
@@ -79,11 +79,9 @@ static uint16_t pushedLevelDuty[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 uint8_t LEDstate;     ///< current state of the LEDs
 
 uint8_t rgbmodeIndex = 0;
-uint8_t rgbmode[CLED_NUM][CLED_ELEMENT];
 
 tiny_config_type tinyConfig;
 
-void i2cSlaveReceiveService(uint8_t receiveDataLength, uint8_t* receiveData);
 void key_led_control(uint8_t ch, uint8_t on);
 void key_led_pwm_on(uint8_t channel, uint8_t on);
 void key_led_pwm_duty(uint8_t channel, uint8_t duty);
@@ -105,7 +103,7 @@ uint8_t handlecmd_led_config_preset(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_dirty(tinycmd_pkt_req_type *p_req);
 
-const tinycmd_handler_func handle_cmd_func[][2] = {
+const tinycmd_handler_array_type cmdhandler[] = {
     {TINY_CMD_CONFIG, handlecmd_config},                 // TINY_CMD_CONFIG
     {TINY_CMD_VER_F, handlecmd_ver},                    // TINY_CMD_VER_F
     {TINY_CMD_RESET_F,handlecmd_reset},                  // TINY_CMD_RESET_F
@@ -136,13 +134,13 @@ void three_lock_state(uint8_t num, uint8_t caps, uint8_t scroll)
 
 void three_lock_on(void)
 {
-    uint8_t *pTmp = localBuffer;
+    uint8_t *pTmp = rgbBuffer;
     // Three lock
     *(pTmp++) = threeLock[0];
     *(pTmp++) = threeLock[1];
     *(pTmp++) = threeLock[2];
-    localBufferLength = 3;
-    ws2812_sendarray(localBuffer, localBufferLength);
+    rgbBufferLength = 3;
+    ws2812_sendarray(rgbBuffer, rgbBufferLength);
 }
 
 void led_array_clear(uint8_t *p_buf)
@@ -153,7 +151,7 @@ void led_array_clear(uint8_t *p_buf)
 void led_array_on(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
 {
     uint8_t i;
-    uint8_t *pTmp = localBuffer;
+    uint8_t *pTmp = rgbBuffer;
     
     if(on == 0)
     {
@@ -171,13 +169,13 @@ void led_array_on(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
         *(pTmp++) = r;
         *(pTmp++) = b;
     }
-    localBufferLength = CLED_ARRAY_SIZE;
-    ws2812_sendarray(localBuffer, localBufferLength);
+    rgbBufferLength = CLED_ARRAY_SIZE;
+    ws2812_sendarray(rgbBuffer, rgbBufferLength);
 }
 
 void led_pos_on(uint8_t pos, uint8_t on, uint8_t r, uint8_t g, uint8_t b)
 {
-    uint8_t *pTmp = localBuffer;
+    uint8_t *pTmp = rgbBuffer;
 
     led_array_clear(pTmp);
     
@@ -197,8 +195,8 @@ void led_pos_on(uint8_t pos, uint8_t on, uint8_t r, uint8_t g, uint8_t b)
     *(pTmp++) = r;
     *(pTmp++) = b;
 
-    localBufferLength = CLED_ARRAY_SIZE;
-    ws2812_sendarray(localBuffer, localBufferLength);
+    rgbBufferLength = CLED_ARRAY_SIZE;
+    ws2812_sendarray(rgbBuffer, rgbBufferLength);
 }
 
 uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req)
@@ -269,13 +267,13 @@ uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
         threeLock[2] = 150;
     }
 
-    pTmp = (uint8_t *)localBuffer;
+    pTmp = (uint8_t *)rgbBuffer;
     *(pTmp++) = threeLock[0];
     *(pTmp++) = threeLock[1];
     *(pTmp++) = threeLock[2];
 
-    localBufferLength = CLED_ELEMENT;
-    ws2812_sendarray(localBuffer,localBufferLength);        // output message data to port D
+    rgbBufferLength = CLED_ELEMENT;
+    ws2812_sendarray(rgbBuffer,rgbBufferLength);        // output message data to port D
 
     return 0;
 }
@@ -295,9 +293,9 @@ uint8_t handlecmd_rgb_pos(tinycmd_pkt_req_type *p_req)
     uint8_t *pTmp;
 
     // clear buffer
-    led_array_clear(localBuffer);
+    led_array_clear(rgbBuffer);
 
-    pTmp = (uint8_t *)localBuffer;
+    pTmp = (uint8_t *)rgbBuffer;
 
     // Three lock
     *(pTmp++) = threeLock[0];
@@ -310,8 +308,8 @@ uint8_t handlecmd_rgb_pos(tinycmd_pkt_req_type *p_req)
     *(pTmp++) = p_rgb_pos_req->led.r;
     *(pTmp++) = p_rgb_pos_req->led.g;
     
-    localBufferLength = CLED_ARRAY_SIZE;
-    ws2812_sendarray(localBuffer,localBufferLength);        // output message data to port D
+    rgbBufferLength = CLED_ARRAY_SIZE;
+    ws2812_sendarray(rgbBuffer,rgbBufferLength);        // output message data to port D
 
     return 0;
 }
@@ -323,9 +321,9 @@ uint8_t handlecmd_rgb_range(tinycmd_pkt_req_type *p_req)
     uint8_t i;
 
     // clear buffer
-    led_array_clear(localBuffer);
+    led_array_clear(rgbBuffer);
 
-    pTmp = (uint8_t *)localBuffer;
+    pTmp = (uint8_t *)rgbBuffer;
 
     // Three lock
     *(pTmp++) = threeLock[0];
@@ -342,8 +340,8 @@ uint8_t handlecmd_rgb_range(tinycmd_pkt_req_type *p_req)
         *(pTmp++) = *(pLed++);
     }
 
-    localBufferLength = CLED_ARRAY_SIZE;
-    ws2812_sendarray(localBuffer,localBufferLength);        // output message data to port D
+    rgbBufferLength = CLED_ARRAY_SIZE;
+    ws2812_sendarray(rgbBuffer,rgbBufferLength);        // output message data to port D
     
     return 0;
 }
@@ -362,8 +360,8 @@ uint8_t handlecmd_rgb_set_preset(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_rgb_set_preset_req_type *pset_preset_req = (tinycmd_rgb_set_preset_req_type *)p_req;
 
-    memset(rgbmode, 0, sizeof(CLED_NUM * CLED_ELEMENT));
-    memcpy(rgbmode, pset_preset_req->data, tinyConfig.rgb_num);
+    memset(rgbBuffer, 0, sizeof(CLED_NUM * CLED_ELEMENT));
+    memcpy(rgbBuffer, pset_preset_req->data, tinyConfig.rgb_num);
 
     return 0;
 }
@@ -439,6 +437,8 @@ uint8_t handlecmd_dirty(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
+uint8_t color[3] = {100,200,100};
+
 uint8_t handlecmd(tinycmd_pkt_req_type *p_req)
 {
     uint8_t ret = 0;
@@ -446,62 +446,21 @@ uint8_t handlecmd(tinycmd_pkt_req_type *p_req)
     uint8_t i;
     cmd = p_req->cmd_code & TINYCMD_CMD_MASK;
 
-    for(i = 0; i < sizeof(handle_cmd_func) / 2; i++)    // scan command func array
+    for(i = 0; i < sizeof(cmdhandler)/sizeof(tinycmd_handler_array_type); i++)    // scan command func array
     {
+        //leeku debug
+        memcpy(&rgbBuffer[i][0], color, sizeof(color));
+        ws2812_sendarray(rgbBuffer, 20);        // output message data to port D
+
         // handle command
-        if(handle_cmd_func[i][0] != cmd)
+        if(cmdhandler[i].cmd == cmd)
         {
-            ret = handle_cmd_func[cmd][1](p_req);
+
+            ret = cmdhandler[i].p_func(p_req);
             break;
         }
     }
     return ret;
-}
-
-// slave operations
-void i2cSlaveReceiveService(uint8_t receiveDataLength, uint8_t* receiveData)
-{
-	uint8_t i;
-
-	/*
-	 * data[15] = rgb 2,3
-	 * data[0] : index;
-	 * data[1~5] : reserved
-	 * data[6~14] : grb data * 3
-	 *
-	 * data[1] = on/off
-	 * data[0] : 0bit = ws2812_pin2 on/off, 1bit = ws2812_pin3 on/off
-	 *
-	 */
-	/*if(receiveDataLength == 1){
-		PORTB &= ~((1<<ws2812_pin2)|(1<<ws2812_pin3));	// masking
-		PORTB |= ((*receiveData & 0x01)<<ws2812_pin2)|(((*receiveData>>1) & 0x01)<<ws2812_pin3);
-
-		return;
-	}else
-	if(receiveDataLength == 15){
-		// led 2, 3
-		if(*receiveData == 1){
-			initWs2812(ws2812_pin2);
-		}else if(*receiveData == 2){
-			initWs2812(ws2812_pin3);
-		}
-		receiveData += 6;
-		receiveDataLength -= 6;
-	}else{
-		// led1
-	    initWs2812(ws2812_pin);
-
-	}*/
-
-    // copy the received data to a local buffer
-    for(i=0; i<receiveDataLength; i++)
-    {
-        localBuffer[i] = *receiveData++;
-    }
-    localBufferLength = receiveDataLength;
-
-    ws2812_sendarray(localBuffer,localBufferLength);
 }
 
 void i2cSlaveSend(uint8_t *pData, uint8_t len)
@@ -902,6 +861,8 @@ int main(void)
     uint16_t count = 0;
 
     tinyConfig.comm_init = 0;
+    memset(rgbBuffer, 0, sizeof(CLED_NUM * CLED_ELEMENT));
+
     TinyInitHW();
     TinyInitTimer();
 

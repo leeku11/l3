@@ -252,7 +252,7 @@ uint8_t establishSlaveComm(void)
                 break;
             }
         }
-        tinycmd_rgb_all(FALSE, 0, 0, 0);
+        tinycmd_rgb_all(TRUE, 200, 200, 200);
     }
 
 #endif // SUPPORT_TINY_CMD
@@ -263,10 +263,6 @@ int8_t updateConf(void)
 {
     eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
 }
-
-
-
-
 
 
 
@@ -282,6 +278,7 @@ uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] = {{200,0,0},{200,0,0},{200,0,0},{200,0,
 
 int8_t kbd_init(void)
 {
+#if 0
 ///////////////////SHOULD BE REMOVED ////////////////
 kbdConf.ps2usb_mode = 1;
 kbdConf.keymapLayerIndex = 0;
@@ -294,7 +291,7 @@ kbdConf.rgb_chain = 14;
 memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
 updateConf();       // should be removed
 ///////////////////SHOULD BE REMOVED ////////////////
-
+#endif
 
 
     portInit();
@@ -324,7 +321,9 @@ updateConf();       // should be removed
 
     keymap_init();
     tinyExist = establishSlaveComm();
-
+    
+//    tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (tinycmd_led_type *)kbdConf.rgb_preset);
+    
     updateConf();
 }
 

@@ -72,6 +72,7 @@ static uint8_t findFNkey(void)
     uint8_t *pBuf;
     for(i = 0; i < MAX_LAYER; i++)
     {
+#if 0     
 ///////////////////SHOULD BE REMOVED ////////////////
         pBuf = &currentLayer[0][0];
         for(j = 0; j < MAX_ROW*MAX_COL; j++)
@@ -80,7 +81,7 @@ static uint8_t findFNkey(void)
         }
         eeprom_update_block(currentLayer, EEP_KEYMAP_ADDR(i), sizeof(currentLayer));
 ///////////////////SHOULD BE REMOVED ////////////////
-
+#endif
         eeprom_read_block(currentLayer, EEP_KEYMAP_ADDR(i), sizeof(currentLayer));
         matrixFN[i] = 0x00;
     	for(col=0;col<MAX_COL;col++)

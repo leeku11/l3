@@ -21,6 +21,8 @@
 #include "tinycmdapi.h"
 #endif
 
+#define HID_DEBUG_CMD
+
 uint8_t interfaceReady = 0;
 
 
@@ -373,13 +375,26 @@ uint8_t bootRxIndex;
 
 typedef enum
 {
-    SET_CONFIG = 2,
-    SET_KEYMAP = 3,
-    SET_MACRO  = 4
+    CMD_DEBUG = 1,
+    CMD_CONFIG = 2,
+    CMD_KEYMAP = 3,
+    CMD_MACRO  = 4
 }BOOT_HID_CMD;
 
 #define HID_REPORT_CMD      (0x0300 | REPORT_ID_CMD)
 #define HID_REPORT_DATA     (0x0300 | REPORT_ID_DATA)
+
+
+typedef struct HIDCMD_debug{
+    uint8_t reportID;
+    uint8_t cmd;
+    uint8_t arg1;
+    uint8_t arg2;   
+    uint8_t arg3;
+    uint8_t arg4;
+    uint8_t arg5;
+    uint8_t arg6;
+}HIDCMD_debug_t;
 
 
 typedef struct HIDCMD_config{
@@ -419,6 +434,7 @@ typedef struct HIDCMD_macro{
 typedef union HIDcommand
 {
   uint8_t   byte[8];
+  HIDCMD_debug_t debug;
   HIDCMD_config_t config;
   HIDCMD_keymap_t keymap;
   HIDCMD_macro_t macrodata;
@@ -442,34 +458,6 @@ uint8_t version[] = "L150205";          // must be length of 7 bytes    HID repo
 
 #define DEBUG_LED   tinycmd_rgb_pos
 
-
-uint8_t setCmdStatus()
-{
-    switch(hidCmd.config.cmd)
-    {
-        case SET_CONFIG:
-        {
-
-            break;
-        }
-        case SET_KEYMAP:
-        {
-
-            break;
-        }
-        case SET_MACRO:
-        {
-
-            break;
-        }
-
-
-
-
-    }
-
-
-}
     
 
 uint8_t txHIDCmd(void)
@@ -478,40 +466,37 @@ uint8_t txHIDCmd(void)
     uint8_t i;
     switch(hidCmd.config.cmd)
     {
-        case SET_CONFIG:
-            {
-                hidData.reportID = 2;
-                hidData.cmd = hidCmd.keymap.cmd;
-                hidData.parm1 = sizeof(kbdConf);
-                eeprom_read_block(hidData.data, EEPADDR_KBD_CONF, sizeof(kbdConf));
-            }
+#ifdef HID_DEBUG_CMD
+        case CMD_DEBUG:
+        {
+            // TODO : upload to HOST(PC) by hidData.data
             break;
-        case SET_KEYMAP :
-            {
-                hidData.reportID = 2;
-                hidData.cmd = hidCmd.keymap.cmd;
-                hidData.parm0 = hidCmd.keymap.index;
-                hidData.parm1 = sizeof(currentLayer);
-#if 1      
-                eeprom_read_block(hidData.data, (void *)(0x300 + (0x80 * hidCmd.keymap.index)), sizeof(currentLayer));
-#else
-                pBuf = hidData.data;
-                for(i = 0; i < MAX_ROW*MAX_COL; i++)
-                {
-                *pBuf++ = pgm_read_byte(keylayer(hidCmd.keymap.index) + i);
-                }
+        }
 #endif
-
- 
-            }
+        case CMD_CONFIG:
+        {
+            hidData.reportID = 2;
+            hidData.cmd = hidCmd.keymap.cmd;
+            hidData.parm1 = sizeof(kbdConf);
+            eeprom_read_block(hidData.data, EEPADDR_KBD_CONF, sizeof(kbdConf));
             break;
+        }
+        case CMD_KEYMAP :
+        {
+            hidData.reportID = 2;
+            hidData.cmd = hidCmd.keymap.cmd;
+            hidData.parm0 = hidCmd.keymap.index;
+            hidData.parm1 = sizeof(currentLayer);
 
-        case SET_MACRO :
-            {
-
-
-            }
+            eeprom_read_block(hidData.data, (void *)(0x300 + (0x80 * hidCmd.keymap.index)), sizeof(currentLayer));
             break;
+        }
+        case CMD_MACRO :
+        {
+
+
+        }
+        break;
     }
 }
 
@@ -519,14 +504,21 @@ uint8_t rxHIDCmd(void)
 {
     switch(hidCmd.config.cmd)
     {
-        case SET_CONFIG:
+#ifdef HID_DEBUG_CMD
+         case CMD_DEBUG:
+            {
+                // TODO : debugging action by hidData.data downloaded from HOST(PC)
+            }
+            break;
+#endif            
+        case CMD_CONFIG:
             {
                 eeprom_update_block(&hidData.data[0], EEPADDR_KBD_CONF, sizeof(kbdConf));
                 tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (tinycmd_led_type *)kbdConf.rgb_preset);
                 tinycmd_rgb_set_effect(kbdConf.rgb_preset_index);
             }
             break;
-        case SET_KEYMAP :
+        case CMD_KEYMAP :
             {
                eeprom_update_block(hidData.data, EEPADDR_KEYMAP_LAYER0 + (0x80 * hidCmd.keymap.index), sizeof(currentLayer));
                 // TO DO reload key map
@@ -535,7 +527,7 @@ uint8_t rxHIDCmd(void)
             }
             break;
 
-        case SET_MACRO :
+        case CMD_MACRO :
             {
 
 
@@ -648,6 +640,7 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
 uint8_t usbFunctionWrite(uchar *data, uchar len) 
 {
     uint8_t result;
+    
     if (expectReport && (len == 1)) {
         if(LEDstate != data[0])
         {
@@ -657,10 +650,23 @@ uint8_t usbFunctionWrite(uchar *data, uchar len)
         expectReport = 0;
         result = 1;     // last block received
     }else if (expectReport == 2){
-        
         memcpy(&hidCmd, &data[0], len);
-        tinycmd_rgb_all(data[1], data[2], data[3], data[4]);
         result = 1;     // last block received
+#ifdef HID_DEBUG_CMD
+        if(hidCmd.debug.cmd == CMD_DEBUG)
+        {
+            
+            //tinycmd_rgb_all(6, 100, 100, 100);
+            //do simple thig
+            if(hidCmd.debug.arg1 >= 20)
+            {
+                tinycmd_rgb_all(1, hidCmd.debug.arg2, hidCmd.debug.arg3, hidCmd.debug.arg4);
+            }else
+            {
+                tinycmd_rgb_pos(hidCmd.debug.arg1, hidCmd.debug.arg2, hidCmd.debug.arg3, hidCmd.debug.arg4);
+            }
+        }
+#endif
     }else if (expectReport == 3)
     {
         
@@ -674,9 +680,6 @@ uint8_t usbFunctionWrite(uchar *data, uchar len)
             data += 4;
             gbootCmdoffset = 0;
             
-            //DEBUG_LED(hidData.cmd, hidData.parm0 , hidData.parm1, hidData.data[0]);
-            //DEBUG_LED(gbootCmd.index, 0,200, 0);
-            DEBUG_LED(hidData.cmd ,  0, 0, 200);
         }
         
         for(;len>0; len--)
@@ -689,8 +692,6 @@ uint8_t usbFunctionWrite(uchar *data, uchar len)
         {
             expectReport = 0;
             result = 1;     // last block received
-            
-            DEBUG_LED(hidData.cmd+1,  200, 0, 0);
             rxHIDCmd();
         }else
         {
