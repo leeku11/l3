@@ -235,7 +235,7 @@ uint8_t establishSlaveComm(void)
 #ifdef SUPPORT_TINY_CMD
     uint16_t retry = 0;
 
-    initI2C();
+    //initI2C();
 
     // Establish a communication with tiny slave
     while(ret == 0 && (retry++ < 1000))
@@ -252,10 +252,9 @@ uint8_t establishSlaveComm(void)
                 break;
             }
         }
-        tinycmd_rgb_all(TRUE, 200, 200, 200);
     }
-
 #endif // SUPPORT_TINY_CMD
+
     return ret;    
 }    
 
@@ -297,6 +296,7 @@ updateConf();       // should be removed
 
 
     portInit();
+    initI2C();
     enable_printf();
     eeprom_read_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
 

@@ -49,7 +49,7 @@
 #define TINYCMD_CMD_MASK                0x7F
 #define TINYCMD_RSP_MASK                0x80
 
-#define DEBUG_LED_ON(p, o, r, g, b)    // led_pos_on(p, o, r, g, b)
+#define DEBUG_LED_ON(p, o, r, g, b)    // rgb_pos_on(p, o, r, g, b)
 
 typedef struct {
     uint8_t comm_init;
@@ -57,10 +57,49 @@ typedef struct {
     uint8_t led_preset_num;
 } tiny_config_type;
 
+typedef struct {
+    uint8_t index;
+    union {
+       uint8_t max_rgb[3]; // grb
+       struct {
+          uint8_t g;
+          uint8_t r;
+          uint8_t b;
+       }max;
+    };
+    uint8_t high_hold;
+    uint8_t low_hold;
+    uint8_t accel_mode;
+    uint8_t dir;
+    uint8_t level;
+    uint8_t cnt;
+    uint8_t hcnt;
+    uint8_t lcnt;
+} rgb_effect_type;
+
+typedef uint8_t (*tiny_effector_func)(rgb_effect_type *); 
+
+enum
+{
+    RGB_EFFECT_BOOTHID = 0,
+    RGB_EFFECT_BASIC,
+    RGB_EFFECT_BASIC_LOOP,
+    RGB_EFFECT_FADE,
+    RGB_EFFECT_FADE_BUF,
+    RGB_EFFECT_FADE_LOOP,
+    RGB_EFFECT_HEARTBIT,
+    RGB_EFFECT_HEARTBIT_BUF,
+    RGB_EFFECT_HEARTBIT_LOOP,
+    RGB_EFFECT_SWIPE,
+    RGB_EFFECT_SWIPE_BUF,
+    RGB_EFFECT_SWIPE_LOOP,
+    RGB_EFFECT_MAX
+};
+
 // local data buffer
 uint8_t rgbBuffer[CLED_NUM][CLED_ELEMENT];
 uint8_t tmprgbBuffer[CLED_NUM][CLED_ELEMENT];
-uint8_t rgbBufferLength = CLED_ARRAY_SIZE;
+uint8_t rgbBufferLength; // = CLED_ARRAY_SIZE;
 
 uint8_t cmdBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
 
@@ -79,7 +118,9 @@ static uint8_t pushedLevel[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 static uint16_t pushedLevelDuty[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 uint8_t LEDstate;     ///< current state of the LEDs
 
-uint8_t rgbmodeIndex = 0;
+uint8_t rgbmodeIndex = 0; // effect preset index
+rgb_effect_type rgbEffect; // current rgb effect
+//rgb_effect_type rgbEffectPreset[2];
 
 tiny_config_type tinyConfig;
 
@@ -125,6 +166,29 @@ const tinycmd_handler_array_type cmdhandler[] = {
 };
 #define CMD_HANDLER_TABLE_SIZE            (sizeof(handle_cmd_func)/sizeof(tinycmd_handler_func))
 
+uint8_t rgb_effect_null(rgb_effect_type *p_effect);
+uint8_t rgb_effect_basic(rgb_effect_type *p_effect);
+uint8_t rgb_effect_basic_loop(rgb_effect_type *p_effect);
+uint8_t rgb_effect_fade_inout(rgb_effect_type *p_effect);
+uint8_t rgb_effect_fade_inout_buf(rgb_effect_type *p_effect);
+uint8_t rgb_effect_fade_inout_loop(rgb_effect_type *p_effect);
+
+const tiny_effector_func effectHandler[] = {
+    rgb_effect_basic,              // RGB_EFFECT_BOOTHID
+    rgb_effect_basic,              // RGB_EFFECT_BASIC
+    rgb_effect_basic_loop,         // RGB_EFFECT_BASIC_LOOP
+    rgb_effect_fade_inout,         // RGB_EFFECT_FADE
+    rgb_effect_fade_inout_buf,     // RGB_EFFECT_FADE_BUF
+    rgb_effect_fade_inout_loop,    // RGB_EFFECT_FADE_LOOP
+    rgb_effect_fade_inout,         // RGB_EFFECT_HEARTBIT
+    rgb_effect_fade_inout_buf,     // RGB_EFFECT_HEARTBIT_BUF
+    rgb_effect_fade_inout_loop,    // RGB_EFFECT_HEARTBIT_LOOP
+    rgb_effect_null,               // RGB_EFFECT_SWIPE
+    rgb_effect_null,               // RGB_EFFECT_SWIPE_BUF
+    rgb_effect_null,               // RGB_EFFECT_SWIPE_LOOP
+};
+#define EFFECT_HANDLER_TABLE_SIZE            (sizeof(effectHandler)/sizeof(tiny_effector_func))
+
 void three_lock_state(uint8_t num, uint8_t caps, uint8_t scroll)
 {
     NCSLock[0] = num;
@@ -137,12 +201,12 @@ void three_lock_update(void)
     ws2812_sendarray(NCSLock , CLED_ELEMENT);
 }
 
-void led_array_clear(void)
+void rgb_array_clear(void)
 {
     memset(rgbBuffer[1], 0, (CLED_ARRAY_SIZE - CLED_ELEMENT));
 }
 
-void led_array_on(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
+void rgb_array_on(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
 {
     uint8_t i;
     
@@ -160,9 +224,9 @@ void led_array_on(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
     ws2812_sendarray(rgbBuffer, rgbBufferLength);
 }
 
-void led_pos_on(uint8_t pos, uint8_t on, uint8_t r, uint8_t g, uint8_t b)
+void rgb_pos_on(uint8_t pos, uint8_t on, uint8_t r, uint8_t g, uint8_t b)
 {
-    led_array_clear();
+    rgb_array_clear();
     
     if(on == 0)
     {
@@ -178,6 +242,430 @@ void led_pos_on(uint8_t pos, uint8_t on, uint8_t r, uint8_t g, uint8_t b)
     ws2812_sendarray(rgbBuffer, rgbBufferLength);
 }
 
+uint8_t rgb_effect_null(rgb_effect_type *p_effect)
+{
+    return 0;
+}
+
+uint8_t rgb_effect_basic(rgb_effect_type *p_effect)
+{
+    uint8_t i = 0, j;
+
+    tmprgbBuffer[i][0] = NCSLock[0];
+    tmprgbBuffer[i][1] = NCSLock[1];
+    tmprgbBuffer[i][2] = NCSLock[2];
+    i++;
+
+    for(; i < CLED_NUM; i++)
+    {
+        for(j = 0; j < 3; j++)
+        {
+            p_effect->level = rgbBuffer[i][j];
+            if(p_effect->level < p_effect->max_rgb[j])
+            {
+                tmprgbBuffer[i][j] = p_effect->level;
+            }
+            else
+            {
+                tmprgbBuffer[i][j] = p_effect->max_rgb[j];
+            }
+        }
+    }
+
+    return 1;
+}
+
+uint8_t rgb_effect_basic_loop(rgb_effect_type *p_effect)
+{
+    uint8_t i = 0, j;
+    uint8_t rgb[3];
+
+    tmprgbBuffer[i][0] = NCSLock[0];
+    tmprgbBuffer[i][1] = NCSLock[1];
+    tmprgbBuffer[i][2] = NCSLock[2];
+    i++;
+
+    rgb[0] = rgbBuffer[p_effect->cnt + i][0];
+    rgb[1] = rgbBuffer[p_effect->cnt + i][1];
+    rgb[2] = rgbBuffer[p_effect->cnt + i][2];
+
+    for(; i < CLED_NUM; i++)
+    {
+        for(j = 0; j < 3; j++)
+        {
+            p_effect->level = rgbBuffer[i][j];
+            if(p_effect->level < p_effect->max_rgb[j])
+            {
+                tmprgbBuffer[i][j] = p_effect->level;
+            }
+            else
+            {
+                tmprgbBuffer[i][j] = p_effect->max_rgb[j];
+            }
+        }
+    }
+
+    if(++p_effect->hcnt == 0)
+    {
+        if(++p_effect->cnt == (CLED_NUM - 1))
+        {
+            p_effect->cnt = 0;
+        }
+    }
+
+    return 1;
+}
+
+uint8_t rgb_effect_fade_inout(rgb_effect_type *p_effect)
+{
+    uint8_t i = 0, j;
+    uint8_t max;
+
+    tmprgbBuffer[i][0] = NCSLock[0];
+    tmprgbBuffer[i][1] = NCSLock[1];
+    tmprgbBuffer[i][2] = NCSLock[2];
+    i++;
+
+    max = 0;
+    if(p_effect->dir == 0) // ASCENDING
+    {
+        for(; i < CLED_NUM; i++)
+        {
+            for(j = 0; j < 3; j++)
+            {
+                if(p_effect->level < p_effect->max_rgb[j])
+                {
+                    tmprgbBuffer[i][j] = p_effect->level;
+                    max++;
+                }
+                else
+                {
+                    tmprgbBuffer[i][j] = p_effect->max_rgb[j];
+                }
+            }
+#if 0            
+            if(p_effect->level < p_effect->g_max)
+            {
+                tmprgbBuffer[i][0] = p_effect->level;
+                max++;
+            }
+            else
+            {
+                tmprgbBuffer[i][0] = p_effect->g_max;
+            }
+            
+            if(p_effect->level < p_effect->r_max)
+            {
+                tmprgbBuffer[i][1] = p_effect->level;
+                max++;
+            }
+            else
+            {
+                tmprgbBuffer[i][0] = p_effect->b_max;
+            }
+            
+            if(p_effect->level < p_effect->b_max)
+            {
+                tmprgbBuffer[i][2] = p_effect->level;
+                max++;
+            }
+            else
+            {
+                tmprgbBuffer[i][0] = p_effect->r_max;
+            }
+#endif // end of #if 0
+        }
+
+        // If no update go to the sustain state
+        if(max == 0)
+        {
+            if(p_effect->hcnt++ > p_effect->high_hold)
+            {
+                p_effect->dir = (!p_effect->dir);
+                p_effect->hcnt = 0;
+            }
+        }
+        else
+        {
+            if(p_effect->accel_mode == 0)
+            {
+                p_effect->level++;
+            }
+            else if(p_effect->accel_mode == 1)
+            {
+                if(p_effect->level < 2)
+                {
+                    p_effect->level = 3;
+                }
+                else if(p_effect->level < 10)
+                {
+                    p_effect->level = p_effect->level * p_effect->level;
+                }
+                else
+                {
+                    p_effect->level = 100;
+                }
+            }
+        }
+    }
+    else // DESCENDING
+    {
+        for(; i < CLED_NUM; i++)
+        {
+            for(j = 0; j < 3; j++)
+            {
+                if(tmprgbBuffer[i][j] > 0)
+                {
+                    tmprgbBuffer[i][j]--;
+                    max++;
+                }
+                else
+                {
+                    tmprgbBuffer[i][j] = 0;
+                }
+            }
+#if 0            
+            if(tmprgbBuffer[i][0] > 0)
+            {
+                tmprgbBuffer[i][0]--;
+                max++;
+            }
+            else
+            {
+                tmprgbBuffer[i][0] = 0;
+            }
+            if(tmprgbBuffer[i][1] > 0)
+            {
+                tmprgbBuffer[i][1]--;
+                max++;
+            }
+            else
+            {
+                tmprgbBuffer[i][1] = 0;
+            }
+            if(tmprgbBuffer[i][2] > 0)
+            {
+                tmprgbBuffer[i][2]--;
+                max++;
+            }
+            else
+            {
+                tmprgbBuffer[i][2] = 0;
+            }
+#endif // end of #if 0
+        }
+
+        if(max == 0)
+        {
+            if(p_effect->lcnt++ > p_effect->low_hold)
+            {
+                p_effect->level = 0;
+                p_effect->dir = (!p_effect->dir);
+                p_effect->lcnt = 0;
+
+                //memset(tmprgbBuffer[i], 0, (CLED_NUM - 1) * CLED_ELEMENT);
+            }
+        }
+    }
+
+    return 1;
+}
+
+uint8_t rgb_effect_fade_inout_buf(rgb_effect_type *p_effect)
+{
+    uint8_t i = 0, j;
+    uint8_t max, limit;
+
+    tmprgbBuffer[i][0] = NCSLock[0];
+    tmprgbBuffer[i][1] = NCSLock[1];
+    tmprgbBuffer[i][2] = NCSLock[2];
+    i++;
+
+    max = 0;
+    if(p_effect->dir == 0) // ASCENDING
+    {
+        for(; i < CLED_NUM; i++)
+        {
+            for(j = 0; j < 3; j++)
+            {
+                // read pixel level
+                limit = rgbBuffer[i][j];
+                // limit max level
+                if(limit > p_effect->max_rgb[j])
+                {
+                    limit = p_effect->max_rgb[j];
+                }
+
+                // increase level according to mode
+                if(p_effect->accel_mode == 0)
+                {
+                    if(tmprgbBuffer[i][j] < limit)
+                    {
+                        tmprgbBuffer[i][j]++;
+                        max++;
+                    }
+                }
+                else if(p_effect->accel_mode == 1)
+                {
+                    if(tmprgbBuffer[i][j] < 2)
+                    {
+                        tmprgbBuffer[i][j] = 3;
+                    }
+                    else if(tmprgbBuffer[i][j] < limit)
+                    {
+                        tmprgbBuffer[i][j] = tmprgbBuffer[i][j] * tmprgbBuffer[i][j];
+                    }
+                    else
+                    {
+                        tmprgbBuffer[i][j] = limit;
+                    }
+                }
+            }
+        }
+
+        // If no update go to the sustain state
+        if(max == 0)
+        {
+            if(p_effect->hcnt++ > p_effect->high_hold)
+            {
+                p_effect->dir = (!p_effect->dir);
+                p_effect->hcnt = 0;
+            }
+        }
+    }
+    else // DESCENDING
+    {
+        for(; i < CLED_NUM; i++)
+        {
+            for(j = 0; j < 3; j++)
+            {
+                if(tmprgbBuffer[i][j] > 0)
+                {
+                    tmprgbBuffer[i][j]--;
+                    max++;
+                }
+                else
+                {
+                    tmprgbBuffer[i][j] = 0;
+                }
+            }
+        }
+
+        if(max == 0)
+        {
+            if(p_effect->lcnt++ > p_effect->low_hold)
+            {
+                p_effect->dir = (!p_effect->dir);
+                p_effect->lcnt = 0;
+            }
+        }
+    }
+
+    return 1;
+}
+
+uint8_t rgb_effect_fade_inout_loop(rgb_effect_type *p_effect)
+{
+    uint8_t i = 0, j;
+    uint8_t max, limit;
+    uint8_t rgb[3];
+
+    tmprgbBuffer[i][0] = NCSLock[0];
+    tmprgbBuffer[i][1] = NCSLock[1];
+    tmprgbBuffer[i][2] = NCSLock[2];
+    i++;
+
+    rgb[0] = rgbBuffer[p_effect->cnt + i][0];
+    rgb[1] = rgbBuffer[p_effect->cnt + i][1];
+    rgb[2] = rgbBuffer[p_effect->cnt + i][2];
+
+    max = 0;
+    if(p_effect->dir == 0) // ASCENDING
+    {
+        for(; i < CLED_NUM; i++)
+        {
+            for(j = 0; j < 3; j++)
+            {
+                // read pixel level
+                limit = rgb[j];
+                // limit max level
+                if(limit > p_effect->max_rgb[j])
+                {
+                    limit = p_effect->max_rgb[j];
+                }
+
+                // increase level according to mode
+                if(p_effect->accel_mode == 0)
+                {
+                    if(tmprgbBuffer[i][j] < limit)
+                    {
+                        tmprgbBuffer[i][j]++;
+                        max++;
+                    }
+                }
+                else if(p_effect->accel_mode == 1)
+                {
+                    if(tmprgbBuffer[i][j] < 2)
+                    {
+                        tmprgbBuffer[i][j] = 3;
+                    }
+                    else if(tmprgbBuffer[i][j] < limit)
+                    {
+                        tmprgbBuffer[i][j] = tmprgbBuffer[i][j] * tmprgbBuffer[i][j];
+                    }
+                    else
+                    {
+                        tmprgbBuffer[i][j] = limit;
+                    }
+                }
+            }
+        }
+
+        // If no update go to the sustain state
+        if(max == 0)
+        {
+            if(p_effect->hcnt++ > p_effect->high_hold)
+            {
+                p_effect->dir = (!p_effect->dir);
+                p_effect->hcnt = 0;
+            }
+        }
+    }
+    else // DESCENDING
+    {
+        for(; i < CLED_NUM; i++)
+        {
+            for(j = 0; j < 3; j++)
+            {
+                if(tmprgbBuffer[i][j] > 0)
+                {
+                    tmprgbBuffer[i][j]--;
+                    max++;
+                }
+                else
+                {
+                    tmprgbBuffer[i][j] = 0;
+                }
+            }
+        }
+
+        if(max == 0)
+        {
+            if(p_effect->lcnt++ > p_effect->low_hold)
+            {
+                p_effect->dir = (!p_effect->dir);
+                p_effect->lcnt = 0;
+
+                if(++p_effect->cnt == (CLED_NUM - 1))
+                {
+                    p_effect->cnt = 0;
+                }
+            }
+        }
+    }
+
+    return 1;
+}
 uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_config_req_type *p_config_req = (tinycmd_config_req_type *)p_req;
@@ -214,7 +702,8 @@ uint8_t handlecmd_ver(tinycmd_pkt_req_type *p_req)
         i2c_reply_done(p_ver_rsp->pkt_len);
 
         // debug
-        led_array_on(TRUE, 100, 0, 0);
+        //rgb_array_on(TRUE, 100, 0, 100);
+        
         //tinyConfig.comm_init = 1;
     }
 
@@ -256,7 +745,7 @@ uint8_t handlecmd_rgb_all(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_rgb_all_req_type *p_rgb_all_req = (tinycmd_rgb_all_req_type *)p_req;
 
-    led_array_on(p_rgb_all_req->on, p_rgb_all_req->led.r, p_rgb_all_req->led.g, p_rgb_all_req->led.b);
+    rgb_array_on(p_rgb_all_req->on, p_rgb_all_req->led.r, p_rgb_all_req->led.g, p_rgb_all_req->led.b);
     
     return 0;
 }
@@ -266,7 +755,7 @@ uint8_t handlecmd_rgb_pos(tinycmd_pkt_req_type *p_req)
     tinycmd_rgb_pos_req_type *p_rgb_pos_req = (tinycmd_rgb_pos_req_type *)p_req;
     uint8_t tmpPos;
     // clear buffer
-    led_array_clear();
+    rgb_array_clear();
 
     tmpPos = p_rgb_pos_req->pos + 1;          // skip NCR indicator
     
@@ -287,7 +776,7 @@ uint8_t handlecmd_rgb_range(tinycmd_pkt_req_type *p_req)
     uint8_t tmpPos;
 
     // clear buffer
-    led_array_clear();
+    rgb_array_clear();
 
     tmpPos = p_rgb_range_req->offset + 1;
     pLed = (uint8_t *)p_rgb_range_req->led;
@@ -309,7 +798,8 @@ uint8_t handlecmd_rgb_set_effect(tinycmd_pkt_req_type *p_req)
     tinycmd_rgb_set_effect_req_type *p_set_effect_req = (tinycmd_rgb_set_effect_req_type *)p_req;
     rgbmodeIndex = p_set_effect_req->preset;
 
-    // Do something here
+    // set effect
+    tiny_rgb_set_effect(rgbmodeIndex);
     
     return 0;
 }
@@ -374,9 +864,6 @@ uint8_t handlecmd_led_config_preset(tinycmd_pkt_req_type *p_req)
         p_gen_rsp->pkt_len = sizeof(tinycmd_ver_rsp_type);
         i2c_reply_done(p_gen_rsp->pkt_len);
 
-        // debug
-        //led_array_on(TRUE, 0, 100, 0);
-
         for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
         {
             pwmDir[ledblock ] = 0;
@@ -395,8 +882,6 @@ uint8_t handlecmd_dirty(tinycmd_pkt_req_type *p_req)
 
     return 0;
 }
-
-uint8_t color[3] = {100,200,100};
 
 uint8_t handlecmd(tinycmd_pkt_req_type *p_req)
 {
@@ -431,9 +916,6 @@ void i2cSlaveSend(uint8_t *pData, uint8_t len)
     while((i2c_reply_ready() == 0) && i2cTimeout--);
     i2c_reply_done(len);
 }
-
-#define END_MARKER 255 // Signals the end of transmission
-int count;
 
 void key_led_control(uint8_t ch, uint8_t on)
 {
@@ -610,7 +1092,7 @@ void tiny_led_wave_set(LED_BLOCK block, uint16_t duty)
     }
 }
 
-void tiny_blink(int matrixState)
+void tiny_led_blink(int matrixState)
 {
     LED_BLOCK ledblock;
 
@@ -652,7 +1134,7 @@ void tiny_blink(int matrixState)
     }
 }
 
-void tiny_fader(void)
+void tiny_led_fader(void)
 {
     uint8_t ledblock;
     for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
@@ -749,8 +1231,106 @@ void tiny_fader(void)
     }
 }
 
+void tiny_rgb_set_effect(uint8_t effect)
+{
+    memset(&rgbEffect, 0, sizeof(rgb_effect_type));
+    
+    if(effect == RGB_EFFECT_BOOTHID)
+    {
+        rgbEffect.index = effect;
+        rgbEffect.max.r = 50;
+        //rgbEffect.max.g = 0;
+        //rgbEffect.max.b = 0;
+        rgbEffect.high_hold = 10;
+        rgbEffect.low_hold = 400;
+        rgbEffect.accel_mode = 1; // quadratic
+        //rgbEffect.dir = 0;
+        //rgbEffect.level = 0;
+        //rgbEffect.cnt = 0;
+        //rgbEffect.hcnt = 0;
+        //rgbEffect.lcnt = 0;
+    }
+    else if((effect == RGB_EFFECT_BASIC) || (effect == RGB_EFFECT_BASIC_LOOP))
+    {
+        rgbEffect.index = effect;
+        rgbEffect.max.r = 70;
+        rgbEffect.max.g = 70;
+        rgbEffect.max.b = 70;
+        //rgbEffect.high_hold = 10;
+        //rgbEffect.low_hold = 400;
+        //rgbEffect.accel_mode = 0; // linear
+        //rgbEffect.dir = 0;
+        //rgbEffect.level = 0;
+        //rgbEffect.cnt = 0;
+        //rgbEffect.hcnt = 0;
+        //rgbEffect.lcnt = 0;
+    }
+    else if((effect == RGB_EFFECT_FADE) || (effect == RGB_EFFECT_FADE) || (effect == RGB_EFFECT_FADE_LOOP))
+    {
+        rgbEffect.index = effect;
+        rgbEffect.max.r = 70;
+        rgbEffect.max.g = 70;
+        rgbEffect.max.b = 70;
+        rgbEffect.high_hold = 5;
+        rgbEffect.low_hold = 200;
+        //rgbEffect.accel_mode = 0; // linear
+        //rgbEffect.dir = 0;
+        //rgbEffect.level = 0;
+        //rgbEffect.cnt = 0;
+        //rgbEffect.hcnt = 0;
+        //rgbEffect.lcnt = 0;
+    }
+    else if((effect == RGB_EFFECT_HEARTBIT) || (effect == RGB_EFFECT_HEARTBIT_BUF) || (effect == RGB_EFFECT_HEARTBIT_LOOP))
+    {
+        rgbEffect.index = effect;
+        rgbEffect.max.r = 70;
+        rgbEffect.max.g = 70;
+        rgbEffect.max.b = 70;
+        //rgbEffect.high_hold = 0;
+        rgbEffect.low_hold = 250;
+        rgbEffect.accel_mode = 1; // quadratic
+        //rgbEffect.dir = 0;
+        //rgbEffect.level = 0;
+        //rgbEffect.cnt = 0;
+        //rgbEffect.hcnt = 0;
+        //rgbEffect.lcnt = 0;
+    }
+    else if((effect == RGB_EFFECT_SWIPE) || (effect == RGB_EFFECT_SWIPE_BUF) || (effect == RGB_EFFECT_SWIPE_LOOP))
+    {
+        rgbEffect.index = effect;
+        //rgbEffect.max.r = 70;
+        //rgbEffect.max.g = 70;
+        //rgbEffect.max.b = 70;
+        //rgbEffect.high_hold = 0;
+        //rgbEffect.low_hold = 250;
+        //rgbEffect.accel_mode = 1; // quadratic
+        //rgbEffect.dir = 0;
+        //rgbEffect.level = 0;
+        //rgbEffect.cnt = 0;
+        //rgbEffect.hcnt = 0;
+        //rgbEffect.lcnt = 0;
+    }
+
+    memset(tmprgbBuffer[1], 0, CLED_ARRAY_SIZE);
+}
+
 void tiny_rgb_effector(void)
 {
+    uint8_t update = 0;
+    uint8_t index = rgbEffect.index;
+
+    if(index < RGB_EFFECT_MAX)
+    {
+        if(effectHandler[index] != 0)
+        {
+            update = effectHandler[index](&rgbEffect);
+        }
+    }
+
+    if(update)
+    {
+        ws2812_sendarray(tmprgbBuffer, CLED_ARRAY_SIZE);
+    }
 }
 
 void tiny_led_mode_change (LED_BLOCK ledblock, int mode)
@@ -808,20 +1388,37 @@ void TinyInitTimer(void)
     timer1PWMBOn();
 }
 
+void TinyInitCfg(void)
+{
+    tinyConfig.comm_init = 0;
+    memset(rgbBuffer, 0, sizeof(CLED_NUM * CLED_ELEMENT));
+    NCSLock = rgbBuffer[0];           // 0'st RGB is NCR indicator 
+}
+
+void TinyInitEffect(void)
+{
+    // init effect. firstly go to boot hid mode
+    rgbmodeIndex = 0;
+    tiny_rgb_set_effect(rgbmodeIndex);
+}
+
 int main(void)
 {
     uint8_t i = 0;
     uint8_t *pTmp;
     uint8_t rcvlen;
 
-    uint16_t count = 0;
+    uint8_t level = 0, dir = 0;
+    //uint8_t pos = 0;
 
-    tinyConfig.comm_init = 0;
-    memset(rgbBuffer, 0, sizeof(CLED_NUM * CLED_ELEMENT));
-    NCSLock = rgbBuffer[0];           // 0'st RGB is NCR indicator 
+    uint16_t count = 0;
+    uint16_t effect_count = 0;
 
     TinyInitHW();
     TinyInitTimer();
+
+    TinyInitCfg();
+    TinyInitEffect();
 
     sei();
 
@@ -843,21 +1440,30 @@ int main(void)
         }
         else
         {
+            count++;
+            effect_count++;
             if(tinyConfig.comm_init)
             {
-                if(++count%250 == 0)
+                if(count%250 == 0)
                 {
-                    tiny_blink(0);
-                    tiny_fader();
+                    tiny_led_blink(0);
+                    tiny_led_fader();
+                }
+
+                if(effect_count%1500 == 0)
+                {
                     tiny_rgb_effector();
                 }
             }
             else
             {
+
+                if(effect_count%2500 == 0)
+                {
+                    tiny_rgb_effector();
+                }
             }
         }
-        //PORTB |= (1<<PB4);
-        //blink();
 
     }
 
