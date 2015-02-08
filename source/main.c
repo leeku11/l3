@@ -321,7 +321,6 @@ updateConf();       // should be removed
     tinyExist = establishSlaveComm();
     
     tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (tinycmd_led_type *)kbdConf.rgb_preset);
-    
     updateConf();
 }
 

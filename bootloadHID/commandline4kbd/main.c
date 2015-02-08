@@ -20,6 +20,9 @@
 #define IDENT_PRODUCT_STRING    "L3"
 
 #define DBG_PRINTF printf
+#define HIDDEBUG
+
+typedef unsigned char uint8_t;
 /* ------------------------------------------------------------------------- */
 
 static char dataBuffer[131072 + 256];    /* buffer for file data */
@@ -194,35 +197,26 @@ typedef struct bootCmd{
 
 bootCmd_t cmdData;
 
-typedef enum
-{
-    SET_CONFIG = 2,
-    SET_KEYMAP = 3,
-    SET_MACRO  = 4
-}BOOT_HID_CMD;
 
-static int setreport(char a, char b,char c,char d )
+static int sendDBGCmd(char *buffer)
 {
 usbDevice_t *dev = NULL;
 int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
-char buffer[8];
+
     if((err = usbOpenDevice(&dev, IDENT_VENDOR_NUM, IDENT_VENDOR_STRING, IDENT_PRODUCT_NUM, IDENT_PRODUCT_STRING, 1)) != 0){
         fprintf(stderr, "Error opening HIDBoot device: %s\n", usbErrorMessage(err));
         goto errorOccurred;
     }
-    len = sizeof(bootCmd_t);
+    len = 8;
 
     buffer[0] = 1;      // Report ID
     buffer[1] = 1;      // Command
-    buffer[2] = a;
-    buffer[3] = b;
-    buffer[4] = c;
-    buffer[5] = d;
     
     if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, buffer, 8)) != 0){
         fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
         goto errorOccurred;
         }
+    printf("cmd : [%d][%d][%d][%d][%d][%d][%d][%d] :length %d Sent \n", buffer[0],buffer[1],buffer[2],buffer[3],buffer[4],buffer[5],buffer[6],buffer[7], len);
     
         fflush(stdout);
     errorOccurred:
@@ -382,22 +376,43 @@ int strtoi(char *str, int nsystem)
     return result;
 }
 
+#define MAX_RGB_CHAIN       20
+
 typedef struct kbd_conf
 {
-    uint8_t ps2usb_mode;                    // 0: PS2, 1: USB
-    uint8_t keymapLayerIndex;                     // KEYMAP layer index;
-    uint8_t swapCtrlCaps;                   // 1: Swap Capslock <-> Left Ctrl
-    uint8_t swapAltGui;                     // 1: Swap Alt <-> GUI(WIN) 
-    uint8_t led_preset_index;               // LED effect  preset index
-    uint8_t led_preset[3][5];               // Block configuration for LED effect  preset
-    uint8_t rgb_preset_index;               // RGB effect preset
-    uint8_t rgb_chain;                      // RGB5050 numbers (H/W dependent)
-    uint8_t rgb_preset[MAX_RGB_CHAIN][3];   // Chain color
+    unsigned char ps2usb_mode;                    // 0: PS2, 1: USB
+    unsigned char keymapLayerIndex;                     // KEYMAP layer index;
+    unsigned char swapCtrlCaps;                   // 1: Swap Capslock <-> Left Ctrl
+    unsigned char swapAltGui;                     // 1: Swap Alt <-> GUI(WIN) 
+    unsigned char led_preset_index;               // LED effect  preset index
+    unsigned char led_preset[3][5];               // Block configuration for LED effect  preset
+    unsigned char rgb_preset_index;               // RGB effect preset
+    unsigned char rgb_chain;                      // RGB5050 numbers (H/W dependent)
+    unsigned char rgb_preset[MAX_RGB_CHAIN][3];   // Chain color
 }kbd_configuration_t;
 
 kbd_configuration_t kbdConf;
 
-#define MAX_RGB_CHAIN       20
+
+typedef struct HIDCMD_debug{
+    uint8_t reportID;
+    uint8_t cmd;
+    uint8_t subcmd;
+    uint8_t arg2;   
+    uint8_t arg3;
+    uint8_t arg4;
+    uint8_t arg5;
+    uint8_t arg6;
+}HIDCMD_debug_t;
+
+typedef enum
+{
+    CMD_DEBUG = 1,
+    CMD_CONFIG = 2,
+    CMD_KEYMAP = 3,
+    CMD_MACRO  = 4
+}BOOT_HID_CMD;
+
 
 typedef enum
 {
@@ -415,12 +430,12 @@ typedef enum
 
 int setConfig(void)
 {
-    static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING, LED_EFFECT_FADING},
+    static unsigned char tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING, LED_EFFECT_FADING},
                     {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING_PUSH_ON, LED_EFFECT_FADING_PUSH_ON},
                     {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSH_OFF, LED_EFFECT_PUSH_OFF}};
 
 
-    static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] = {{200,0,0},{200,0,50},{200,0,100},{200,0,150},{200,0,200},
+    static unsigned char tmprgp_preset[MAX_RGB_CHAIN][3] = {{200,0,0},{200,0,50},{200,0,100},{200,0,150},{200,0,200},
                     {0,200,0},{0,200,50},{0,200,100},{0,200,150},{0,200,200},
                     {0,0,200},{50,0,200},{100,0,200},{150,0,200},{200,0,200},
                     {200,0,0},{200,50,0},{200,100,0},{200,150,0},{200,200,0}};
@@ -430,10 +445,10 @@ int setConfig(void)
     kbdConf.keymapLayerIndex = 0;
     kbdConf.swapCtrlCaps = 0;
     kbdConf.swapAltGui = 0;
-    kbdConf.led_preset_index = 0;
+    kbdConf.led_preset_index = 2;
     memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
-    kbdConf.rgb_preset_index = 0;
-    kbdConf.rgb_chain = 14;
+    kbdConf.rgb_preset_index = 1;
+    kbdConf.rgb_chain = MAX_RGB_CHAIN;
     memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
 
 
@@ -490,8 +505,28 @@ return 0;
     // if no file was given, endAddress is less than startAddress and no data is uploaded
 #endif
 
-#ifdef HIDDEBUG
-    setreport(strtoi(argv[1], 10), strtoi(argv[2], 10), strtoi(argv[3], 10), strtoi(argv[4], 10));
+#if 1
+    setConfig();
+    return 1;
+#endif
+
+#if 0 //def HIDDEBUG
+    HIDCMD_debug_t dbgCmd;
+    unsigned char buffer[8];
+
+
+if (strtoi(argv[1], 10) == CMD_DEBUG)
+    buffer[0] = 1;      // Report ID
+    buffer[1] = strtoi(argv[1], 10);    // Command
+    buffer[2] = strtoi(argv[2], 10);    // SubCmd
+    buffer[3] = strtoi(argv[3], 10);    // arg3
+    buffer[4] = strtoi(argv[4], 10);    // arg4
+    buffer[5] = strtoi(argv[5], 10);    // arg5
+    buffer[6] = strtoi(argv[6], 10);    // arg6
+    buffer[7] = strtoi(argv[7], 10);    // arg7
+    
+
+    sendDBGCmd(buffer);
     return 1;
 #endif
     cmdData.cmd = strtoi(argv[1], 10);

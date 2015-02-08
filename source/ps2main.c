@@ -228,29 +228,29 @@ int processRX(void)
             // Reflect LED states to PD0~2
             // scroll lock
             if(rxed & 0x01){
-                LEDstate |= LED_SCROLL;
+                gLEDstate |= LED_SCROLL;
             }else{          
-                LEDstate &= ~LED_SCROLL;
+                gLEDstate &= ~LED_SCROLL;
             }
     
             // num lock
             if(rxed & 0x02){
-                LEDstate |= LED_NUM;
+                gLEDstate |= LED_NUM;
             }else{
-                LEDstate &= ~LED_NUM;
+                gLEDstate &= ~LED_NUM;
             }
             
             // capslock
             if(rxed & 0x04)
             {
-                LEDstate |= LED_CAPS;
+                gLEDstate |= LED_CAPS;
             }
             else
             {
-                LEDstate &= ~LED_CAPS;
+                gLEDstate &= ~LED_CAPS;
             }
     
-            led_3lockupdate(LEDstate);
+            led_3lockupdate(gLEDstate);
             tx_state(0xFA, STA_NORMAL);
             break;
 

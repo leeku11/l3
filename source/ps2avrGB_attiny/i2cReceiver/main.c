@@ -234,7 +234,7 @@ uint8_t rgb_effect_basic(rgb_effect_param_type *p_effect)
     tmprgbBuffer[i][2] = NCSLock[2];
     i++;
 
-    for(; i < CLED_NUM; i++)
+    for(i = 1; i < CLED_NUM; i++)
     {
         for(j = 0; j < 3; j++)
         {
@@ -267,7 +267,7 @@ uint8_t rgb_effect_basic_loop(rgb_effect_param_type *p_effect)
     rgb[1] = rgbBuffer[p_effect->cnt + i][1];
     rgb[2] = rgbBuffer[p_effect->cnt + i][2];
 
-    for(; i < CLED_NUM; i++)
+    for(i = 1; i < CLED_NUM; i++)
     {
         for(j = 0; j < 3; j++)
         {
@@ -312,7 +312,7 @@ uint8_t rgb_effect_fade_inout(rgb_effect_param_type *p_effect)
     max = 0;
     if(p_effect->dir == 0) // ASCENDING
     {
-        for(; i < CLED_NUM; i++)
+        for(i = 1; i < CLED_NUM; i++)
         {
             for(j = 0; j < 3; j++)
             {
@@ -425,7 +425,7 @@ uint8_t rgb_effect_fade_inout_buf(rgb_effect_param_type *p_effect)
     max = 0;
     if(p_effect->dir == 0) // ASCENDING
     {
-        for(; i < CLED_NUM; i++)
+        for(i = 1; i < CLED_NUM; i++)
         {
             for(j = 0; j < 3; j++)
             {
@@ -543,7 +543,7 @@ uint8_t rgb_effect_fade_inout_loop(rgb_effect_param_type *p_effect)
     max = 0;
     if(p_effect->dir == 0) // ASCENDING
     {
-        for(; i < CLED_NUM; i++)
+        for(i = 1; i < CLED_NUM; i++)
         {
             for(j = 0; j < 3; j++)
             {
@@ -700,21 +700,22 @@ uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_three_lock_req_type *p_three_lock_req = (tinycmd_three_lock_req_type *)p_req;
 
-    NCSLock[0] = 0;
-    NCSLock[1] = 0;
-    NCSLock[2] = 0;
+    tmprgbBuffer[0][0] = NCSLock[0] = 0;
+    tmprgbBuffer[0][1] = NCSLock[1] = 0;
+    tmprgbBuffer[0][2] = NCSLock[2] = 0;
     
     if(p_three_lock_req->lock & (1<<2))
     {
-        NCSLock[0] = 240;
+        tmprgbBuffer[0][0] = NCSLock[0] = 240;
+
     }
     if(p_three_lock_req->lock & (1<<1))
     {
-        NCSLock[1] = 240;
+        tmprgbBuffer[0][1] = NCSLock[2] = 240;
     }
     if(p_three_lock_req->lock & (1<<0))
     {
-        NCSLock[2] = 240;
+        tmprgbBuffer[0][2] = NCSLock[2] = 240;
     }
 
     ws2812_sendarray(NCSLock,CLED_ELEMENT);        // output message data to port D
@@ -1362,7 +1363,7 @@ int main(void)
             effect_count++;
             if(tinyConfig.comm_init)
             {
-                if(count%250 == 0)
+                if(count%150 == 0)
                 {
                     tiny_led_blink(scanDirty);
                     tiny_led_fader();

@@ -36,8 +36,6 @@ uint8_t ledmode[LEDMODE_INDEX_MAX][LED_BLOCK_MAX] = {
     { 0, 0, 0, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS },
 };
 
-uint8_t LEDstate;     ///< current state of the LEDs
-
 static uint8_t speed[LED_BLOCK_MAX] = {0, 0, 0, 5, 5};
 static uint8_t brigspeed[LED_BLOCK_MAX] = {0, 0, 0, 3, 3};
 static uint8_t pwmDir[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
@@ -362,10 +360,12 @@ void led_mode_init(void)
         led_mode_change(ledblock, ledmode[ledmodeIndex][ledblock]);
     }
     
-    led_3lockupdate(LEDstate);
+    led_3lockupdate(gLEDstate);
 
 #ifdef LED_CONTROL_SLAVE
     tinycmd_led_preset_config((uint8_t*)ledmode);
+    tinycmd_led_set_effect(kbdConf.led_preset_index);
+
 #endif // LED_CONTROL_SLAVE
 }
 

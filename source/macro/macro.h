@@ -6,6 +6,7 @@ extern uint8_t initMacroAddr(void);
 extern void playMacroUSB(uint8_t macrokey);
 extern void playMacroPS2(uint8_t macrokey);
 extern void recordMacro(uint8_t macrokey);
+extern void sendMatrix(char col, char row);
 void resetMacro(void);
 
 

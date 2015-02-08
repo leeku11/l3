@@ -40,7 +40,7 @@ typedef enum
 #define PUSHED_LEVEL_MAX        20
 
 extern uint8_t tinyExist;
-extern uint8_t LEDstate;     ///< current state of the LEDs
+extern volatile uint8_t gLEDstate;     ///< current state of the LEDs
 extern uint8_t ledmodeIndex;
 extern uint8_t ledmode[LEDMODE_INDEX_MAX][LED_BLOCK_MAX];
 void led_blink(int matrixState);

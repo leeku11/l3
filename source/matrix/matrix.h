@@ -5,6 +5,12 @@
 
 #define DEBOUNCE_MAX        4           // 10 is 5ms at 12MHz XTAL
 
+typedef enum HID_REPORT_MODE{
+    HID_REPORT_KEY = 1,
+    HID_REPORT_MATRIX = 2,
+}HID_REPORT_MODE_E;
+
+
 #define keylayer(layer)  (KEYMAP_LAYER0 + (0x100 * layer))
 
 extern uint32_t MATRIX[MAX_COL];

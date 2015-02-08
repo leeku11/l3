@@ -321,7 +321,7 @@ uint8_t scanmatrix(void)
          if (kbdsleepmode == 1)
          {
              led_mode_init();
-             led_3lockupdate(LEDstate);
+             led_3lockupdate(gLEDstate);
              kbdsleepmode = 0;
          }
       }
@@ -461,6 +461,8 @@ uint8_t swap_key(uint8_t keyidx)
     return keyidx;
 }
 
+static uint8_t gDirty;
+
 // return : key modified
 uint8_t scankey(void)
 {
@@ -474,7 +476,12 @@ uint8_t scankey(void)
     long keyaddr;
 
     matrixState = scanmatrix();
-
+    if(matrixState != gDirty)
+    {
+        gDirty = matrixState;
+        tinycmd_dirty(matrixState);
+    }
+    
    if (matrixState == 0 && isFNpushed > 0)
    {
       isFNpushed--;
@@ -499,23 +506,20 @@ uint8_t scankey(void)
         prev = MATRIX[col];
         cur  = curMATRIX[col];
         MATRIX[col] = curMATRIX[col];
-		for(i = 0; i < MAX_ROW; i++)
+		for(row = 0; row < MAX_ROW; row++)
 		{
             prevBit = (uint8_t)(prev & 0x01);
             curBit = (uint8_t)(cur & 0x01);
             prev >>= 1;
             cur >>= 1;
 
-            row = i;
+            if (reportMatrix == HID_REPORT_MATRIX)
+            {
+                if(prevBit && !curBit)
+                    sendMatrix(col, row);
+                continue;
+            }
 
-            //keyaddr = 0x6000; //keymap[t_layer];
-//            keymap[t_layer] = 0X6000;
-//            keyaddr = keymap[t_layer];
-//            keyaddr += col*MAX_ROW;
-//            keyaddr += row;
-
- //           keyidx = pgm_read_byte(keyaddr); //keymap[t_layer]+(col*MAX_ROW)+row);
- //           keyidx = pgm_read_byte(keymap[t_layer]+(col*MAX_ROW)+row);
 
             if(t_layer != KEY_LAYER_FN)
                 keyidx = currentLayer[col][row];

@@ -323,11 +323,27 @@ void sendString(char* string) {
     clearKey();
 }
 
-
-uint8_t getkey(uint8_t key, uint16_t index)
+void sendMatrix(char col, char row)
 {
+    Key a;
+    
+    a.mode = 0;
+    a.key = K_A + col;
+    sendKey(a);
 
+    a.key = K_MINUS;
+    sendKey(a);
+
+    a.key = K_A + row;
+    sendKey(a);
+
+    a.key = K_SPACE;
+    sendKey(a);
+
+    clearKey();
 }
+
+
 void playMacroUSB(uint8_t macrokey)
 {
     uint8_t i;

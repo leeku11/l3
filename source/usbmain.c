@@ -34,7 +34,14 @@ static uint8_t keyboardReport[8]; ///< buffer for HID reports
 static uint8_t oldReportBuffer[8]; ///< buufer for HID reports save on Overflower
 uint8_t reportIndex; // keyboardReport[0] contains modifiers
 
+typedef enum HID_DEBUG_SUB_CMD{
+    HID_DEBUG_LED,
+    HID_DEBUG_RGB,
+    HID_DEBUG_KEYMAPER,
+}HID_DEBUG_SUB_CMD_E;
 
+
+uint8_t reportMatrix = 0 ;
 
 report_extra_t extraReport;
 report_extra_t oldextraReport;
@@ -388,12 +395,12 @@ typedef enum
 typedef struct HIDCMD_debug{
     uint8_t reportID;
     uint8_t cmd;
-    uint8_t arg1;
-    uint8_t arg2;   
+    uint8_t subcmd;
     uint8_t arg3;
     uint8_t arg4;
     uint8_t arg5;
     uint8_t arg6;
+    uint8_t arg7;
 }HIDCMD_debug_t;
 
 
@@ -415,9 +422,9 @@ typedef struct HIDCMD_keymap{
     uint8_t index;
     uint8_t row;   
     uint8_t col;
-    uint8_t rsvd4;
-    uint8_t rsvd5;
+    uint8_t reportMatrix;
     uint8_t rsvd6;
+    uint8_t rsvd7;
 }HIDCMD_keymap_t;
 
 typedef struct HIDCMD_macro{
@@ -515,7 +522,6 @@ uint8_t rxHIDCmd(void)
             {
                 eeprom_update_block(&hidData.data[0], EEPADDR_KBD_CONF, sizeof(kbdConf));
                 tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (tinycmd_led_type *)kbdConf.rgb_preset);
-                tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, &kbdConf.rgb_effect_param);
             }
             break;
         case CMD_KEYMAP :
@@ -629,6 +635,34 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
     return 0;
 }
 
+uint8_t usbFuncDebugCmdHandler(void)
+{
+
+    switch (hidCmd.debug.subcmd)
+    {
+        case HID_DEBUG_LED: 
+
+            break;
+        case HID_DEBUG_RGB: 
+            if(hidCmd.debug.arg3 < 20)
+            {
+                tinycmd_rgb_pos(hidCmd.debug.arg3, hidCmd.debug.arg4, hidCmd.debug.arg5, hidCmd.debug.arg6);
+            }else if(hidCmd.debug.arg3 == 21)
+            {
+                tinycmd_rgb_range(hidCmd.debug.arg4, hidCmd.debug.arg5, hidCmd.debug.arg6, hidCmd.debug.arg7, 0);
+            }else
+            {
+                tinycmd_rgb_all(1, hidCmd.debug.arg3, hidCmd.debug.arg4, hidCmd.debug.arg5);
+            }
+            break;
+        case HID_DEBUG_KEYMAPER: 
+            reportMatrix = hidCmd.debug.arg3;
+            break;
+    }
+
+}
+
+volatile uint8_t gLEDstate;     ///< current state of the LEDs
 
 /**
  * The write function is called when LEDs should be set. Normally, we get only
@@ -640,35 +674,36 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
 uint8_t usbFunctionWrite(uchar *data, uchar len) 
 {
     uint8_t result;
-    
-    if (expectReport && (len == 1)) {
-        if(LEDstate != data[0])
+    uint8_t LEDstate;
+
+    if ((expectReport) && (len == 1)) {
+        
+        LEDstate = (data[0] & LED_NUM) | (data[0] & LED_CAPS) | (data[0] & LED_SCROLL);
+        if(gLEDstate != LEDstate)
         {
-            LEDstate = data[0]; // Get the state of all 5 LEDs
-            led_3lockupdate(data[0]);
+            gLEDstate = LEDstate;            // Get the state of all 5 LEDs
+            led_3lockupdate(LEDstate);
         }
         expectReport = 0;
         result = 1;     // last block received
     }else if (expectReport == 2){
+    
         memcpy(&hidCmd, &data[0], len);
-        result = 1;     // last block received
 #ifdef HID_DEBUG_CMD
         if(hidCmd.debug.cmd == CMD_DEBUG)
         {
-            //tinycmd_rgb_all(6, 100, 100, 100);
-            //do simple thig
-            if(hidCmd.debug.arg1 < 20)
-            {
-                tinycmd_rgb_pos(hidCmd.debug.arg1, hidCmd.debug.arg2, hidCmd.debug.arg3, hidCmd.debug.arg4);
-            }else if(hidCmd.debug.arg1 == 21)
-            {
-                tinycmd_rgb_range(hidCmd.debug.arg2, hidCmd.debug.arg3, hidCmd.debug.arg4, 0, 0);
-            }else
-            {
-                tinycmd_rgb_all(1, hidCmd.debug.arg2, hidCmd.debug.arg3, hidCmd.debug.arg4);
-            }
-        }
+            usbFuncDebugCmdHandler();
+
+        }else
 #endif
+            {
+            if(hidCmd.keymap.cmd == CMD_KEYMAP)
+            {
+                reportMatrix = hidCmd.keymap.reportMatrix;
+            }
+            result = 1;     // last block received
+        }
+
     }else if (expectReport == 3)
     {
         
@@ -763,7 +798,7 @@ uint8_t cmpReportBuffer(void)
 uint8_t usbRollOver = 0;
 
 // _lkh debug
-#if 0//def SUPPORT_TINY_CMD
+#if 1//def SUPPORT_TINY_CMD
 void rgb_set_effect_param(uint8_t effect, rgb_effect_param_type *p_param)
 {
     memset(p_param, 0, sizeof(rgb_effect_param_type));
@@ -877,7 +912,7 @@ uint8_t buildHIDreports(uint8_t keyidx)
         {
             keyboardReport[reportIndex] = keyidx; // set next available entry
             reportIndex++;
-#if 0//def SUPPORT_TINY_CMD
+#if 1//def SUPPORT_TINY_CMD
             {
                 switch(keyidx)
                 {
