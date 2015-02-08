@@ -345,37 +345,6 @@ uint8_t rgb_effect_fade_inout(rgb_effect_type *p_effect)
                     tmprgbBuffer[i][j] = p_effect->max_rgb[j];
                 }
             }
-#if 0            
-            if(p_effect->level < p_effect->g_max)
-            {
-                tmprgbBuffer[i][0] = p_effect->level;
-                max++;
-            }
-            else
-            {
-                tmprgbBuffer[i][0] = p_effect->g_max;
-            }
-            
-            if(p_effect->level < p_effect->r_max)
-            {
-                tmprgbBuffer[i][1] = p_effect->level;
-                max++;
-            }
-            else
-            {
-                tmprgbBuffer[i][0] = p_effect->b_max;
-            }
-            
-            if(p_effect->level < p_effect->b_max)
-            {
-                tmprgbBuffer[i][2] = p_effect->level;
-                max++;
-            }
-            else
-            {
-                tmprgbBuffer[i][0] = p_effect->r_max;
-            }
-#endif // end of #if 0
         }
 
         // If no update go to the sustain state
@@ -394,6 +363,21 @@ uint8_t rgb_effect_fade_inout(rgb_effect_type *p_effect)
                 p_effect->level++;
             }
             else if(p_effect->accel_mode == 1)
+            {
+                if(p_effect->level == 0)
+                {
+                    p_effect->level = 1;
+                }
+                else if(p_effect->level < 100)
+                {
+                    p_effect->level = 4 * p_effect->level;
+                }
+                else
+                {
+                    p_effect->level = 100;
+                }
+            }
+            else if(p_effect->accel_mode == 2)
             {
                 if(p_effect->level < 2)
                 {
@@ -435,35 +419,6 @@ uint8_t rgb_effect_fade_inout(rgb_effect_type *p_effect)
                     }
                 }
             }
-#if 0            
-            if(tmprgbBuffer[i][0] > 0)
-            {
-                tmprgbBuffer[i][0]--;
-                max++;
-            }
-            else
-            {
-                tmprgbBuffer[i][0] = 0;
-            }
-            if(tmprgbBuffer[i][1] > 0)
-            {
-                tmprgbBuffer[i][1]--;
-                max++;
-            }
-            else
-            {
-                tmprgbBuffer[i][1] = 0;
-            }
-            if(tmprgbBuffer[i][2] > 0)
-            {
-                tmprgbBuffer[i][2]--;
-                max++;
-            }
-            else
-            {
-                tmprgbBuffer[i][2] = 0;
-            }
-#endif // end of #if 0
         }
 
         p_effect->cnt++;
@@ -519,6 +474,21 @@ uint8_t rgb_effect_fade_inout_buf(rgb_effect_type *p_effect)
                     }
                 }
                 else if(p_effect->accel_mode == 1)
+                {
+                    if(tmprgbBuffer[i][j] == 0)
+                    {
+                        tmprgbBuffer[i][j] = 1;
+                    }
+                    else if(tmprgbBuffer[i][j] < limit)
+                    {
+                        tmprgbBuffer[i][j] = 4 * tmprgbBuffer[i][j];
+                    }
+                    else
+                    {
+                        tmprgbBuffer[i][j] = limit;
+                    }
+                }
+                else if(p_effect->accel_mode == 2)
                 {
                     if(tmprgbBuffer[i][j] < 2)
                     {
@@ -617,6 +587,21 @@ uint8_t rgb_effect_fade_inout_loop(rgb_effect_type *p_effect)
                     }
                 }
                 else if(p_effect->accel_mode == 1)
+                {
+                    if(tmprgbBuffer[i][j] == 0)
+                    {
+                        tmprgbBuffer[i][j] = 1;
+                    }
+                    else if(tmprgbBuffer[i][j] < limit)
+                    {
+                        tmprgbBuffer[i][j] = 4 * tmprgbBuffer[i][j];
+                    }
+                    else
+                    {
+                        tmprgbBuffer[i][j] = limit;
+                    }
+                }
+                else if(p_effect->accel_mode == 2)
                 {
                     if(tmprgbBuffer[i][j] < 2)
                     {
@@ -1294,7 +1279,7 @@ void tiny_rgb_set_effect(uint8_t effect)
         //rgbEffect.hcnt = 0;
         //rgbEffect.lcnt = 0;
     }
-    else if((effect == RGB_EFFECT_FADE) || (effect == RGB_EFFECT_FADE) || (effect == RGB_EFFECT_FADE_LOOP))
+    else if((effect == RGB_EFFECT_FADE) || (effect == RGB_EFFECT_FADE_BUF) || (effect == RGB_EFFECT_FADE_LOOP))
     {
         rgbEffect.index = effect;
         rgbEffect.max.r = 100;
