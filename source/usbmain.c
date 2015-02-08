@@ -795,7 +795,7 @@ uint8_t buildHIDreports(uint8_t keyidx)
         {
             keyboardReport[reportIndex] = keyidx; // set next available entry
             reportIndex++;
-#ifdef SUPPORT_TINY_CMD
+#if 0//def SUPPORT_TINY_CMD
             {
                 switch(keyidx)
                 {
