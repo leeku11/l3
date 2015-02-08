@@ -87,9 +87,9 @@ enum
     RGB_EFFECT_FADE,
     RGB_EFFECT_FADE_BUF,
     RGB_EFFECT_FADE_LOOP,
-    RGB_EFFECT_HEARTBIT,
-    RGB_EFFECT_HEARTBIT_BUF,
-    RGB_EFFECT_HEARTBIT_LOOP,
+    RGB_EFFECT_HEARTBEAT,
+    RGB_EFFECT_HEARTBEAT_BUF,
+    RGB_EFFECT_HEARTBEAT_LOOP,
     RGB_EFFECT_SWIPE,
     RGB_EFFECT_SWIPE_BUF,
     RGB_EFFECT_SWIPE_LOOP,
@@ -136,6 +136,7 @@ uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_rgb_all(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_rgb_pos(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_rgb_range(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_rgb_buffer(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_rgb_set_effect(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_rgb_set_preset(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_led_level(tinycmd_pkt_req_type *p_req);
@@ -155,6 +156,7 @@ const tinycmd_handler_array_type cmdhandler[] = {
     {TINY_CMD_RGB_ALL_F,handlecmd_rgb_all},                // TINY_CMD_RGB_ALL_F
     {TINY_CMD_RGB_POS_F,handlecmd_rgb_pos},                // TINY_CMD_RGB_POS_F
     {TINY_CMD_RGB_RANGE_F,handlecmd_rgb_range},              // TINY_CMD_RGB_RANGE_F
+    {TINY_CMD_RGB_BUFFER_F,handlecmd_rgb_buffer},              // TINY_CMD_RGB_BUFFER_F
     {TINY_CMD_RGB_SET_EFFECT_F,handlecmd_rgb_set_effect},         // TINY_CMD_RGB_SET_EFFECT_F
     {TINY_CMD_RGB_SET_PRESET_F,handlecmd_rgb_set_preset},         // TINY_CMD_RGB_SET_PRESET_F
 
@@ -174,15 +176,15 @@ uint8_t rgb_effect_fade_inout_buf(rgb_effect_type *p_effect);
 uint8_t rgb_effect_fade_inout_loop(rgb_effect_type *p_effect);
 
 const tiny_effector_func effectHandler[] = {
-    rgb_effect_basic,              // RGB_EFFECT_BOOTHID
+    rgb_effect_fade_inout,         // RGB_EFFECT_BOOTHID
     rgb_effect_basic,              // RGB_EFFECT_BASIC
     rgb_effect_basic_loop,         // RGB_EFFECT_BASIC_LOOP
     rgb_effect_fade_inout,         // RGB_EFFECT_FADE
     rgb_effect_fade_inout_buf,     // RGB_EFFECT_FADE_BUF
     rgb_effect_fade_inout_loop,    // RGB_EFFECT_FADE_LOOP
-    rgb_effect_fade_inout,         // RGB_EFFECT_HEARTBIT
-    rgb_effect_fade_inout_buf,     // RGB_EFFECT_HEARTBIT_BUF
-    rgb_effect_fade_inout_loop,    // RGB_EFFECT_HEARTBIT_LOOP
+    rgb_effect_fade_inout,         // RGB_EFFECT_HEARTBEAT
+    rgb_effect_fade_inout_buf,     // RGB_EFFECT_HEARTBEAT_BUF
+    rgb_effect_fade_inout_loop,    // RGB_EFFECT_HEARTBEAT_LOOP
     rgb_effect_null,               // RGB_EFFECT_SWIPE
     rgb_effect_null,               // RGB_EFFECT_SWIPE_BUF
     rgb_effect_null,               // RGB_EFFECT_SWIPE_LOOP
@@ -293,7 +295,7 @@ uint8_t rgb_effect_basic_loop(rgb_effect_type *p_effect)
     {
         for(j = 0; j < 3; j++)
         {
-            p_effect->level = rgbBuffer[i][j];
+            p_effect->level = rgb[j];
             if(p_effect->level < p_effect->max_rgb[j])
             {
                 tmprgbBuffer[i][j] = p_effect->level;
@@ -414,14 +416,23 @@ uint8_t rgb_effect_fade_inout(rgb_effect_type *p_effect)
         {
             for(j = 0; j < 3; j++)
             {
-                if(tmprgbBuffer[i][j] > 0)
+#if 0
+                if(p_effect->accel_mode == 1 && p_effect->cnt%2)
                 {
-                    tmprgbBuffer[i][j]--;
                     max++;
                 }
                 else
+#endif
                 {
-                    tmprgbBuffer[i][j] = 0;
+                    if(tmprgbBuffer[i][j] > 0)
+                    {
+                        tmprgbBuffer[i][j]--;
+                        max++;
+                    }
+                    else
+                    {
+                        tmprgbBuffer[i][j] = 0;
+                    }
                 }
             }
 #if 0            
@@ -454,6 +465,8 @@ uint8_t rgb_effect_fade_inout(rgb_effect_type *p_effect)
             }
 #endif // end of #if 0
         }
+
+        p_effect->cnt++;
 
         if(max == 0)
         {
@@ -771,21 +784,44 @@ uint8_t handlecmd_rgb_pos(tinycmd_pkt_req_type *p_req)
 uint8_t handlecmd_rgb_range(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_rgb_range_req_type *p_rgb_range_req = (tinycmd_rgb_range_req_type *)p_req;
-    uint8_t *pTmp, *pLed;
-    uint8_t i;
-    uint8_t tmpPos;
+    tinycmd_led_type *pLed; 
+    uint8_t i, tmpPos;
 
     // clear buffer
     rgb_array_clear();
 
     tmpPos = p_rgb_range_req->offset + 1;
-    pLed = (uint8_t *)p_rgb_range_req->led;
+    pLed = p_rgb_range_req->led;
 
     for(i = 0; i < p_rgb_range_req->num; i++)
     {
-        rgbBuffer[tmpPos+i][0] = *(pLed++);
-        rgbBuffer[tmpPos+i][1] = *(pLed++);
-        rgbBuffer[tmpPos+i][2] = *(pLed++);
+        rgbBuffer[tmpPos+i][0] = pLed[i].b;
+        rgbBuffer[tmpPos+i][1] = pLed[i].r;
+        rgbBuffer[tmpPos+i][2] = pLed[i].g;
+    }
+
+    ws2812_sendarray(rgbBuffer,rgbBufferLength);        // output message data to port D
+    
+    return 0;
+}
+
+uint8_t handlecmd_rgb_buffer(tinycmd_pkt_req_type *p_req)
+{
+    tinycmd_rgb_buffer_req_type *p_rgb_buffer_req = (tinycmd_rgb_buffer_req_type *)p_req;
+    tinycmd_led_type *pLed; 
+    uint8_t i, tmpPos;
+
+    // clear buffer
+    rgb_array_clear();
+
+    tmpPos = p_rgb_buffer_req->offset + 1;
+    pLed = p_rgb_buffer_req->led;
+
+    for(i = 0; i < p_rgb_buffer_req->num; i++)
+    {
+        rgbBuffer[tmpPos+i][0] = pLed[i].b;
+        rgbBuffer[tmpPos+i][1] = pLed[i].r;
+        rgbBuffer[tmpPos+i][2] = pLed[i].g;
     }
 
     ws2812_sendarray(rgbBuffer,rgbBufferLength);        // output message data to port D
@@ -1241,8 +1277,8 @@ void tiny_rgb_set_effect(uint8_t effect)
         rgbEffect.max.r = 50;
         //rgbEffect.max.g = 0;
         //rgbEffect.max.b = 0;
-        rgbEffect.high_hold = 10;
-        rgbEffect.low_hold = 400;
+        rgbEffect.high_hold = 25;
+        rgbEffect.low_hold = 12;
         rgbEffect.accel_mode = 1; // quadratic
         //rgbEffect.dir = 0;
         //rgbEffect.level = 0;
@@ -1256,8 +1292,8 @@ void tiny_rgb_set_effect(uint8_t effect)
         rgbEffect.max.r = 70;
         rgbEffect.max.g = 70;
         rgbEffect.max.b = 70;
-        //rgbEffect.high_hold = 10;
-        //rgbEffect.low_hold = 400;
+        rgbEffect.high_hold = 100;
+        //rgbEffect.low_hold = 0;
         //rgbEffect.accel_mode = 0; // linear
         //rgbEffect.dir = 0;
         //rgbEffect.level = 0;
@@ -1268,11 +1304,11 @@ void tiny_rgb_set_effect(uint8_t effect)
     else if((effect == RGB_EFFECT_FADE) || (effect == RGB_EFFECT_FADE) || (effect == RGB_EFFECT_FADE_LOOP))
     {
         rgbEffect.index = effect;
-        rgbEffect.max.r = 70;
-        rgbEffect.max.g = 70;
-        rgbEffect.max.b = 70;
-        rgbEffect.high_hold = 5;
-        rgbEffect.low_hold = 200;
+        rgbEffect.max.r = 100;
+        rgbEffect.max.g = 100;
+        rgbEffect.max.b = 100;
+        rgbEffect.high_hold = 15;
+        rgbEffect.low_hold = 0;
         //rgbEffect.accel_mode = 0; // linear
         //rgbEffect.dir = 0;
         //rgbEffect.level = 0;
@@ -1280,14 +1316,14 @@ void tiny_rgb_set_effect(uint8_t effect)
         //rgbEffect.hcnt = 0;
         //rgbEffect.lcnt = 0;
     }
-    else if((effect == RGB_EFFECT_HEARTBIT) || (effect == RGB_EFFECT_HEARTBIT_BUF) || (effect == RGB_EFFECT_HEARTBIT_LOOP))
+    else if((effect == RGB_EFFECT_HEARTBEAT) || (effect == RGB_EFFECT_HEARTBEAT_BUF) || (effect == RGB_EFFECT_HEARTBEAT_LOOP))
     {
         rgbEffect.index = effect;
-        rgbEffect.max.r = 70;
-        rgbEffect.max.g = 70;
-        rgbEffect.max.b = 70;
-        //rgbEffect.high_hold = 0;
-        rgbEffect.low_hold = 250;
+        rgbEffect.max.r = 100;
+        rgbEffect.max.g = 100;
+        rgbEffect.max.b = 100;
+        rgbEffect.high_hold = 25;
+        rgbEffect.low_hold = 5;
         rgbEffect.accel_mode = 1; // quadratic
         //rgbEffect.dir = 0;
         //rgbEffect.level = 0;
@@ -1311,7 +1347,7 @@ void tiny_rgb_set_effect(uint8_t effect)
         //rgbEffect.lcnt = 0;
     }
 
-    memset(tmprgbBuffer[1], 0, CLED_ARRAY_SIZE);
+    memset(tmprgbBuffer, 0, CLED_ARRAY_SIZE);
 }
 
 void tiny_rgb_effector(void)
@@ -1450,7 +1486,7 @@ int main(void)
                     tiny_led_fader();
                 }
 
-                if(effect_count%1500 == 0)
+                if(effect_count%777 == 0)
                 {
                     tiny_rgb_effector();
                 }
@@ -1458,7 +1494,7 @@ int main(void)
             else
             {
 
-                if(effect_count%2500 == 0)
+                if(effect_count%1500 == 0)
                 {
                     tiny_rgb_effector();
                 }

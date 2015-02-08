@@ -133,25 +133,24 @@ void tinycmd_rgb_range(uint8_t num, uint8_t offset, uint8_t r, uint8_t g, uint8_
 void tinycmd_rgb_buffer(uint8_t num, uint8_t offset, tinycmd_led_type *led)
 {
     uint8_t i;
-    tinycmd_rgb_range_req_type *p_rgb_range_req = (tinycmd_rgb_range_req_type *)localBuffer;
+    tinycmd_rgb_buffer_req_type *p_rgb_buffer_req = (tinycmd_rgb_buffer_req_type *)localBuffer;
 
     //overflow
     if((offset + num) > TINYCMD_LED_MAX)
         return;
 
-    p_rgb_range_req->cmd_code = TINY_CMD_RGB_RANGE_F;
-    p_rgb_range_req->pkt_len = sizeof(tinycmd_rgb_range_req_type);
+    p_rgb_buffer_req->cmd_code = TINY_CMD_RGB_BUFFER_F;
+    p_rgb_buffer_req->pkt_len = sizeof(tinycmd_rgb_buffer_req_type);
 
-    p_rgb_range_req->num = num;
-    p_rgb_range_req->offset = offset;
-
+    p_rgb_buffer_req->num = num;
+    p_rgb_buffer_req->offset = offset;
     
-    for(i = 0; i < p_rgb_range_req->num; i++)
+    for(i = 0; i < p_rgb_buffer_req->num; i++)
     {
-       p_rgb_range_req->led[i] = *led++;
+       p_rgb_buffer_req->led[i] = *led++;
     }
 
-    i2cMasterSend(TARGET_ADDR, p_rgb_range_req->pkt_len, (uint8_t *)p_rgb_range_req);
+    i2cMasterSend(TARGET_ADDR, p_rgb_buffer_req->pkt_len, (uint8_t *)p_rgb_buffer_req);
 }
 
 

@@ -795,6 +795,79 @@ uint8_t buildHIDreports(uint8_t keyidx)
         {
             keyboardReport[reportIndex] = keyidx; // set next available entry
             reportIndex++;
+#ifdef SUPPORT_TINY_CMD
+            {
+                switch(keyidx)
+                {
+                    case K_F1:
+                        tinycmd_rgb_set_effect(0); // RGB_EFFECT_BOOTHID
+                        break;
+                    case K_F2:
+                        tinycmd_rgb_set_effect(1); // RGB_EFFECT_BASIC
+                        break;
+                    case K_F3:
+                        tinycmd_rgb_set_effect(2); // RGB_EFFECT_BASIC_LOOP
+                        break;
+                    case K_F4:
+                        tinycmd_rgb_set_effect(3); // RGB_EFFECT_FADE
+                        break;
+                    case K_F5:
+                        tinycmd_rgb_set_effect(4); // RGB_EFFECT_FADE_BUF
+                        break;
+                    case K_F6:
+                        tinycmd_rgb_set_effect(5); // RGB_EFFECT_FADE_LOOP
+                        break;
+                    case K_F7:
+                        tinycmd_rgb_set_effect(6); // RGB_EFFECT_HEARTBEAT
+                        break;
+                    case K_F8:
+                        tinycmd_rgb_set_effect(7); // RGB_EFFECT_HEARTBEAT_BUF
+                        break;
+                    case K_F9:
+                        tinycmd_rgb_set_effect(8); // RGB_EFFECT_HEARTBEAT_LOOP
+                        break;
+                    case K_F10:
+                        //tinycmd_rgb_set_effect(9); // RGB_EFFECT_SWIPE
+                        tinycmd_rgb_all(1, 100, 100, 0);
+                        break;
+                    case K_F11:
+                        //tinycmd_rgb_set_effect(10); // RGB_EFFECT_SWIPE_BUF
+                        tinycmd_rgb_all(1, 0, 100, 100);
+                        break;
+                    case K_F12:
+                        //tinycmd_rgb_set_effect(11); // RGB_EFFECT_SWIPE_LOOP
+                        //tinycmd_rgb_all(1, 100, 0, 100);
+                        {
+                            // fill test pattern
+                            static const tinycmd_led_type testled[20] = {
+                                {100, 0, 0},
+                                {0, 100, 0},
+                                {0, 0, 100},
+                                {100, 100, 0},
+                                {0, 100, 100},
+                                {100, 0, 100},
+                                {80, 80, 80},
+                                {50, 100, 150},
+                                {150, 50, 100},
+                                {100, 150, 50},
+                                {80, 80, 80},
+                                {50, 50, 100},
+                                {100, 50, 50},
+                                {50, 100, 50},
+                                {80, 80, 80},
+                                {30, 50, 120},
+                                {120, 30, 50},
+                                {50, 120, 30},
+                                {80, 80, 80},
+                                {30, 150, 30}
+                            };
+                            // set rgb leds
+                            tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (tinycmd_led_type *)testled);
+                        }
+                        break;
+                }
+            }
+#endif // SUPPORT_TINY_CMD
         }
         
     }    

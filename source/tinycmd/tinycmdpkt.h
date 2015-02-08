@@ -77,6 +77,16 @@ typedef struct
   tinycmd_led_type led[TINYCMD_LED_MAX];
 } tinycmd_rgb_range_req_type;
 
+// TINY_CMD_RGB_BUFFER_F
+typedef struct
+{
+  uint8_t cmd_code;
+  uint8_t pkt_len;
+  uint8_t num;
+  uint8_t offset;
+  tinycmd_led_type led[TINYCMD_LED_MAX];
+} tinycmd_rgb_buffer_req_type;
+
 // TINY_CMD_RGB_SET_EFFECT_F
 typedef struct
 {
