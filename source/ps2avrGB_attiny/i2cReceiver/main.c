@@ -808,21 +808,14 @@ uint8_t handlecmd_rgb_range(tinycmd_pkt_req_type *p_req)
 uint8_t handlecmd_rgb_buffer(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_rgb_buffer_req_type *p_rgb_buffer_req = (tinycmd_rgb_buffer_req_type *)p_req;
-    tinycmd_led_type *pLed; 
     uint8_t i, tmpPos;
 
     // clear buffer
     rgb_array_clear();
 
     tmpPos = p_rgb_buffer_req->offset + 1;
-    pLed = p_rgb_buffer_req->led;
 
-    for(i = 0; i < p_rgb_buffer_req->num; i++)
-    {
-        rgbBuffer[tmpPos+i][0] = pLed[i].b;
-        rgbBuffer[tmpPos+i][1] = pLed[i].r;
-        rgbBuffer[tmpPos+i][2] = pLed[i].g;
-    }
+    memcpy(rgbBuffer[tmpPos], p_rgb_buffer_req->data, p_rgb_buffer_req->num * CLED_ELEMENT);
 
     ws2812_sendarray(rgbBuffer,rgbBufferLength);        // output message data to port D
     

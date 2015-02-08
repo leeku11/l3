@@ -84,7 +84,7 @@ typedef struct
   uint8_t pkt_len;
   uint8_t num;
   uint8_t offset;
-  tinycmd_led_type led[TINYCMD_LED_MAX];
+  uint8_t data[TINYCMD_LED_MAX*3];
 } tinycmd_rgb_buffer_req_type;
 
 // TINY_CMD_RGB_SET_EFFECT_F

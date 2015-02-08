@@ -838,31 +838,8 @@ uint8_t buildHIDreports(uint8_t keyidx)
                         //tinycmd_rgb_set_effect(11); // RGB_EFFECT_SWIPE_LOOP
                         //tinycmd_rgb_all(1, 100, 0, 100);
                         {
-                            // fill test pattern
-                            static const tinycmd_led_type testled[20] = {
-                                {100, 0, 0},
-                                {0, 100, 0},
-                                {0, 0, 100},
-                                {100, 100, 0},
-                                {0, 100, 100},
-                                {100, 0, 100},
-                                {80, 80, 80},
-                                {50, 100, 150},
-                                {150, 50, 100},
-                                {100, 150, 50},
-                                {80, 80, 80},
-                                {50, 50, 100},
-                                {100, 50, 50},
-                                {50, 100, 50},
-                                {80, 80, 80},
-                                {30, 50, 120},
-                                {120, 30, 50},
-                                {50, 120, 30},
-                                {80, 80, 80},
-                                {30, 150, 30}
-                            };
                             // set rgb leds
-                            tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (tinycmd_led_type *)testled);
+                            tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (tinycmd_led_type *)kbdConf.rgb_preset);
                         }
                         break;
                 }
