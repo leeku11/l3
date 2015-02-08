@@ -7,12 +7,14 @@
 #define TINYCMD_THREE_LOCK_NUM        3
 #define TINYCMD_TEST_DATA_LEN         (TINYCMD_LED_MAX * 3 + TINYCMD_THREE_LOCK_NUM)
 
+#if 0
 enum {
   TINY_RESET_HARD = 0,
   TINY_RESET_SOFT,
   TINY_RESET_DATA,
   TINY_RESET_MAX
 } reset_type_e;
+#endif
 
 typedef struct
 {

@@ -39,9 +39,9 @@
 #define OFF                             0
 #define ON                              1
 
-#define ws2812_pin2  1
-#define ws2812_pin3  4	// PB4 -> OC1B
-//#define ws2812_pin4  5 //reset... do not use!!
+#define ws2812_pin2                     1
+#define ws2812_pin3                     4       // PB4 -> OC1B
+//#define ws2812_pin4                                      5           //reset... do not use!!
 
 #define DEBUG_LED_ON(p, o, r, g, b)    // rgb_pos_on(p, o, r, g, b)
 
@@ -70,31 +70,37 @@ enum
     RGB_EFFECT_MAX
 };
 
+typedef enum
+{
+    TINY_LED_PIN_BASE = 0,
+    TINY_LED_PIN_WASD,
+    TINY_LED_PIN_MAX
+}TINY_LED_BLOCK;    
+#define TINY_LED_BLOCK_MAX              TINY_LED_PIN_MAX
+
 // local data buffer
+uint8_t *NCSLock; // initial level
 uint8_t rgbBuffer[CLED_NUM][CLED_ELEMENT];
 uint8_t tmprgbBuffer[CLED_NUM][CLED_ELEMENT];
 uint8_t rgbBufferLength; // = CLED_ARRAY_SIZE;
 
 uint8_t cmdBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
 
-uint8_t *NCSLock; // initial level
+uint8_t tinyLedmodeIndex = 0;
+uint8_t tinyLedmode[LEDMODE_INDEX_MAX][TINY_LED_BLOCK_MAX];
 
-uint8_t ledmodeIndex = 0;
-uint8_t ledmode[LEDMODE_INDEX_MAX][LED_BLOCK_MAX];
+static uint8_t tinySpeed[TINY_LED_BLOCK_MAX] = {5, 5};
+static uint8_t tinyBrigspeed[TINY_LED_BLOCK_MAX] = {3, 3};
+static uint8_t tinyPwmDir[TINY_LED_BLOCK_MAX] = {0, 0};
+static uint16_t tinyPwmCounter[TINY_LED_BLOCK_MAX] = {0, 0};
 
-static uint8_t speed[LED_BLOCK_MAX] = {0, 0, 0, 5, 5};
-static uint8_t brigspeed[LED_BLOCK_MAX] = {0, 0, 0, 3, 3};
-static uint8_t pwmDir[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
-static uint16_t pwmCounter[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
+static uint16_t tinyPushedLevelStay[TINY_LED_BLOCK_MAX] = {0, 0};
+static uint8_t tinyPushedLevel[TINY_LED_BLOCK_MAX] = {0, 0};
+static uint16_t tinyPushedLevelDuty[TINY_LED_BLOCK_MAX] = {0, 0};
 
-static uint16_t pushedLevelStay[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
-static uint8_t pushedLevel[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
-static uint16_t pushedLevelDuty[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
-uint8_t LEDstate;     ///< current state of the LEDs
-
-uint8_t rgbmodeIndex = 0; // effect preset index
-rgb_effect_param_type rgbEffect; // current rgb effect
-//rgb_effect_param_type rgbEffectPreset[2];
+uint8_t tinyRgbmodeIndex = 0; // effect preset index
+rgb_effect_param_type tinyRgbEffect; // current rgb effect
+//rgb_effect_param_type tinyRgbEffectPreset[2];
 
 uint8_t scanDirty;
 
@@ -103,7 +109,7 @@ tiny_config_type tinyConfig;
 void key_led_control(uint8_t ch, uint8_t on);
 void key_led_pwm_on(uint8_t channel, uint8_t on);
 void key_led_pwm_duty(uint8_t channel, uint8_t duty);
-void tiny_led_mode_change (LED_BLOCK ledblock, int mode);
+void tiny_led_mode_change (TINY_LED_BLOCK ledblock, int mode);
 
 
 uint8_t handlecmd_ver(tinycmd_pkt_req_type *p_req);
@@ -152,7 +158,7 @@ uint8_t rgb_effect_fade_inout_buf(rgb_effect_param_type *p_effect);
 uint8_t rgb_effect_fade_inout_loop(rgb_effect_param_type *p_effect);
 
 const tiny_effector_func effectHandler[] = {
-    rgb_effect_fade_inout,         // RGB_EFFECT_BOOTHID
+    rgb_effect_null,               // RGB_EFFECT_BOOTHID
     rgb_effect_basic,              // RGB_EFFECT_BASIC
     rgb_effect_basic_loop,         // RGB_EFFECT_BASIC_LOOP
     rgb_effect_fade_inout,         // RGB_EFFECT_FADE
@@ -167,17 +173,27 @@ const tiny_effector_func effectHandler[] = {
 };
 #define EFFECT_HANDLER_TABLE_SIZE            (sizeof(effectHandler)/sizeof(tiny_effector_func))
 
-void three_lock_state(uint8_t num, uint8_t caps, uint8_t scroll)
+#if 0
+void set_effect_temp(void)
 {
-    NCSLock[0] = num;
-    NCSLock[1] = caps;
-    NCSLock[2] = scroll;
+    tinyRgbmodeIndex = RGB_EFFECT_BASIC;
+    memset(&tinyRgbEffect, 0, sizeof(rgb_effect_param_type));
+    tinyRgbEffect.index = RGB_EFFECT_BASIC;
+    tinyRgbEffect.max.r = 50;
+    tinyRgbEffect.max.g = 50;
+    //tinyRgbEffect.max.b = 50;
+    //p_param->max.g = 0;
+    //p_param->max.b = 0;
+    //tinyRgbEffect.high_hold = 50;
+    //tinyRgbEffect.low_hold = 12;
+    //tinyRgbEffect.accel_mode = 1; // quadratic
+    //p_param->dir = 0;
+    //p_param->level = 0;
+    //p_param->cnt = 0;
+    //p_param->hcnt = 0;
+    //p_param->lcnt = 0;
 }
-
-void three_lock_update(void)
-{
-    ws2812_sendarray(NCSLock , CLED_ELEMENT);
-}
+#endif
 
 void rgb_array_clear(void)
 {
@@ -234,18 +250,17 @@ uint8_t rgb_effect_basic(rgb_effect_param_type *p_effect)
     tmprgbBuffer[i][2] = NCSLock[2];
     i++;
 
-    for(i = 1; i < CLED_NUM; i++)
+    for(; i < CLED_NUM; i++)
     {
         for(j = 0; j < 3; j++)
         {
-            p_effect->level = rgbBuffer[i][j];
-            if(p_effect->level < p_effect->max_rgb[j])
+            if(rgbBuffer[i][j] > p_effect->max_rgb[j])
             {
-                tmprgbBuffer[i][j] = p_effect->level;
+                tmprgbBuffer[i][j] = p_effect->max_rgb[j];
             }
             else
             {
-                tmprgbBuffer[i][j] = p_effect->max_rgb[j];
+                tmprgbBuffer[i][j] = rgbBuffer[i][j];
             }
         }
     }
@@ -258,6 +273,29 @@ uint8_t rgb_effect_basic_loop(rgb_effect_param_type *p_effect)
     uint8_t i = 0, j;
     uint8_t rgb[3];
 
+#if 0
+    uint8_t *addr = (uint8_t *)rgbBuffer[0];
+
+    tmprgbBuffer[i][0] = rgbBuffer[0][0];
+    tmprgbBuffer[i][1] = rgbBuffer[0][1];
+    tmprgbBuffer[i][2] = rgbBuffer[0][2];
+
+    if(NCSLock == 0)
+    {
+        rgb_array_on(1, 0, 100, 0);
+    }
+    else if(NCSLock != addr)
+    {
+        rgb_array_on(1, 100, 0, 0);
+    }
+    else
+    {
+        rgb_array_on(1, 0, 0, 100);
+    }
+
+    return 0;
+
+#else
     tmprgbBuffer[i][0] = NCSLock[0];
     tmprgbBuffer[i][1] = NCSLock[1];
     tmprgbBuffer[i][2] = NCSLock[2];
@@ -267,7 +305,7 @@ uint8_t rgb_effect_basic_loop(rgb_effect_param_type *p_effect)
     rgb[1] = rgbBuffer[p_effect->cnt + i][1];
     rgb[2] = rgbBuffer[p_effect->cnt + i][2];
 
-    for(i = 1; i < CLED_NUM; i++)
+    for(; i < CLED_NUM; i++)
     {
         for(j = 0; j < 3; j++)
         {
@@ -283,13 +321,15 @@ uint8_t rgb_effect_basic_loop(rgb_effect_param_type *p_effect)
         }
     }
 
-    if(++p_effect->hcnt == 0)
+    if(++p_effect->hcnt > p_effect->high_hold)
     {
+        p_effect->hcnt = 0;
         if(++p_effect->cnt == (CLED_NUM - 1))
         {
             p_effect->cnt = 0;
         }
     }
+#endif
 
     return 1;
 }
@@ -312,17 +352,12 @@ uint8_t rgb_effect_fade_inout(rgb_effect_param_type *p_effect)
     max = 0;
     if(p_effect->dir == 0) // ASCENDING
     {
-        for(i = 1; i < CLED_NUM; i++)
+        for(; i < CLED_NUM; i++)
         {
             for(j = 0; j < 3; j++)
             {
                 // read pixel level
                 limit = rgb[j];
-                // limit max level
-                if(limit > p_effect->max_rgb[j])
-                {
-                    limit = p_effect->max_rgb[j];
-                }
 
                 // increase level according to mode
                 if(p_effect->accel_mode == 0)
@@ -425,7 +460,7 @@ uint8_t rgb_effect_fade_inout_buf(rgb_effect_param_type *p_effect)
     max = 0;
     if(p_effect->dir == 0) // ASCENDING
     {
-        for(i = 1; i < CLED_NUM; i++)
+        for(; i < CLED_NUM; i++)
         {
             for(j = 0; j < 3; j++)
             {
@@ -543,7 +578,7 @@ uint8_t rgb_effect_fade_inout_loop(rgb_effect_param_type *p_effect)
     max = 0;
     if(p_effect->dir == 0) // ASCENDING
     {
-        for(i = 1; i < CLED_NUM; i++)
+        for(; i < CLED_NUM; i++)
         {
             for(j = 0; j < 3; j++)
             {
@@ -654,8 +689,8 @@ uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req)
     tinyConfig.rgb_num = p_config_req->rgb_num;
     tinyConfig.led_preset_num = p_config_req->led_preset_num;
 
-    ledmodeIndex = p_config_req->led_preset_index;
-    rgbmodeIndex = p_config_req->rgb_preset_index;
+    tinyLedmodeIndex = p_config_req->led_preset_index;
+    tinyRgbmodeIndex = p_config_req->rgb_preset_index;
     
     return 0;
 }
@@ -700,22 +735,21 @@ uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_three_lock_req_type *p_three_lock_req = (tinycmd_three_lock_req_type *)p_req;
 
-    tmprgbBuffer[0][0] = NCSLock[0] = 0;
-    tmprgbBuffer[0][1] = NCSLock[1] = 0;
-    tmprgbBuffer[0][2] = NCSLock[2] = 0;
+    NCSLock[0] = 0;
+    NCSLock[1] = 0;
+    NCSLock[2] = 0;
     
     if(p_three_lock_req->lock & (1<<2))
     {
-        tmprgbBuffer[0][0] = NCSLock[0] = 240;
-
+        NCSLock[0] = 240;
     }
     if(p_three_lock_req->lock & (1<<1))
     {
-        tmprgbBuffer[0][1] = NCSLock[2] = 240;
+        NCSLock[1] = 240;
     }
     if(p_three_lock_req->lock & (1<<0))
     {
-        tmprgbBuffer[0][2] = NCSLock[2] = 240;
+        NCSLock[2] = 240;
     }
 
     ws2812_sendarray(NCSLock,CLED_ELEMENT);        // output message data to port D
@@ -793,10 +827,13 @@ uint8_t handlecmd_rgb_buffer(tinycmd_pkt_req_type *p_req)
 uint8_t handlecmd_rgb_set_effect(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_rgb_set_effect_req_type *p_set_effect_req = (tinycmd_rgb_set_effect_req_type *)p_req;
-    rgbmodeIndex = p_set_effect_req->index;
-    rgbEffect = p_set_effect_req->effect_param;
-
+    tinyRgbmodeIndex = p_set_effect_req->index;
+    //tinyRgbEffect = p_set_effect_req->effect_param;
+    memcpy(&tinyRgbEffect, &p_set_effect_req->effect_param, sizeof(rgb_effect_param_type));
     memset(&tmprgbBuffer, 0, CLED_ARRAY_SIZE);
+
+    //temp
+    //set_effect_temp();
     
     return 0;
 }
@@ -823,7 +860,7 @@ uint8_t handlecmd_led_set_effect(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_led_set_effect_req_type *p_set_effect_req = (tinycmd_led_set_effect_req_type *)p_req;
 
-    ledmodeIndex = p_set_effect_req->preset;
+    tinyLedmodeIndex = p_set_effect_req->preset;
     
     return 0;
 }
@@ -831,8 +868,10 @@ uint8_t handlecmd_led_set_effect(tinycmd_pkt_req_type *p_req)
 uint8_t handlecmd_led_set_preset(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_led_set_preset_req_type *p_set_preset_req = (tinycmd_led_set_preset_req_type *)p_req;
+    uint8_t block;
 
-    ledmode[p_set_preset_req->preset][p_set_preset_req->block] = p_set_preset_req->effect;
+    block = p_set_preset_req->block - 3;
+    tinyLedmode[p_set_preset_req->preset][block] = p_set_preset_req->effect;
     
     return 0;
 }
@@ -841,9 +880,18 @@ uint8_t handlecmd_led_config_preset(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_led_config_preset_req_type *p_cfg_preset_req = (tinycmd_led_config_preset_req_type *)p_req;
     volatile uint16_t i2cTimeout;
-    LED_BLOCK ledblock;
+    uint8_t i, j;
+    uint8_t *pTmp = p_cfg_preset_req->data;
 
-    memcpy(ledmode, p_cfg_preset_req->data, sizeof(ledmode));
+    //memcpy(tinyLedmode, p_cfg_preset_req->data, sizeof(tinyLedmode));
+    for(i = 0; i < LEDMODE_INDEX_MAX; i++)
+    {
+        pTmp+=3;
+        for(j = 0; j < TINY_LED_BLOCK_MAX; j++)
+        {
+            tinyLedmode[i][j] = *pTmp++;
+        }
+    }    
 
     if((p_cfg_preset_req->cmd_code & TINY_CMD_RSP_MASK) != 0)
     {
@@ -860,14 +908,12 @@ uint8_t handlecmd_led_config_preset(tinycmd_pkt_req_type *p_req)
         p_gen_rsp->cmd_code = TINY_CMD_VER_F;
         p_gen_rsp->pkt_len = sizeof(tinycmd_rsp_type);
         i2c_reply_done(p_gen_rsp->pkt_len);
-
-        for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
+        for (i = 0; i < 2; i++)
         {
-            pwmDir[ledblock ] = 0;
-            pwmCounter[ledblock] = 0;
-            tiny_led_mode_change(ledblock, ledmode[ledmodeIndex][ledblock]);
+            tinyPwmDir[i] = 0;
+            tinyPwmCounter[i] = 0;
+            tiny_led_mode_change(i, tinyLedmode[tinyLedmodeIndex][i]);
         }
-
         tinyConfig.comm_init = 1;
     }
 
@@ -1004,19 +1050,14 @@ void key_led_pwm_duty(uint8_t channel, uint8_t duty)
     }
 }
 
-void tiny_led_off(LED_BLOCK block)
+void tiny_led_off(TINY_LED_BLOCK block)
 {
     switch(block)
     {
-        case LED_PIN_NUMLOCK:
-        case LED_PIN_CAPSLOCK:
-        case LED_PIN_SCROLLOCK:
-//            *(ledport[block]) |= BV(ledpin[block]);
-            break;
-        case LED_PIN_BASE:
+        case TINY_LED_PIN_BASE:
             PORTB &= ~(1<<PB1);
             break;
-        case LED_PIN_WASD:
+        case TINY_LED_PIN_WASD:
             PORTB &= ~(1<<PB4);
             break;                    
         default:
@@ -1024,19 +1065,14 @@ void tiny_led_off(LED_BLOCK block)
     }
 }
 
-void tiny_led_on(LED_BLOCK block)
+void tiny_led_on(TINY_LED_BLOCK block)
 {
     switch(block)
     {
-        case LED_PIN_NUMLOCK:
-        case LED_PIN_CAPSLOCK:
-        case LED_PIN_SCROLLOCK:
-//            *(ledport[block]) |= BV(ledpin[block]);
-            break;
-        case LED_PIN_BASE:
+        case TINY_LED_PIN_BASE:
             PORTB |= (1<<PB1);
             break;
-        case LED_PIN_WASD:
+        case TINY_LED_PIN_WASD:
             PORTB |= (1<<PB4);
             break;
         default:
@@ -1045,15 +1081,15 @@ void tiny_led_on(LED_BLOCK block)
     
 }
 
-void tiny_led_wave_on(LED_BLOCK block)
+void tiny_led_wave_on(TINY_LED_BLOCK block)
 {
     switch(block)
     {
-        case LED_PIN_BASE:
+        case TINY_LED_PIN_BASE:
             timer1PWMAOn();
             PORTB |= (1<<PB1);
             break;
-        case LED_PIN_WASD:
+        case TINY_LED_PIN_WASD:
             timer1PWMBOn();
             PORTB |= (1<<PB4);
             break;
@@ -1062,15 +1098,15 @@ void tiny_led_wave_on(LED_BLOCK block)
     }
 }
 
-void tiny_led_wave_off(LED_BLOCK block)
+void tiny_led_wave_off(TINY_LED_BLOCK block)
 {
     switch(block)
     {
-        case LED_PIN_BASE:
+        case TINY_LED_PIN_BASE:
             timer1PWMASet(PWM_DUTY_MIN);
             timer1PWMAOff();
             break;
-        case LED_PIN_WASD:
+        case TINY_LED_PIN_WASD:
             timer1PWMBSet(PWM_DUTY_MIN);
             timer1PWMBOff();
             break;
@@ -1082,14 +1118,14 @@ void tiny_led_wave_off(LED_BLOCK block)
 
 
 
-void tiny_led_wave_set(LED_BLOCK block, uint16_t duty)
+void tiny_led_wave_set(TINY_LED_BLOCK block, uint16_t duty)
 {
     switch(block)
     {
-        case LED_PIN_BASE:
+        case TINY_LED_PIN_BASE:
             timer1PWMASet(duty);
             break;
-        case LED_PIN_WASD:
+        case TINY_LED_PIN_WASD:
             timer1PWMBSet(duty);
             break;
        default:
@@ -1099,13 +1135,13 @@ void tiny_led_wave_set(LED_BLOCK block, uint16_t duty)
 
 void tiny_led_blink(int matrixState)
 {
-    LED_BLOCK ledblock;
+    TINY_LED_BLOCK ledblock;
 
-    for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
+    for (ledblock = TINY_LED_PIN_BASE; ledblock <= TINY_LED_PIN_WASD; ledblock++)
     {
         if(matrixState & SCAN_DIRTY)      // 1 or more key is pushed
         {
-            switch(ledmode[ledmodeIndex][ledblock])
+            switch(tinyLedmode[tinyLedmodeIndex][ledblock])
             {
 
                 case LED_EFFECT_FADING_PUSH_ON:
@@ -1123,7 +1159,7 @@ void tiny_led_blink(int matrixState)
         }
         else
         {          // none of keys is pushed
-            switch(ledmode[ledmodeIndex][ledblock])
+            switch(tinyLedmode[tinyLedmodeIndex][ledblock])
             {
                 case LED_EFFECT_FADING_PUSH_ON:
                 case LED_EFFECT_PUSH_ON:
@@ -1142,94 +1178,94 @@ void tiny_led_blink(int matrixState)
 void tiny_led_fader(void)
 {
     uint8_t ledblock;
-    for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
+    for (ledblock = TINY_LED_PIN_BASE; ledblock <= TINY_LED_PIN_WASD; ledblock++)
     {
-        if((ledmode[ledmodeIndex][ledblock] == LED_EFFECT_FADING)
-           || ((ledmode[ledmodeIndex][ledblock] == LED_EFFECT_FADING_PUSH_ON)))
+        if((tinyLedmode[tinyLedmodeIndex][ledblock] == LED_EFFECT_FADING)
+           || ((tinyLedmode[tinyLedmodeIndex][ledblock] == LED_EFFECT_FADING_PUSH_ON)))
         {
-            if(pwmDir[ledblock]==0)
+            if(tinyPwmDir[ledblock]==0)
             {
-                tiny_led_wave_set(ledblock, ((uint16_t)(pwmCounter[ledblock]/brigspeed[ledblock])));        // brighter
-                if(pwmCounter[ledblock]>=255*brigspeed[ledblock])
+                tiny_led_wave_set(ledblock, ((uint16_t)(tinyPwmCounter[ledblock]/tinyBrigspeed[ledblock])));        // brighter
+                if(tinyPwmCounter[ledblock]>=255*tinyBrigspeed[ledblock])
                 {
-                    pwmDir[ledblock] = 1;
+                    tinyPwmDir[ledblock] = 1;
                     DEBUG_LED_ON(0, 1, 50, 50, 0);
                 }
             }
-            else if(pwmDir[ledblock]==2)
+            else if(tinyPwmDir[ledblock]==2)
             {
-                tiny_led_wave_set(ledblock, ((uint16_t)(255-pwmCounter[ledblock]/speed[ledblock])));    // darker
-                if(pwmCounter[ledblock]>=255*speed[ledblock])
+                tiny_led_wave_set(ledblock, ((uint16_t)(255-tinyPwmCounter[ledblock]/tinySpeed[ledblock])));    // darker
+                if(tinyPwmCounter[ledblock]>=255*tinySpeed[ledblock])
                 {
-                    pwmDir[ledblock] = 3;
+                    tinyPwmDir[ledblock] = 3;
                     DEBUG_LED_ON(1, 1, 50, 50, 0);
                 }
             }
-            else if(pwmDir[ledblock]==1)
+            else if(tinyPwmDir[ledblock]==1)
             {
-                if(pwmCounter[ledblock]>=255*speed[ledblock])
+                if(tinyPwmCounter[ledblock]>=255*tinySpeed[ledblock])
                 {
-                    pwmCounter[ledblock] = 0;
-                    pwmDir[ledblock] = 2;
+                    tinyPwmCounter[ledblock] = 0;
+                    tinyPwmDir[ledblock] = 2;
                     DEBUG_LED_ON(2, 1, 50, 50, 0);
                 }
             }
-            else if(pwmDir[ledblock]==3)
+            else if(tinyPwmDir[ledblock]==3)
             {
-                if(pwmCounter[ledblock]>=255*brigspeed[ledblock])
+                if(tinyPwmCounter[ledblock]>=255*tinyBrigspeed[ledblock])
                 {
-                    pwmCounter[ledblock] = 0;
-                    pwmDir[ledblock] = 0;
+                    tinyPwmCounter[ledblock] = 0;
+                    tinyPwmDir[ledblock] = 0;
                     DEBUG_LED_ON(3, 1, 50, 50, 0);
                 }
             }
 
             tiny_led_wave_on(ledblock);
 
-            // pwmDir 0~3 : idle
+            // tinyPwmDir 0~3 : idle
        
-            pwmCounter[ledblock]++;
+            tinyPwmCounter[ledblock]++;
 
         }
-        else if (ledmode[ledmodeIndex][ledblock] == LED_EFFECT_PUSHED_LEVEL)
+        else if (tinyLedmode[tinyLedmodeIndex][ledblock] == LED_EFFECT_PUSHED_LEVEL)
         {
     		// 일정시간 유지
-    		if(pushedLevelStay[ledblock] > 0)
+    		if(tinyPushedLevelStay[ledblock] > 0)
     		{
-    			pushedLevelStay[ledblock]--;
+    			tinyPushedLevelStay[ledblock]--;
     		}
     		else
     		{
     			// 시간이 흐르면 레벨을 감소 시킨다.
-    			if(pushedLevelDuty[ledblock] > 0)
+    			if(tinyPushedLevelDuty[ledblock] > 0)
     			{
-    				pwmCounter[ledblock]++;
-    				if(pwmCounter[ledblock] >= speed[ledblock])
+    				tinyPwmCounter[ledblock]++;
+    				if(tinyPwmCounter[ledblock] >= tinySpeed[ledblock])
     				{
-    					pwmCounter[ledblock] = 0;			
-    					pushedLevelDuty[ledblock]--;
-    					pushedLevel[ledblock] = PUSHED_LEVEL_MAX - (255-pushedLevelDuty[ledblock]) / (255/PUSHED_LEVEL_MAX);
-    					/*if(pushedLevel_prev != pushedLevel){
-    						DEBUG_PRINT(("---------------------------------decrease pushedLevel : %d, life : %d\n", pushedLevel, pushedLevelDuty));
-    						pushedLevel_prev = pushedLevel;
+    					tinyPwmCounter[ledblock] = 0;			
+    					tinyPushedLevelDuty[ledblock]--;
+    					tinyPushedLevel[ledblock] = PUSHED_LEVEL_MAX - (255-tinyPushedLevelDuty[ledblock]) / (255/PUSHED_LEVEL_MAX);
+    					/*if(pushedLevel_prev != tinyPushedLevel){
+    						DEBUG_PRINT(("---------------------------------decrease tinyPushedLevel : %d, life : %d\n", tinyPushedLevel, tinyPushedLevelDuty));
+    						pushedLevel_prev = tinyPushedLevel;
     					}*/
     				}
     			}
     			else
     			{
-    				pushedLevel[ledblock] = 0;
-    				pwmCounter[ledblock] = 0;
+    				tinyPushedLevel[ledblock] = 0;
+    				tinyPwmCounter[ledblock] = 0;
     			}
     		}
-    		tiny_led_wave_set(ledblock, pushedLevelDuty[ledblock]);
+    		tiny_led_wave_set(ledblock, tinyPushedLevelDuty[ledblock]);
 
     	}
     	else
         {
             tiny_led_wave_set(ledblock, 0);
             tiny_led_wave_off(ledblock);
-            pwmCounter[ledblock]=0;
-            pwmDir[ledblock]=0;
+            tinyPwmCounter[ledblock]=0;
+            tinyPwmDir[ledblock]=0;
 
             DEBUG_LED_ON(7, 1, 50, 50, 50);
         }
@@ -1239,13 +1275,13 @@ void tiny_led_fader(void)
 void tiny_rgb_effector(void)
 {
     uint8_t update = 0;
-    uint8_t index = rgbEffect.index;
+    uint8_t index = tinyRgbEffect.index;
 
     if(index < RGB_EFFECT_MAX)
     {
         if(effectHandler[index] != 0)
         {
-            update = effectHandler[index](&rgbEffect);
+            update = effectHandler[index](&tinyRgbEffect);
         }
     }
 
@@ -1255,7 +1291,7 @@ void tiny_rgb_effector(void)
     }
 }
 
-void tiny_led_mode_change (LED_BLOCK ledblock, int mode)
+void tiny_led_mode_change (TINY_LED_BLOCK ledblock, int mode)
 {
     switch (mode)
     {
@@ -1275,7 +1311,7 @@ void tiny_led_mode_change (LED_BLOCK ledblock, int mode)
             tiny_led_wave_on(ledblock);
             break;
         default :
-            ledmode[ledmodeIndex][ledblock] = LED_EFFECT_FADING;
+            tinyLedmode[tinyLedmodeIndex][ledblock] = LED_EFFECT_FADING;
             break;
      }
 }
@@ -1313,15 +1349,17 @@ void TinyInitTimer(void)
 void TinyInitCfg(void)
 {
     tinyConfig.comm_init = 0;
-    memset(rgbBuffer, 0, sizeof(CLED_NUM * CLED_ELEMENT));
-    NCSLock = rgbBuffer[0];           // 0'st RGB is NCR indicator 
+    memset(rgbBuffer, 0, CLED_ARRAY_SIZE);
+    NCSLock = &rgbBuffer[0][0];           // 0'st RGB is NCR indicator 
+
+    //set_effect_temp();
 }
 
 void TinyInitEffect(void)
 {
     // init effect. firstly go to boot hid mode
-    rgbmodeIndex = 0;
-    memset(&rgbEffect, 0, sizeof(rgb_effect_param_type));
+    tinyRgbmodeIndex = 0;
+    memset(&tinyRgbEffect, 0, sizeof(rgb_effect_param_type));
 }
 
 int main(void)

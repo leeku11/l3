@@ -522,6 +522,7 @@ uint8_t rxHIDCmd(void)
             {
                 eeprom_update_block(&hidData.data[0], EEPADDR_KBD_CONF, sizeof(kbdConf));
                 tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (tinycmd_led_type *)kbdConf.rgb_preset);
+                tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, &kbdConf.rgb_effect_param);
             }
             break;
         case CMD_KEYMAP :
@@ -799,6 +800,23 @@ uint8_t usbRollOver = 0;
 
 // _lkh debug
 #if 1//def SUPPORT_TINY_CMD
+/*
+    RGB_EFFECT_BOOTHID = 0,
+    RGB_EFFECT_BASIC,
+    RGB_EFFECT_BASIC_LOOP,
+    RGB_EFFECT_FADE,
+    RGB_EFFECT_FADE_BUF,
+    RGB_EFFECT_FADE_LOOP,
+    RGB_EFFECT_HEARTBEAT,
+    RGB_EFFECT_HEARTBEAT_BUF,
+    RGB_EFFECT_HEARTBEAT_LOOP,
+    RGB_EFFECT_SWIPE,
+    RGB_EFFECT_SWIPE_BUF,
+    RGB_EFFECT_SWIPE_LOOP,
+    RGB_EFFECT_MAX
+
+*/
+
 void rgb_set_effect_param(uint8_t effect, rgb_effect_param_type *p_param)
 {
     memset(p_param, 0, sizeof(rgb_effect_param_type));
@@ -823,7 +841,7 @@ void rgb_set_effect_param(uint8_t effect, rgb_effect_param_type *p_param)
         p_param->max.r = 70;
         p_param->max.g = 70;
         p_param->max.b = 70;
-        p_param->high_hold = 10;
+        p_param->high_hold = 50;
         //p_param->low_hold = 0;
         //p_param->accel_mode = 0; // linear
         //p_param->dir = 0;

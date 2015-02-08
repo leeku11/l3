@@ -155,42 +155,55 @@ void led_wave_set(LED_BLOCK block, uint16_t duty)
 
 void led_blink(int matrixState)
 {
-#ifdef LED_CONTROL_MASTER
-    LED_BLOCK ledblock;
-
-    for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
+    if(tinyExist)
     {
-        
-        if(matrixState & SCAN_DIRTY)      // 1 or more key is pushed
-        {
-            switch(ledmode[ledmodeIndex][ledblock])
-            {
+        static int matrixStateOld = 0;
 
-                case LED_EFFECT_FADING_PUSH_ON:
-                case LED_EFFECT_PUSH_ON:
-                    led_on(ledblock);
-                    break;
-                case LED_EFFECT_PUSH_OFF:
-                    led_wave_off(ledblock);
-                    led_wave_set(ledblock, 0);
-                    led_off(ledblock);
-                    break;
-                default :
-                    break;
-            }             
-        }else{          // none of keys is pushed
-            switch(ledmode[ledmodeIndex][ledblock])
-                 {
-                     case LED_EFFECT_FADING_PUSH_ON:
-                     case LED_EFFECT_PUSH_ON:
-                        led_off(ledblock);
-                        break;
-                     case LED_EFFECT_PUSH_OFF:
+        if(matrixStateOld != matrixState)
+        {
+            matrixStateOld = matrixState;
+            tinycmd_dirty(matrixState & SCAN_DIRTY);
+        }
+    }
+#ifdef LED_CONTROL_MASTER
+    else
+    {
+        LED_BLOCK ledblock;
+    
+        for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
+        {
+            
+            if(matrixState & SCAN_DIRTY)      // 1 or more key is pushed
+            {
+                switch(ledmode[ledmodeIndex][ledblock])
+                {
+    
+                    case LED_EFFECT_FADING_PUSH_ON:
+                    case LED_EFFECT_PUSH_ON:
                         led_on(ledblock);
                         break;
-                     default :
-                         break;
-                 }
+                    case LED_EFFECT_PUSH_OFF:
+                        led_wave_off(ledblock);
+                        led_wave_set(ledblock, 0);
+                        led_off(ledblock);
+                        break;
+                    default :
+                        break;
+                }             
+            }else{          // none of keys is pushed
+                switch(ledmode[ledmodeIndex][ledblock])
+                     {
+                         case LED_EFFECT_FADING_PUSH_ON:
+                         case LED_EFFECT_PUSH_ON:
+                            led_off(ledblock);
+                            break;
+                         case LED_EFFECT_PUSH_OFF:
+                            led_on(ledblock);
+                            break;
+                         default :
+                             break;
+                     }
+            }
         }
     }
 #endif // LED_CONTROL_MASTER

@@ -42,7 +42,7 @@ void tinycmd_reset(uint8_t type)
     
     p_reset_req->cmd_code = TINY_CMD_RESET_F;
     p_reset_req->pkt_len = sizeof(tinycmd_reset_req_type);
-    p_reset_req->type = TINY_RESET_HARD;
+    p_reset_req->type = 0;
 
     i2cMasterSend(TARGET_ADDR, p_reset_req->pkt_len, (uint8_t *)p_reset_req);
 }
@@ -174,7 +174,8 @@ void tinycmd_rgb_set_effect(uint8_t index, rgb_effect_param_type *p_param)
     p_rgb_set_effect->cmd_code = TINY_CMD_RGB_SET_EFFECT_F;
     p_rgb_set_effect->pkt_len = sizeof(tinycmd_rgb_set_effect_req_type);
     p_rgb_set_effect->index = index;
-    p_rgb_set_effect->effect_param = *p_param;
+    //p_rgb_set_effect->effect_param = *p_param;
+    memcpy(&p_rgb_set_effect->effect_param, p_param, sizeof(rgb_effect_param_type));
 
     i2cMasterSend(TARGET_ADDR, p_rgb_set_effect->pkt_len, (uint8_t *)p_rgb_set_effect);
 }
