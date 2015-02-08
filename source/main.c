@@ -287,7 +287,7 @@ kbdConf.swapCtrlCaps = 0;
 kbdConf.swapAltGui = 0;
 kbdConf.led_preset_index = 0;
 memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
-kbdConf.rgb_preset_index = 0;
+kbdConf.rgb_effect_index = 0;
 kbdConf.rgb_chain = 14;
 memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
 updateConf();       // should be removed

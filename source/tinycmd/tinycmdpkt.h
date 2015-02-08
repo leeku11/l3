@@ -1,6 +1,8 @@
 #ifndef TINYCMDPKT_H
 #define TINYCMDPKT_H
 
+#include "hwaddress.h" // for rgb effect. temporary
+
 #define TINYCMD_LED_MAX               20
 #define TINYCMD_THREE_LOCK_NUM        3
 #define TINYCMD_TEST_DATA_LEN         (TINYCMD_LED_MAX * 3 + TINYCMD_THREE_LOCK_NUM)
@@ -92,7 +94,8 @@ typedef struct
 {
   uint8_t cmd_code;
   uint8_t pkt_len;
-  uint8_t preset;
+  uint8_t index;
+  rgb_effect_param_type effect_param;
 } tinycmd_rgb_set_effect_req_type;
 
 // TINY_CMD_RGB_SET_PRESET_F
@@ -143,7 +146,6 @@ typedef struct
 typedef struct
 {
   uint8_t cmd_code;
-  uint8_t dirty;
 } tinycmd_dirty_req_type;
 
 typedef union

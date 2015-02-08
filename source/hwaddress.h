@@ -1,3 +1,5 @@
+#ifndef HWADDRESS_H
+#define HWADDRESS_H
 
 #define EEPADDR_LEDMODE_INDEX   (uint8_t *)11
 #define EEPADDR_USBPS2_MODE  (uint8_t *)12
@@ -26,6 +28,25 @@
 #define MAX_RGB_CHAIN       20
 
 
+typedef struct {
+    uint8_t index;
+    union {
+       uint8_t max_rgb[3]; // grb
+       struct {
+          uint8_t g;
+          uint8_t r;
+          uint8_t b;
+       }max;
+    };
+    uint8_t high_hold;
+    uint8_t low_hold;
+    uint8_t accel_mode;
+    uint8_t dir;
+    uint8_t level;
+    uint8_t cnt;
+    uint8_t hcnt;
+    uint8_t lcnt;
+} rgb_effect_param_type;
 
 
 typedef struct kbd_conf
@@ -36,9 +57,10 @@ typedef struct kbd_conf
     uint8_t swapAltGui;                     // 1: Swap Alt <-> GUI(WIN) 
     uint8_t led_preset_index;               // LED effect  preset index
     uint8_t led_preset[3][5];               // Block configuration for LED effect  preset
-    uint8_t rgb_preset_index;               // RGB effect preset
+    uint8_t rgb_effect_index;               // RGB effect index
     uint8_t rgb_chain;                      // RGB5050 numbers (H/W dependent)
     uint8_t rgb_preset[MAX_RGB_CHAIN][3];   // Chain color
+    rgb_effect_param_type rgb_effect_param; // RGB effect parameter
 }kbd_configuration_t;
 
 
@@ -51,4 +73,5 @@ typedef struct kbd_conf
 
 extern kbd_configuration_t kbdConf;
 extern int8_t updateConf(void);
- 
+
+#endif // HWADDRESS_H

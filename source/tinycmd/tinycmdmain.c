@@ -5,6 +5,7 @@
 #include "tinycmdpkt.h"
 #include "i2c.h"
 #include "led.h"
+#include "hwaddress.h"
 
 extern uint8_t tinyExist;           // 1 : attiny85 is exist, 0 : not
 extern unsigned char localBuffer[0x50];
@@ -68,6 +69,22 @@ void tinycmd_three_lock(uint8_t num, uint8_t caps, uint8_t scroll)
     p_three_lock_req->lock = lock;
 
     i2cMasterSend(TARGET_ADDR, p_three_lock_req->pkt_len, (uint8_t *)p_three_lock_req);
+}
+
+void tinycmd_dirty(uint8_t down)
+{
+    tinycmd_dirty_req_type *p_dirty_req = (tinycmd_dirty_req_type *)localBuffer;
+
+    if(down)
+    {
+        p_dirty_req->cmd_code = TINY_CMD_DIRTY | TINY_CMD_KEY_MASK;
+    }
+    else
+    {
+        p_dirty_req->cmd_code = TINY_CMD_DIRTY;
+    }
+
+    i2cMasterSend(TARGET_ADDR, sizeof(tinycmd_dirty_req_type), (uint8_t *)p_dirty_req);
 }
 
 void tinycmd_rgb_all(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
@@ -151,12 +168,13 @@ void tinycmd_rgb_buffer(uint8_t num, uint8_t offset, uint8_t *data)
 }
 
 
-void tinycmd_rgb_set_effect(uint8_t index)
+void tinycmd_rgb_set_effect(uint8_t index, rgb_effect_param_type *p_param)
 {
     tinycmd_rgb_set_effect_req_type *p_rgb_set_effect = (tinycmd_rgb_set_effect_req_type *)localBuffer;
     p_rgb_set_effect->cmd_code = TINY_CMD_RGB_SET_EFFECT_F;
     p_rgb_set_effect->pkt_len = sizeof(tinycmd_rgb_set_effect_req_type);
-    p_rgb_set_effect->preset = index;
+    p_rgb_set_effect->index = index;
+    p_rgb_set_effect->effect_param = *p_param;
 
     i2cMasterSend(TARGET_ADDR, p_rgb_set_effect->pkt_len, (uint8_t *)p_rgb_set_effect);
 }
