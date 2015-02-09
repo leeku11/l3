@@ -2,6 +2,8 @@
 */
 
 #include <avr/io.h>     // include I/O definitions (port names, pin names, etc)
+#include <avr/wdt.h>    // include watch dog feature
+
 #include <stdbool.h>
 #include <util/delay.h>
 
@@ -1370,11 +1372,11 @@ void led_pushed_level_cal(void)
 
     for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
     { 
-        if(pushedLevel[ledblock] < PUSHED_LEVEL_MAX)
+        if(tinyPushedLevel[ledblock] < PUSHED_LEVEL_MAX)
         {
-            pushedLevelStay[ledblock] = 511;
-            pushedLevel[ledblock]++;
-            pushedLevelDuty[ledblock] = (255 * pushedLevel[ledblock]) / PUSHED_LEVEL_MAX;
+            tinyPushedLevelStay[ledblock] = 511;
+            tinyPushedLevel[ledblock]++;
+            tinyPushedLevelDuty[ledblock] = (255 * tinyPushedLevel[ledblock]) / PUSHED_LEVEL_MAX;
         }
     }
 }
@@ -1394,11 +1396,13 @@ int main(void)
 
     TinyInitCfg();
     TinyInitEffect();
+    wdt_enable(WDTO_2S);
 
     sei();
 
     for(;;)
     {
+        wdt_reset();
         rcvlen = i2c_message_ready();
 
         if(rcvlen != 0)
