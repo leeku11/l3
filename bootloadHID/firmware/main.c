@@ -213,10 +213,10 @@ static void initForUsbConnectivity(void)
     usbDeviceConnect();
     sei();
 }
-void writepage(uchar *data, ulong addr) 
+void writepage(uchar *data, addr_t addr) 
     __attribute__ ((section (".appinboot")));
 
-void writepage(uchar *data, ulong addr)
+void writepage(uchar *data, addr_t addr)
 {
     uint len = SPM_PAGESIZE;
     ADDRESS address;

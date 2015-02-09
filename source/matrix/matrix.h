@@ -28,4 +28,5 @@ extern uint8_t processFNkeys(uint8_t keyidx);
 extern uint8_t getLayer(uint8_t FNcolrow);
 extern uint8_t scankey(void);
 extern uint8_t scanmatrix(void);
+extern uint8_t cntKey(uint8_t keyidx, uint8_t clearmask);
 

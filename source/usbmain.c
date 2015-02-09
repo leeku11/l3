@@ -468,8 +468,6 @@ uint8_t version[] = "L150205";          // must be length of 7 bytes    HID repo
 
 uint8_t txHIDCmd(void)
 {
-    uint8_t *pBuf;
-    uint8_t i;
     switch(hidCmd.config.cmd)
     {
 #ifdef HID_DEBUG_CMD
@@ -504,9 +502,10 @@ uint8_t txHIDCmd(void)
         }
         break;
     }
+    return 0;
 }
 
-uint8_t rxHIDCmd(void)
+void rxHIDCmd(void)
 {
     switch(hidCmd.config.cmd)
     {
@@ -663,7 +662,7 @@ uint8_t usbFuncDebugCmdHandler(void)
             Reset_AVR();
             break;
     }
-
+    return 0;
 }
 
 volatile uint8_t gLEDstate;     ///< current state of the LEDs
@@ -677,7 +676,7 @@ volatile uint8_t gLEDstate;     ///< current state of the LEDs
  */
 uint8_t usbFunctionWrite(uchar *data, uchar len) 
 {
-    uint8_t result;
+    uint8_t result = 1;
     uint8_t LEDstate;
 
     if ((expectReport) && (len == 1)) {
@@ -1020,10 +1019,6 @@ uint8_t usbmain(void) {
     uint8_t updateNeeded = 0;
     uint8_t idleCounter = 0;
     uint32_t interfaceCount = 0;
-#ifdef SUPPORT_I2C
-    uint16_t test_cnt = 0, test_cnt2 = 0;
-    uint8_t duty = 0;
-#endif
 	interfaceReady = 0;
 
     DEBUG_PRINT(("USB\n"));

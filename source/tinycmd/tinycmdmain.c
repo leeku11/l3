@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "global.h"
 #include "tinycmd.h"
@@ -149,7 +150,6 @@ void tinycmd_rgb_range(uint8_t num, uint8_t offset, uint8_t r, uint8_t g, uint8_
 
 void tinycmd_rgb_buffer(uint8_t num, uint8_t offset, uint8_t *data)
 {
-    uint8_t i;
     tinycmd_rgb_buffer_req_type *p_rgb_buffer_req = (tinycmd_rgb_buffer_req_type *)localBuffer;
 
     //overflow

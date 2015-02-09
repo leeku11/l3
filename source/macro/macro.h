@@ -10,4 +10,4 @@ extern void sendMatrix(char col, char row);
 void resetMacro(void);
 
 
-extern int8_t flash_writeinpage (uint8_t *data, unsigned long addr);
+extern uint8_t flash_writeinpage (uint8_t *data, uint16_t addr);

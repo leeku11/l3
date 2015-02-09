@@ -189,6 +189,14 @@ Key charToKey(char character) {
     return key;
 } 
 
+void clearKey(void)
+{
+    if(kbdConf.ps2usb_mode)
+    {
+        usbSendReport(0, 0);
+    }
+}
+
 
 /**
  * Send a key to the computer, followed by the release of all keys. This can be
@@ -223,7 +231,6 @@ void sendKey(Key keytosend)
 
 void printModifier(uint8_t keytosend, uint8_t open)
 {
-   uint8_t keyval = 0;
    Key prtKey;
    
    prtKey.mode = 0;
@@ -289,23 +296,17 @@ void printModifier(uint8_t keytosend, uint8_t open)
 
 }
 
-void clearKey(void)
-{
-    if(kbdConf.ps2usb_mode)
-    {
-        usbSendReport(0, 0);
-    }
-}
+
 /**
  * Send a string to the computer. This function converts each character of an
  * ASCII-string to a key-structure and uses sendKey() to send it.
  * \param string string to send
  */
-void sendString(char* string) {
+void sendString(uint16_t pString) {
     uint8_t i = 0;
-    uint8_t keychar, oldkeychar;
+    uint8_t keychar, oldkeychar = 0;
     Key key;
-    while((keychar = pgm_read_byte(string))!= (uint8_t)NULL && i < 32) // limit to 64 charater to send at once.
+    while((keychar = pgm_read_byte(pString))!= (uint16_t)NULL && i < 32) // limit to 64 charater to send at once.
     {
         key = charToKey(keychar);
 
@@ -315,7 +316,7 @@ void sendString(char* string) {
         }
         oldkeychar = keychar;
         sendKey(key);
-        string++;
+        pString++;
         i++;
     }
     
@@ -497,38 +498,26 @@ void playMacroPS2(uint8_t macrokey)
 
 #if 1
 
+#if (FLASHEND) > 0xffff /* we need long addressing */
+#   define addr_t           unsigned long
+#else
+#   define addr_t           unsigned int
+#endif
+
+
 typedef union ADDRESS_U{
-    long  l;
+    addr_t  l;
     unsigned int    s[sizeof(long)/2];
     uchar   c[sizeof(long)];
 }ADDRESS;
 
-int8_t flash_writeinpage (uint8_t *data, unsigned long addr)
-{
-   if (addr < 0x4400)      // FW code area
-   {
-      
-      wdt_disable();
-      while(1)
-      {
-         _delay_ms(1);
-      }
-      return -1;
-   }else{
 
-      writepage(data, addr);
-   }
-
-}
-
-
-void writepage(uint8_t *data, unsigned long addr) 
+void writepage(uint8_t *data, addr_t addr) 
     __attribute__ ((section (".appinboot")));
 
-void writepage(uint8_t *data, unsigned long addr)
+void writepage(uint8_t *data, addr_t addr)
 {
-    uchar   isLast;
-    uchar len;
+    uchar len= SPM_PAGESIZE;
 #if 1
     ADDRESS address;
 
@@ -566,19 +555,39 @@ void writepage(uint8_t *data, unsigned long addr)
     return;
 }
 
+
+uint8_t flash_writeinpage (uint8_t *data, uint16_t addr)
+{
+   if (addr < 0x4400)      // FW code area
+   {
+      
+      wdt_disable();
+      while(1)
+      {
+         _delay_ms(1);
+      }
+      return -1;
+   }else{
+
+      writepage(data, addr);
+   }
+   return 0;
+}
+
+
+
 void resetMacro(void)
 {
     uint8_t mIndex;
-    long address;
     
-    sendString(mresetstart);
+    sendString((uint16_t) &mresetstart[0]);
     for (mIndex = 0; mIndex < MAX_MACRO_INDEX; mIndex++)
     {
       wdt_reset();
       eeprom_write_byte(EEPADDR_MACRO_SET+mIndex, 0);
-      sendString("-");
+      sendString((uint16_t) "-");
     }
-    sendString(macroresetdone);
+    sendString((uint16_t) &macroresetdone);
 }
 
 
@@ -589,7 +598,6 @@ void recordMacro(uint8_t macrokey)
    uint8_t prevBit, curBit;
    uint8_t keyidx;
    uint8_t matrixState = 0;
-   uint8_t retVal = 0;
    int16_t i;
    int16_t index;
    uint8_t mIndex;
@@ -619,7 +627,7 @@ void recordMacro(uint8_t macrokey)
       }
    }
 
-   sendString(macrostart);
+   sendString((uint16_t) &macrostart[0]);
 
 
 
@@ -673,7 +681,7 @@ void recordMacro(uint8_t macrokey)
                      wdt_reset();
                      eeprom_write_byte(EEPADDR_MACRO_SET+mIndex, 1);
                      wdt_reset();
-                     sendString(macroend);
+                     sendString((uint16_t) &macroend[0]);
                      return;
                   }
                   else

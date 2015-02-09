@@ -14,6 +14,7 @@
 #include "matrix.h"
 #include "hwaddress.h"
 #include "macro.h"
+#include "Tinycmdapi.h"
 
 #undef LED_CONTROL_MASTER
 #define LED_CONTROL_SLAVE
@@ -30,11 +31,15 @@ static uint8_t const ledpin[] = {LED_NUM_PIN, LED_CAP_PIN, LED_SCR_PIN};
 uint8_t ledmodeIndex;
 
 
+#ifdef LED_CONTROL_MASTER    
+
 uint8_t ledmode[LEDMODE_INDEX_MAX][LED_BLOCK_MAX] = {
     { 0, 0, 0, LED_EFFECT_FADING, LED_EFFECT_FADING },
     { 0, 0, 0, LED_EFFECT_PUSH_ON, LED_EFFECT_PUSH_ON },
     { 0, 0, 0, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS },
 };
+
+
 
 static uint8_t speed[LED_BLOCK_MAX] = {0, 0, 0, 5, 5};
 static uint8_t brigspeed[LED_BLOCK_MAX] = {0, 0, 0, 3, 3};
@@ -46,7 +51,7 @@ static uint8_t pushedLevel[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 static uint16_t pushedLevelDuty[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 
 extern uint16_t scankeycntms;
-
+#endif
 
 
 void led_off(LED_BLOCK block)
@@ -369,18 +374,19 @@ void led_mode_init(void)
 #ifdef LED_CONTROL_MASTER
         pwmDir[ledblock ] = 0;
         pwmCounter[ledblock] = 0;
-#endif // LED_CONTROL_MASTER
         led_mode_change(ledblock, ledmode[ledmodeIndex][ledblock]);
+#endif // LED_CONTROL_MASTER
     }
     
     led_3lockupdate(gLEDstate);
 
-#ifdef LED_CONTROL_SLAVE
+#if 0 //def LED_CONTROL_SLAVE
     tinycmd_led_preset_config((uint8_t*)ledmode);
     tinycmd_led_set_effect(kbdConf.led_preset_index);
 
 #endif // LED_CONTROL_SLAVE
 }
+#ifdef LED_CONTROL_MASTER
 
 void led_mode_change (LED_BLOCK ledblock, int mode)
 {
@@ -406,6 +412,7 @@ void led_mode_change (LED_BLOCK ledblock, int mode)
             break;
      }
 }
+#endif
 
 #if 0
 void led_mode_save(void)
@@ -413,6 +420,9 @@ void led_mode_save(void)
     eeprom_write_byte(EEPADDR_LEDMODE_INDEX, ledmodeIndex);
 }
 #endif
+
+#ifdef LED_CONTROL_MASTER
+
 void led_pushed_level_cal(void)
 {
     LED_BLOCK ledblock;
@@ -428,6 +438,7 @@ void led_pushed_level_cal(void)
         }
     }
 }
+#endif
 
 #if 0
 uint8_t PROGMEM ledstart[32] = "LED record mode - push any key@";

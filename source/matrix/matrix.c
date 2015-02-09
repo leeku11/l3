@@ -21,7 +21,7 @@
 #include "macro.h"
 
 #include "ps2main.h"
-
+#include "tinycmdapi.h"
 #define STANDBY_LOOP    130000  // scan matix entry is 2.2msec @ 12Mh x-tal : 5min
 
 typedef enum KEY_LAYER_NUM{
@@ -65,8 +65,7 @@ static uint8_t findFNkey(void)
 {
     uint8_t col, row;
     uint8_t keyidx;
-    uint8_t i, j;
-    uint8_t *pBuf;
+    uint8_t i;
     for(i = 0; i < MAX_LAYER; i++)
     {
 #if 0     
@@ -106,7 +105,6 @@ static uint8_t findFNkey(void)
 void keymap_init(void) 
 {
 	int16_t i, j, keyidx;
-    uint8_t *pBuf;
 #if 1
 	// set zero for every flags
 	for(i=0;i<MAX_KEY;i++)
@@ -158,7 +156,6 @@ void keymap_init(void)
 uint8_t processPushedFNkeys(uint8_t keyidx)
 {
     uint8_t retVal = 0;
-    uint8_t key;
     
     if(keyidx >= K_LED0 && keyidx <= K_LED3)
     {
@@ -199,12 +196,11 @@ uint8_t processPushedFNkeys(uint8_t keyidx)
 uint8_t processReleasedFNkeys(uint8_t keyidx)
 {
     uint8_t retVal = 0;
-    uint8_t ledblock;
         
     if(keyidx >= K_LED0 && keyidx <= K_LED3)
     {
         kbdConf.led_preset_index = keyidx-K_LED0;
-        led_mode_change(ledblock, ledmode[kbdConf.led_preset_index][ledblock]);
+//        led_mode_change(ledblock, ledmode[kbdConf.led_preset_index][ledblock]);
         retVal = 1;
     }else if(keyidx >= K_LFX && keyidx <= K_LARR)
     {
@@ -232,7 +228,7 @@ uint8_t getLayer(uint8_t FNcolrow)
 {
     uint8_t col;
     uint8_t row;
-    uint8_t cur, vPinA, vPinB, vPinD;
+    uint8_t vPinA, vPinB, vPinD;
     uint32_t tmp;
     col = (FNcolrow >> 5) & 0x0f;
     row = FNcolrow & 0x1f;
@@ -273,7 +269,6 @@ uint8_t scanmatrix(void)
    uint8_t vPinA, vPinB, vPinD;
 
    uint8_t matrixState = 0;
-   uint8_t ledblock;
 
     if (scankeycntms++ >= STANDBY_LOOP)
         scankeycntms = STANDBY_LOOP;
@@ -282,8 +277,6 @@ uint8_t scanmatrix(void)
     {
         kbdsleepmode = 1;
         ledmodeIndex = 4;       // hidden OFF index
-
-        led_mode_change(ledblock, ledmode[ledmodeIndex][ledblock]);
     }
     
 
@@ -465,8 +458,6 @@ uint8_t scankey(void)
 	uint8_t keyidx;
 	uint8_t matrixState = 0;
 	uint8_t retVal = 0;
-    int8_t i;
-    long keyaddr;
 
     matrixState = scanmatrix();
     if(matrixState != gDirty)
@@ -528,7 +519,7 @@ uint8_t scankey(void)
             
             if (!prevBit && curBit)   //pushed
             {
-                led_pushed_level_cal();          /* LED_EFFECT_PUSHED_LEVEL calculate */        
+//                led_pushed_level_cal();          /* LED_EFFECT_PUSHED_LEVEL calculate */        
                 if (processPushedFNkeys(keyidx))
                     continue;
             }else if (prevBit && !curBit)  //released
