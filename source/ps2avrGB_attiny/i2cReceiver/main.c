@@ -6,6 +6,7 @@
 
 #include <stdbool.h>
 #include <util/delay.h>
+#include <string.h>
 
 #include "i2c-slave.h"
 #include "../Light_WS2812/light_ws2812.h"
