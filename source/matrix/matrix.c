@@ -42,7 +42,6 @@ uint8_t currentLayer[MAX_COL][MAX_ROW];
 uint8_t matrixFN[MAX_LAYER];           // (col << 4 | row)
 //uint8_t layer = 0;
 uint8_t kbdsleepmode = 0;
-uint8_t ledPortBackup = 0;
 uint16_t macrokeypushedcnt;
 uint16_t ledkeypushedcnt;
 uint16_t macroresetcnt;
@@ -58,8 +57,6 @@ uint16_t cntLcaps = 0;
 uint16_t cntLctrl = 0;
 uint16_t cntLAlt = 0;
 uint16_t cntLGui = 0;
-
-uint8_t isLED3000 = 0;
 
 int8_t isFNpushed = 0;
 

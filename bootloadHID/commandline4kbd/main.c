@@ -505,12 +505,12 @@ return 0;
     // if no file was given, endAddress is less than startAddress and no data is uploaded
 #endif
 
-#if 1
+#if 0
     setConfig();
     return 1;
 #endif
 
-#if 0 //def HIDDEBUG
+#if 1 //def HIDDEBUG
     HIDCMD_debug_t dbgCmd;
     unsigned char buffer[8];
 

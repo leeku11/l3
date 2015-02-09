@@ -125,17 +125,15 @@ these macros are defined, the boot loader usees them.
 #define DDR_LED0    DDRD
 #define DDR_LED1    DDRD
 #define DDR_LED2    DDRD
-#define DDR_LED3    DDRD
 
 #define PORT_LED0   PORTD
 #define PORT_LED1   PORTD
 #define PORT_LED2   PORTD
-#define PORT_LED3   PORTD
 
-#define PIN_LED0    1 << 4
-#define PIN_LED1    1 << 5
+#define PIN_LED0    1 << 5
+#define PIN_LED1    1 << 6
 #define PIN_LED2    1 << 7
-#define PIN_LED3    1 << 5
+
 
 
 
@@ -151,7 +149,6 @@ static void ledOff()
    PORT_LED0 &= ~(PIN_LED0);
    PORT_LED1 &= ~(PIN_LED1);
    PORT_LED2 &= ~(PIN_LED2);
-   PORT_LED3 &= ~(PIN_LED3);            
 }
 
 static void ledInit()
@@ -159,7 +156,6 @@ static void ledInit()
    DDR_LED0 |= (PIN_LED0);
    DDR_LED1 |= (PIN_LED1);
    DDR_LED2 |= (PIN_LED2);
-   DDR_LED3 |= (PIN_LED3); 
 
 }
 
@@ -178,10 +174,7 @@ static void ledOn(uint8_t pin)
       case 2:
          PORT_LED2 |= PIN_LED2;
          break;
-      
-      case 3:
-         PORT_LED3 |= PIN_LED3;
-         break;
+
 
       default:
          break;   
@@ -192,10 +185,10 @@ static void ledOn(uint8_t pin)
 static inline void  bootLoaderInit(void)
 {
 
-	// 5v -> 3.3v for USB	
-	 DDRD |= (1 << PIND0);	
-    PORTD |= (1 << PIND0);	
-    // PS2 pullup	
+	// 5v -> 3.3v for USB - INPUT(PULLUP	
+	PORTD |= (1 << PIND0);	
+    DDRD &= ~(1 << PIND0);	
+    // PS2 pullup	- OUT0
     DDRD |= (1 << PIND1);	
     PORTD &= ~(1 << PIND1);
   

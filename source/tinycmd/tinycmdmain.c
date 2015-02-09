@@ -8,7 +8,7 @@
 #include "hwaddress.h"
 
 extern uint8_t tinyExist;           // 1 : attiny85 is exist, 0 : not
-extern unsigned char localBuffer[0x50];
+extern unsigned char localBuffer[0x4B];
 extern unsigned char localBufferLength;
 
 #define TARGET_ADDR     0xB0

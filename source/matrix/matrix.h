@@ -21,10 +21,7 @@ extern uint8_t  currentLayer[MAX_COL][MAX_ROW];
 
 extern uint8_t matrixFN[MAX_LAYER];           // (col << 4 | row)
 //extern uint8_t layer;
-extern uint8_t ledPortBackup;
 extern uint8_t kbdsleepmode;
-extern uint8_t isLED3000;
-
 
 extern void keymap_init(void);
 extern uint8_t processFNkeys(uint8_t keyidx);

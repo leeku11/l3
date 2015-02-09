@@ -376,8 +376,6 @@ MODIFIERS modifierBitmap[] = {
 #define HID_BOOT_CMD_LEN    0x07
 #define HID_BOOT_DATA_LEN   0x83
 uint8_t bootRxRemains;
-uint8_t bootRxBuffer[HID_BOOT_DATA_LEN];
-uint8_t bootRxIndex;
 
 
 typedef enum
@@ -795,8 +793,6 @@ uint8_t cmpReportBuffer(void)
     return result;
 }
 
-
-uint8_t usbRollOver = 0;
 
 // _lkh debug
 #if 1//def SUPPORT_TINY_CMD
