@@ -62,9 +62,3 @@ const uint8_t PROGMEM keycode_set2_proc_shift[16] =
 	K_INSERT, K_DEL, K_HOME, K_END, K_PGUP, K_PGDN, K_LGUI, K_RGUI, K_APPS,
  	K_LEFT, K_RIGHT, K_UP, K_DOWN, K_KP_SLASH, K_NONE, K_NONE };
 
-long keymap[MAX_LAYER] = {
-    KEYMAP_LAYER0, // FACTORY DEFAULT
-    KEYMAP_LAYER1,
-    KEYMAP_LAYER2,
-    KEYMAP_LAYER3,
-};

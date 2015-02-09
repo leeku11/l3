@@ -407,11 +407,12 @@ void led_mode_change (LED_BLOCK ledblock, int mode)
      }
 }
 
+#if 0
 void led_mode_save(void)
 {
     eeprom_write_byte(EEPADDR_LEDMODE_INDEX, ledmodeIndex);
 }
-
+#endif
 void led_pushed_level_cal(void)
 {
     LED_BLOCK ledblock;
@@ -428,6 +429,7 @@ void led_pushed_level_cal(void)
     }
 }
 
+#if 0
 uint8_t PROGMEM ledstart[32] = "LED record mode - push any key@";
 uint8_t PROGMEM ledend[32] = "LED record done@";
 uint8_t PROGMEM sledmode[8][15] = {"fading@", "fading-pushon@", "pushed-weight@","pushon@", "pushoff@", "always@", "caps@", "off@"}; 
@@ -572,3 +574,5 @@ void recordLED(uint8_t ledkey)
     }
     }
 }
+
+#endif

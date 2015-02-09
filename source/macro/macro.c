@@ -16,7 +16,6 @@
 #include "usbdrv.h"
 #include "usbmain.h"
 #include "ps2main.h"
-#include "keymap.h"
 #include "matrix.h"
 #include "macro.h"
 #include "led.h"
@@ -579,10 +578,6 @@ void resetMacro(void)
       eeprom_write_byte(EEPADDR_MACRO_SET+mIndex, 0);
       sendString("-");
     }
-    
-    eeprom_write_byte(EEPADDR_SWAPCTRLCAPS, 0x80);
-    eeprom_write_byte(EEPADDR_SWAPALTGUI, 0x80);
-
     sendString(macroresetdone);
 }
 

@@ -38,6 +38,7 @@ typedef enum HID_DEBUG_SUB_CMD{
     HID_DEBUG_LED,
     HID_DEBUG_RGB,
     HID_DEBUG_KEYMAPER,
+    HID_DEBUG_JMP_BOOTLOADER
 }HID_DEBUG_SUB_CMD_E;
 
 
@@ -656,6 +657,10 @@ uint8_t usbFuncDebugCmdHandler(void)
             break;
         case HID_DEBUG_KEYMAPER: 
             reportMatrix = hidCmd.debug.arg3;
+            break;
+        case HID_DEBUG_JMP_BOOTLOADER:
+            eeprom_write_byte(EEPADDR_BOOTLOADER_ACT, 0xCA);
+            Reset_AVR();
             break;
     }
 

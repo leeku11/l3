@@ -184,7 +184,6 @@ static void ledOn(uint8_t pin)
 
 static inline void  bootLoaderInit(void)
 {
-
 	// 5v -> 3.3v for USB - INPUT(PULLUP	
 	PORTD |= (1 << PIND0);	
     DDRD &= ~(1 << PIND0);	
@@ -217,6 +216,11 @@ static inline uint8_t bootLoaderCondition() {
 		prevState = (PIN_ROW0 & (1 << PINA0));
 	}
 	if(!prevState) isBootloader = 1;
+    if(eeprom_read_byte(0) == 0xCA) // bootloade signature
+    {
+        isBootloader = 1;
+        eeprom_write_byte(0, 0);    // clear
+    }
 
     if (isBootloader) {
         // boot loader active, blink leds

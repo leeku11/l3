@@ -112,14 +112,7 @@ void keymap_init(void)
 	for(i=0;i<MAX_KEY;i++)
 		KFLA[i]=0;
 #endif
-    keyidx = 0x6300;
-    for (i = 0; i < MAX_LAYER; i++)
-    {
-        keymap[i] = keyidx;
-        keyidx += 0x100;
-    }
-        
-	// set flags
+  	// set flags
 	for(i=0;(keyidx=pgm_read_byte((uint16_t)(&keycode_set2_special[i])))!=K_NONE;i++)
 		KFLA[keyidx] |= KFLA_SPECIAL;
     
@@ -212,7 +205,6 @@ uint8_t processReleasedFNkeys(uint8_t keyidx)
     {
         kbdConf.led_preset_index = keyidx-K_LED0;
         led_mode_change(ledblock, ledmode[kbdConf.led_preset_index][ledblock]);
-        led_mode_save();
         retVal = 1;
     }else if(keyidx >= K_LFX && keyidx <= K_LARR)
     {
@@ -394,7 +386,9 @@ uint8_t cntKey(uint8_t keyidx, uint8_t clearmask)
             macrokeypushedcnt = 0;
         }
         
-    }else if (keyidx >= K_LED0 && keyidx <= K_LED3)
+    }
+#if 0    
+    else if (keyidx >= K_LED0 && keyidx <= K_LED3)
     {
         if(clearmask == 0x0000)
         {
@@ -406,7 +400,9 @@ uint8_t cntKey(uint8_t keyidx, uint8_t clearmask)
             ledkeypushedcnt = 0;
         }
         
-    }else if (keyidx == K_MRESET)
+    }
+#endif    
+    else if (keyidx == K_MRESET)
     {
          if(clearmask == 0x0000)
         {

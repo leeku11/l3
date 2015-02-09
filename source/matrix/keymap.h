@@ -388,6 +388,4 @@ extern const uint8_t PROGMEM keycode_set2_make_break[];
 extern const uint8_t PROGMEM keycode_set2_extend[];
 extern const uint8_t PROGMEM keycode_set2_proc_shift[];
 extern const uint8_t PROGMEM keymap_code[MAX_LAYER][MAX_COL][MAX_ROW];
-extern long keymap[MAX_LAYER];
-
 #endif

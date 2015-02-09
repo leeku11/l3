@@ -1,14 +1,7 @@
 #ifndef HWADDRESS_H
 #define HWADDRESS_H
 
-#define EEPADDR_LEDMODE_INDEX   (uint8_t *)11
-#define EEPADDR_USBPS2_MODE  (uint8_t *)12
-#define EEPADDR_KEYLAYER     (uint8_t *)13
-#define EEPADDR_SWAPCTRLCAPS (uint8_t *)14
-#define EEPADDR_SWAPALTGUI   (uint8_t *)15
-
-#define EEPADDR_LED_MODE     (uint8_t *)200
-
+#define EEPADDR_BOOTLOADER_ACT      (void *)0
 
 #define EEPADDR_MACRO_SET           (uint8_t *)0x100    // 256-511 (1Byte x 52)
 #define EEPADDR_KBD_CONF            (void *)0x200    // 512-767

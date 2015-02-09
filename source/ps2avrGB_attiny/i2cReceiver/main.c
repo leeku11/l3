@@ -925,6 +925,7 @@ uint8_t handlecmd_dirty(tinycmd_pkt_req_type *p_req)
     if(p_req->cmd_code & TINY_CMD_KEY_MASK) // down
     {
         scanDirty |= SCAN_DIRTY;
+        led_pushed_level_cal();
     }
     else
     {
@@ -1361,6 +1362,23 @@ void TinyInitEffect(void)
     tinyRgbmodeIndex = 0;
     memset(&tinyRgbEffect, 0, sizeof(rgb_effect_param_type));
 }
+
+void led_pushed_level_cal(void)
+{
+    LED_BLOCK ledblock;
+    // update pushed level
+
+    for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
+    { 
+        if(pushedLevel[ledblock] < PUSHED_LEVEL_MAX)
+        {
+            pushedLevelStay[ledblock] = 511;
+            pushedLevel[ledblock]++;
+            pushedLevelDuty[ledblock] = (255 * pushedLevel[ledblock]) / PUSHED_LEVEL_MAX;
+        }
+    }
+}
+
 
 int main(void)
 {

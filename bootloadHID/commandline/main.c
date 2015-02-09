@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <windows.h>
 #include "usbcalls.h"
 
 #define IDENT_VENDOR_NUM        0x16c0
@@ -182,16 +183,30 @@ static int uploadData(char *dataBuffer)
 {
 usbDevice_t *dev = NULL;
 int         err = 0, len, mask, pageSize, deviceSize, i;
+int         timeOut = 10;
 union{
     char            bytes[1];
     deviceInfo_t    info;
     deviceData_t    data;
 }           buffer;
 
-    if((err = usbOpenDevice(&dev, IDENT_VENDOR_NUM, IDENT_VENDOR_STRING, IDENT_PRODUCT_NUM, IDENT_PRODUCT_STRING, 1)) != 0){
+
+    for(i=0; i<timeOut; i++)
+    {
+        if((err = usbOpenDevice(&dev, IDENT_VENDOR_NUM, IDENT_VENDOR_STRING, IDENT_PRODUCT_NUM, IDENT_PRODUCT_STRING, 1)) == 0){
+            printf("usbOpenDevice() successed! \n");
+            break;
+        }
+        Sleep(1000);
+           
+    }
+    if((i==0) && err != 0)
+    {
         fprintf(stderr, "Error opening HIDBoot device: %s\n", usbErrorMessage(err));
         goto errorOccurred;
     }
+
+    
     len = sizeof(buffer);
     if(endAddress[addressIndex] > startAddress[0]){    // we need to upload data
         if((err = usbGetReport(dev, USB_HID_REPORT_TYPE_FEATURE, 1, buffer.bytes, &len)) != 0){
