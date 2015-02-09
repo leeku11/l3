@@ -364,7 +364,7 @@ void playMacroUSB(uint8_t macrokey)
     address = MACRO_ADDR_START + (0x100 * mIndex);
 
     macroSET = eeprom_read_byte(EEPADDR_MACRO_SET+mIndex);
-    if (macroSET != 1)      // MACRO not recorded
+    if (macroSET != EEPVAL_MACRO_BIT)      // MACRO not recorded
     {
         return;
     }
@@ -434,7 +434,7 @@ void playMacroPS2(uint8_t macrokey)
     
 
     macroSET = eeprom_read_byte(EEPADDR_MACRO_SET+mIndex);
-     if (macroSET != 1)      // MACRO not recorded
+     if (macroSET != EEPVAL_MACRO_BIT)      // MACRO not recorded
      {
          return;
      }
@@ -584,7 +584,7 @@ void resetMacro(void)
     for (mIndex = 0; mIndex < MAX_MACRO_INDEX; mIndex++)
     {
       wdt_reset();
-      eeprom_write_byte(EEPADDR_MACRO_SET+mIndex, 0);
+      eeprom_write_byte(EEPADDR_MACRO_SET+mIndex, ~(EEPVAL_MACRO_BIT));
       sendString((uint16_t) "-");
     }
     sendString((uint16_t) &macroresetdone);
@@ -679,7 +679,7 @@ void recordMacro(uint8_t macrokey)
                      wdt_reset();
                      flash_writeinpage(macrobuffer, address+(page*128));
                      wdt_reset();
-                     eeprom_write_byte(EEPADDR_MACRO_SET+mIndex, 1);
+                     eeprom_write_byte(EEPADDR_MACRO_SET+mIndex, EEPVAL_MACRO_BIT);
                      wdt_reset();
                      sendString((uint16_t) &macroend[0]);
                      return;

@@ -2,8 +2,11 @@
 #define HWADDRESS_H
 
 #define EEPADDR_BOOTLOADER_ACT      (void *)0
+#define EEPVAL_BOOTLOADER_BIT       0xCA
 
 #define EEPADDR_MACRO_SET           (uint8_t *)0x100    // 256-511 (1Byte x 52)
+#define EEPVAL_MACRO_BIT            0xCA                // 0xCA :macro is recorded 
+
 #define EEPADDR_KBD_CONF            (void *)0x200    // 512-767
 
 #define EEPADDR_KEYMAP_LAYER0       (void *)0x300    // 768 -895
