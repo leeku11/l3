@@ -6,7 +6,7 @@
 #define TINY_CMD_KEY_MASK               0x40
 
 // System Command
-#define TINY_CMD_CONFIG                 0
+#define TINY_CMD_CONFIG_F               0
 #define TINY_CMD_VER_F                  1
 #define TINY_CMD_RESET_F                2
 #define TINY_CMD_THREE_LOCK_F           3

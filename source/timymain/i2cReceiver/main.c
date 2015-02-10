@@ -85,7 +85,7 @@ typedef enum
 uint8_t *NCSLock; // initial level
 uint8_t rgbBuffer[CLED_NUM][CLED_ELEMENT];
 uint8_t tmprgbBuffer[CLED_NUM][CLED_ELEMENT];
-uint8_t rgbBufferLength; // = CLED_ARRAY_SIZE;
+uint8_t rgbBufferLength = CLED_ARRAY_SIZE;
 
 uint8_t cmdBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
 
@@ -113,7 +113,7 @@ void key_led_control(uint8_t ch, uint8_t on);
 void key_led_pwm_on(uint8_t channel, uint8_t on);
 void key_led_pwm_duty(uint8_t channel, uint8_t duty);
 void tiny_led_mode_change (TINY_LED_BLOCK ledblock, int mode);
-
+void tiny_led_pushed_level_cal(void);
 
 uint8_t handlecmd_ver(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_reset(tinycmd_pkt_req_type *p_req);
@@ -132,7 +132,7 @@ uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_dirty(tinycmd_pkt_req_type *p_req);
 
 const tinycmd_handler_array_type cmdhandler[] = {
-    {TINY_CMD_CONFIG, handlecmd_config},                 // TINY_CMD_CONFIG
+    {TINY_CMD_CONFIG_F, handlecmd_config},                 // TINY_CMD_CONFIG
     {TINY_CMD_VER_F, handlecmd_ver},                    // TINY_CMD_VER_F
     {TINY_CMD_RESET_F,handlecmd_reset},                  // TINY_CMD_RESET_F
     {TINY_CMD_THREE_LOCK_F,handlecmd_three_lock},             // TINY_CMD_THREE_LOCK_F
@@ -685,6 +685,25 @@ uint8_t rgb_effect_fade_inout_loop(rgb_effect_param_type *p_effect)
 
     return 1;
 }
+
+static uint8_t sendResponse(uint8_t cmd)
+{
+    tinycmd_rsp_type *p_rsp = (tinycmd_rsp_type *)i2c_rdbuf;
+    volatile uint16_t i2cTimeout;
+     /*
+     * To set response data, wait until i2c_reply_ready() returns nonzero,
+     * then fill i2c_rdbuf with the data, finally call i2c_reply_done(n).
+     * Interrupts are disabled while updating.
+     */
+    i2cTimeout = 0xFFFF;
+    while((i2c_reply_ready() == 0) && i2cTimeout--);
+    
+    p_rsp->cmd_code = cmd;
+    i2c_reply_done(sizeof(tinycmd_rsp_type));
+
+    return 0;
+}
+
 uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_config_req_type *p_config_req = (tinycmd_config_req_type *)p_req;
@@ -700,32 +719,6 @@ uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req)
 
 uint8_t handlecmd_ver(tinycmd_pkt_req_type *p_req)
 {
-    volatile uint16_t i2cTimeout;
-    tinycmd_ver_req_type *p_ver_req = (tinycmd_ver_req_type *)p_req;
-
-    if((p_ver_req->cmd_code & TINY_CMD_RSP_MASK) != 0)
-    {
-         /*
-         * To set response data, wait until i2c_reply_ready() returns nonzero,
-         * then fill i2c_rdbuf with the data, finally call i2c_reply_done(n).
-         * Interrupts are disabled while updating.
-         */
-        i2cTimeout = 0xFFFF;
-        while((i2c_reply_ready() == 0) && i2cTimeout--);
-        
-        tinycmd_ver_rsp_type *p_ver_rsp = (tinycmd_ver_rsp_type *)i2c_rdbuf;
-
-        p_ver_rsp->cmd_code = TINY_CMD_VER_F;
-        p_ver_rsp->pkt_len = sizeof(tinycmd_ver_rsp_type);
-        p_ver_rsp->version = 0xA5;
-        i2c_reply_done(p_ver_rsp->pkt_len);
-
-        // debug
-        //rgb_array_on(TRUE, 100, 0, 100);
-        
-        //tinyConfig.comm_init = 1;
-    }
-
     return 0;
 }
 
@@ -756,6 +749,7 @@ uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
     }
 
     ws2812_sendarray(NCSLock,CLED_ELEMENT);        // output message data to port D
+
     return 0;
 }
 
@@ -764,7 +758,7 @@ uint8_t handlecmd_rgb_all(tinycmd_pkt_req_type *p_req)
     tinycmd_rgb_all_req_type *p_rgb_all_req = (tinycmd_rgb_all_req_type *)p_req;
 
     rgb_array_on(p_rgb_all_req->on, p_rgb_all_req->led.r, p_rgb_all_req->led.g, p_rgb_all_req->led.b);
-    
+
     return 0;
 }
 
@@ -806,7 +800,7 @@ uint8_t handlecmd_rgb_range(tinycmd_pkt_req_type *p_req)
     }
 
     ws2812_sendarray((uint8_t *)rgbBuffer,rgbBufferLength);        // output message data to port D
-    
+
     return 0;
 }
 
@@ -823,7 +817,7 @@ uint8_t handlecmd_rgb_buffer(tinycmd_pkt_req_type *p_req)
     memcpy(rgbBuffer[tmpPos], p_rgb_buffer_req->data, p_rgb_buffer_req->num * CLED_ELEMENT);
 
     ws2812_sendarray((uint8_t *)rgbBuffer,rgbBufferLength);        // output message data to port D
-    
+
     return 0;
 }
 
@@ -835,9 +829,6 @@ uint8_t handlecmd_rgb_set_effect(tinycmd_pkt_req_type *p_req)
     memcpy(&tinyRgbEffect, &p_set_effect_req->effect_param, sizeof(rgb_effect_param_type));
     memset(&tmprgbBuffer, 0, CLED_ARRAY_SIZE);
 
-    //temp
-    //set_effect_temp();
-    
     return 0;
 }
 
@@ -864,7 +855,7 @@ uint8_t handlecmd_led_set_effect(tinycmd_pkt_req_type *p_req)
     tinycmd_led_set_effect_req_type *p_set_effect_req = (tinycmd_led_set_effect_req_type *)p_req;
 
     tinyLedmodeIndex = p_set_effect_req->preset;
-    
+
     return 0;
 }
 
@@ -875,21 +866,20 @@ uint8_t handlecmd_led_set_preset(tinycmd_pkt_req_type *p_req)
 
     block = p_set_preset_req->block - 3;
     tinyLedmode[p_set_preset_req->preset][block] = p_set_preset_req->effect;
-    
+
     return 0;
 }
 
 uint8_t handlecmd_led_config_preset(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_led_config_preset_req_type *p_cfg_preset_req = (tinycmd_led_config_preset_req_type *)p_req;
-    volatile uint16_t i2cTimeout;
     uint8_t i, j;
     uint8_t *pTmp = p_cfg_preset_req->data;
 
     //memcpy(tinyLedmode, p_cfg_preset_req->data, sizeof(tinyLedmode));
     for(i = 0; i < LEDMODE_INDEX_MAX; i++)
     {
-        pTmp += 3;
+        pTmp+=3;
         for(j = 0; j < TINY_LED_BLOCK_MAX; j++)
         {
             tinyLedmode[i][j] = *pTmp++;
@@ -898,19 +888,6 @@ uint8_t handlecmd_led_config_preset(tinycmd_pkt_req_type *p_req)
 
     if((p_cfg_preset_req->cmd_code & TINY_CMD_RSP_MASK) != 0)
     {
-         /*
-         * To set response data, wait until i2c_reply_ready() returns nonzero,
-         * then fill i2c_rdbuf with the data, finally call i2c_reply_done(n).
-         * Interrupts are disabled while updating.
-         */
-        i2cTimeout = 0xFFFF;
-        while((i2c_reply_ready() == 0) && i2cTimeout--);
-        
-        tinycmd_rsp_type *p_gen_rsp = (tinycmd_rsp_type *)i2c_rdbuf;
-
-        p_gen_rsp->cmd_code = TINY_CMD_VER_F;
-        p_gen_rsp->pkt_len = sizeof(tinycmd_rsp_type);
-        i2c_reply_done(p_gen_rsp->pkt_len);
         for (i = 0; i < 2; i++)
         {
             tinyPwmDir[i] = 0;
@@ -954,6 +931,12 @@ uint8_t handlecmd(tinycmd_pkt_req_type *p_req)
             break;
         }
     }
+
+    if((p_req->cmd_code & TINY_CMD_RSP_MASK) != 0)
+    {
+        sendResponse(cmd);
+    }
+
     return ret;
 }
 

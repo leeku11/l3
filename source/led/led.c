@@ -315,7 +315,7 @@ void led_3lockupdate(uint8_t LEDstate)
 {
     if (tinyExist)
     {
-        tinycmd_three_lock((LEDstate & LED_NUM), (LEDstate & LED_CAPS), (LEDstate & LED_SCROLL));
+        tinycmd_three_lock((LEDstate & LED_NUM), (LEDstate & LED_CAPS), (LEDstate & LED_SCROLL), TRUE);
     }
 #ifdef LED_CONTROL_MASTER
     else
@@ -380,7 +380,7 @@ void led_mode_init(void)
     
     led_3lockupdate(gLEDstate);
 
-#ifdef LED_CONTROL_SLAVE
+#if 0//def LED_CONTROL_SLAVE
     tinycmd_led_preset_config((uint8_t *)&kbdConf.led_preset[0][0]);
     tinycmd_led_set_effect(kbdConf.led_preset_index);
 

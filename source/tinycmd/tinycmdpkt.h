@@ -160,6 +160,7 @@ typedef union
   tinycmd_rgb_all_req_type             rgb_all;                  // TINY_CMD_RGB_ALL_F
   tinycmd_rgb_pos_req_type             rgb_pos;                  // TINY_CMD_RGB_POS_F
   tinycmd_rgb_range_req_type           rgb_range;                // TINY_CMD_RGB_RANGE_F
+  tinycmd_rgb_buffer_req_type          rgb_buffer;               // TINY_CMD_RGB_BUFFER_F
   tinycmd_rgb_set_effect_req_type      rgb_set_effect;           // TINY_CMD_RGB_SET_EFFECT_F
   tinycmd_rgb_set_preset_req_type      rgb_set_preset;           // TINY_CMD_RGB_SET_PRESET_F
   tinycmd_led_level_req_type           led_level;                // TINY_CMD_LED_LEVEL_F
@@ -174,7 +175,6 @@ typedef union
 typedef struct
 {
   uint8_t cmd_code;
-  uint8_t pkt_len;
 } tinycmd_rsp_type;
 
 
@@ -188,8 +188,8 @@ typedef struct
 typedef union
 {
   uint8_t cmd_code;
-  tinycmd_rsp_type gen;
-  tinycmd_ver_rsp_type ver;
+  tinycmd_rsp_type gen;       // general response
+  tinycmd_ver_rsp_type ver;   // for version
 } tinycmd_pkt_rsp_type;
 
 #endif // TINYCMDPKT_H

@@ -30,7 +30,7 @@
 
 // local data buffer
 uint8_t tinyExist = 0;
-unsigned char localBuffer[0x40];
+unsigned char localBuffer[0x4B];
 unsigned char localBufferLength;
 #endif // SUPPORT_I2C
 
@@ -231,7 +231,7 @@ int8_t setPS2USB(void)
 uint8_t establishSlaveComm(void)
 {
     uint8_t ret = 0;
-    
+
 #ifdef SUPPORT_TINY_CMD
     uint16_t retry = 0;
 
@@ -241,31 +241,54 @@ uint8_t establishSlaveComm(void)
     while(ret == 0 && (retry++ < 1000))
     {
         // proving
-        tinycmd_ver(TRUE);
-
-        tinycmd_ver_rsp_type *p_ver_rsp = (tinycmd_ver_rsp_type*)localBuffer;
-        if(p_ver_rsp->cmd_code == TINY_CMD_VER_F)
+        ret = tinycmd_ver(TRUE);
+        if(ret)
         {
-            if(p_ver_rsp->version == 0xA5)
-            {
-                ret = 1;
-                break;
-            }
+            tinycmd_config(TRUE);
+            break;
         }
     }
 #endif // SUPPORT_TINY_CMD
 
     return ret;    
-}    
+}  
 
-void updateConf(void)
+uint8_t tiny_init(void)
+{
+    uint8_t ret = 0;
+    if(tinyExist)
+    {
+        // Init RGB Effect
+        tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
+        { // temporary
+            kbdConf.rgb_effect_index = 5; // RGB_EFFECT_FADE_LOOP
+            memset(&kbdConf.rgb_effect_param, 0, sizeof(rgb_effect_param_type));
+            kbdConf.rgb_effect_param.index = 5;  // RGB_EFFECT_FADE_LOOP
+            kbdConf.rgb_effect_param.high_hold = 5;
+            kbdConf.rgb_effect_param.accel_mode = 1; // quadratic
+        }
+        tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, &kbdConf.rgb_effect_param, TRUE);
+
+        // Init LED Effect
+        tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
+        tinycmd_led_preset_config(kbdConf.led_preset, TRUE);
+
+/*
+              kbdConf.rgb_chain = 14;
+*/
+        ret = 1;
+    }
+    return ret;
+}
+
+int8_t updateConf(void)
 {
     eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
 }
 
 
 
-void kbd_init(void)
+int8_t kbd_init(void)
 {
 #if 0
 ///////////////////SHOULD BE REMOVED ////////////////
@@ -319,8 +342,9 @@ updateConf();       // should be removed
 
     keymap_init();
     tinyExist = establishSlaveComm();
+
+    tiny_init();
     
-    tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (tinycmd_led_type *)kbdConf.rgb_preset);
     updateConf();
 }
 
