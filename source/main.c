@@ -16,6 +16,7 @@
 #include <avr/eeprom.h>
 #include <avr/wdt.h>
 #include <util/delay.h>     /* for _delay_ms() */
+#include <string.h>
 
 #include "hwport.h"
 #include "usbdrv.h"
@@ -271,7 +272,7 @@ uint8_t tiny_init(void)
 
         // Init LED Effect
         tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
-        tinycmd_led_preset_config(kbdConf.led_preset, TRUE);
+        tinycmd_led_preset_config((uint8_t *)kbdConf.led_preset, TRUE);
 
 /*
               kbdConf.rgb_chain = 14;
@@ -281,14 +282,14 @@ uint8_t tiny_init(void)
     return ret;
 }
 
-int8_t updateConf(void)
+void updateConf(void)
 {
     eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
 }
 
 
 
-int8_t kbd_init(void)
+void kbd_init(void)
 {
 #if 0
 ///////////////////SHOULD BE REMOVED ////////////////

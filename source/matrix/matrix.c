@@ -47,6 +47,9 @@ uint16_t cntLGui = 0;
 
 int8_t isFNpushed = 0;
 
+static uint8_t gDirty;
+
+
 
 static uint8_t findFNkey(void)
 {
@@ -125,6 +128,8 @@ uint8_t processPushedFNkeys(uint8_t keyidx)
     
     if(keyidx >= K_LED0 && keyidx <= K_LED3)
     {
+        kbdConf.led_preset_index = keyidx - K_LED0;
+        led_mode_init();
         retVal = 1;
     }else if(keyidx >= K_LFX && keyidx <= K_LARR)
     {
@@ -134,7 +139,6 @@ uint8_t processPushedFNkeys(uint8_t keyidx)
         kbdConf.keymapLayerIndex = keyidx - K_L0;
         updateConf();
         keymap_init();
-        led_mode_init();
         retVal = 1;
     }else if(keyidx >= K_M01 && keyidx <= K_M52)
     {
@@ -407,7 +411,6 @@ uint8_t swap_key(uint8_t keyidx)
     return keyidx;
 }
 
-static uint8_t gDirty;
 
 // return : key modified
 uint8_t scankey(void)

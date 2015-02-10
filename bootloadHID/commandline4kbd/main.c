@@ -423,14 +423,14 @@ typedef enum
 
 typedef enum
 {
-    LED_EFFECT_FADING          = 0, //ok
-    LED_EFFECT_FADING_PUSH_ON  = 1, //?
-    LED_EFFECT_PUSHED_LEVEL    = 2, //?
-    LED_EFFECT_PUSH_ON         = 3, //ok
-    LED_EFFECT_PUSH_OFF        = 4, //ok
-    LED_EFFECT_ALWAYS          = 5, //ok
-    LED_EFFECT_BASECAPS        = 6, //?
-    LED_EFFECT_OFF             = 7, //?
+    LED_EFFECT_FADING          = 0,
+    LED_EFFECT_FADING_PUSH_ON  = 1,
+    LED_EFFECT_PUSHED_LEVEL    = 2,
+    LED_EFFECT_PUSH_ON         = 3, 
+    LED_EFFECT_PUSH_OFF        = 4,
+    LED_EFFECT_ALWAYS          = 5,
+    LED_EFFECT_BASECAPS        = 6,
+    LED_EFFECT_OFF             = 7, 
     LED_EFFECT_NONE
 }LED_MODE;
 

@@ -62,6 +62,6 @@ typedef struct kbd_conf
 #define MACRO_ADDR_START      0x4400     // 0x4400 ~ 0x6FFF  (7KBytes - 256B x 44)
 
 extern kbd_configuration_t kbdConf;
-extern int8_t updateConf(void);
+extern void updateConf(void);
 
 #endif // HWADDRESS_H

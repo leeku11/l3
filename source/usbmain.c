@@ -61,10 +61,6 @@ MODIFIERS modifierBitmap[] = {
 
 
 
-
-
-
-
 /*------------------------------------------------------------------*
  * Descriptors                                                      *
  *------------------------------------------------------------------*/
@@ -418,13 +414,15 @@ void rxHIDCmd(void)
         case CMD_CONFIG:
             {
                 eeprom_update_block(&hidData.data[0], EEPADDR_KBD_CONF, sizeof(kbdConf));
-                tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (tinycmd_led_type *)kbdConf.rgb_preset, TRUE);
+                tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
                 tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, &kbdConf.rgb_effect_param, TRUE);
+                led_mode_init();
             }
             break;
         case CMD_KEYMAP :
             {
                eeprom_update_block(hidData.data, EEPADDR_KEYMAP_LAYER0 + (0x80 * hidCmd.keymap.index), sizeof(currentLayer));
+               keymap_init();
                 // TO DO reload key map
                 
             }
@@ -795,9 +793,9 @@ void rgb_set_effect_param(uint8_t effect, rgb_effect_param_type *p_param)
 #endif
 
 
-static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS},
-                {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSHED_LEVEL, LED_EFFECT_PUSHED_LEVEL},
-                {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_OFF, LED_EFFECT_BASECAPS}};
+static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING, LED_EFFECT_FADING_PUSH_ON},
+                {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSHED_LEVEL, LED_EFFECT_PUSH_ON},
+                {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSH_OFF, LED_EFFECT_BASECAPS}};
 
 
 
@@ -876,12 +874,16 @@ uint8_t buildHIDreports(uint8_t keyidx)
                     case K_F10:
                         //rgb_set_effect_param(9, &kbdConf.rgb_effect_param);
                         //tinycmd_rgb_set_effect(9, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_SWIPE
-                        tinycmd_rgb_all(1, 100, 100, 0, TRUE);
+                        tinycmd_rgb_all(1, 100, 100, 0, FALSE);
+                        tinycmd_led_preset_config((uint8_t *)&tmpled_preset[0][0], FALSE);
+                        tinycmd_led_set_effect(0, FALSE);
                         break;
                     case K_F11:
                         //rgb_set_effect_param(10, &kbdConf.rgb_effect_param);
                         //tinycmd_rgb_set_effect(10, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_SWIPE_BUF
-                        tinycmd_rgb_all(1, 0, 100, 100, TRUE);
+                        tinycmd_rgb_all(1, 0, 100, 100, FALSE);
+                        tinycmd_led_set_effect(1, FALSE);
+
                         break;
                     case K_F12:
                         //rgb_set_effect_param(11, &kbdConf.rgb_effect_param);
@@ -889,8 +891,9 @@ uint8_t buildHIDreports(uint8_t keyidx)
                         //tinycmd_rgb_all(1, 100, 0, 100);
                         {
                             // set rgb leds
-                            tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (tinycmd_led_type *)kbdConf.rgb_preset, TRUE);
+                            tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, FALSE);
                         }
+                            tinycmd_led_set_effect(2, FALSE);
                         break;
                 }
             }

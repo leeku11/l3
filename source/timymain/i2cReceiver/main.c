@@ -106,6 +106,7 @@ rgb_effect_param_type tinyRgbEffect; // current rgb effect
 //rgb_effect_param_type tinyRgbEffectPreset[2];
 
 uint8_t scanDirty;
+uint32_t gcounter = 0;
 
 tiny_config_type tinyConfig;
 
@@ -729,11 +730,12 @@ uint8_t handlecmd_reset(tinycmd_pkt_req_type *p_req)
 
 uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
 {
+    uint8_t i;
     tinycmd_three_lock_req_type *p_three_lock_req = (tinycmd_three_lock_req_type *)p_req;
 
-    NCSLock[0] = 0;
-    NCSLock[1] = 0;
-    NCSLock[2] = 0;
+    NCSLock[0] = 0;     // Num
+    NCSLock[1] = 0;     // Caps
+    NCSLock[2] = 0;     // Scrl
     
     if(p_three_lock_req->lock & (1<<2))
     {
@@ -748,8 +750,22 @@ uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
         NCSLock[2] = 240;
     }
 
-    ws2812_sendarray(NCSLock,CLED_ELEMENT);        // output message data to port D
+    for (i=TINY_LED_PIN_BASE; i<=TINY_LED_PIN_WASD; i++)
+    {
+        if(tinyLedmode[tinyLedmodeIndex][i] == LED_EFFECT_BASECAPS)
+        {
+            if(NCSLock[1] != 0)
+            {
+                tiny_led_on(i);
+            }else
+            {
+                tiny_led_off(i);
+            }
+        }
+    }
+    
 
+    ws2812_sendarray(NCSLock,CLED_ELEMENT);        // output message data to port D
     return 0;
 }
 
@@ -856,6 +872,9 @@ uint8_t handlecmd_led_set_effect(tinycmd_pkt_req_type *p_req)
 
     tinyLedmodeIndex = p_set_effect_req->preset;
 
+    tiny_led_mode_change(TINY_LED_PIN_BASE, tinyLedmodeIndex);
+    tiny_led_mode_change(TINY_LED_PIN_WASD, tinyLedmodeIndex);
+    
     return 0;
 }
 
@@ -905,13 +924,15 @@ uint8_t handlecmd_dirty(tinycmd_pkt_req_type *p_req)
     if(p_req->cmd_code & TINY_CMD_KEY_MASK) // down
     {
         scanDirty |= SCAN_DIRTY;
+
+        gcounter = 0;
         tiny_led_pushed_level_cal();
     }
     else
     {
         scanDirty = 0;
     }
-    
+    tiny_led_blink(scanDirty);
     return 0;
 }
 
@@ -1039,6 +1060,7 @@ void key_led_pwm_duty(uint8_t channel, uint8_t duty)
 
 void tiny_led_off(TINY_LED_BLOCK block)
 {
+    tiny_led_wave_off(block);
     switch(block)
     {
         case TINY_LED_PIN_BASE:
@@ -1054,6 +1076,7 @@ void tiny_led_off(TINY_LED_BLOCK block)
 
 void tiny_led_on(TINY_LED_BLOCK block)
 {
+    tiny_led_wave_off(block);
     switch(block)
     {
         case TINY_LED_PIN_BASE:
@@ -1136,8 +1159,6 @@ void tiny_led_blink(int matrixState)
                     tiny_led_on(ledblock);
                     break;
                 case LED_EFFECT_PUSH_OFF:
-                    tiny_led_wave_off(ledblock);
-                    tiny_led_wave_set(ledblock, 0);
                     tiny_led_off(ledblock);
                     break;
                 default :
@@ -1168,7 +1189,7 @@ void tiny_led_fader(void)
     for (ledblock = TINY_LED_PIN_BASE; ledblock <= TINY_LED_PIN_WASD; ledblock++)
     {
         if((tinyLedmode[tinyLedmodeIndex][ledblock] == LED_EFFECT_FADING)
-           || ((tinyLedmode[tinyLedmodeIndex][ledblock] == LED_EFFECT_FADING_PUSH_ON)))
+           || ((tinyLedmode[tinyLedmodeIndex][ledblock] == LED_EFFECT_FADING_PUSH_ON) && (gcounter > 0x10000)))
         {
             if(tinyPwmDir[ledblock]==0)
             {
@@ -1226,26 +1247,11 @@ void tiny_led_fader(void)
     			// 시간이 흐르면 레벨을 감소 시킨다.
     			if(tinyPushedLevelDuty[ledblock] > 0)
     			{
-    				tinyPwmCounter[ledblock]++;
-    				if(tinyPwmCounter[ledblock] >= tinySpeed[ledblock])
-    				{
-    					tinyPwmCounter[ledblock] = 0;			
     					tinyPushedLevelDuty[ledblock]--;
-    					tinyPushedLevel[ledblock] = PUSHED_LEVEL_MAX - (255-tinyPushedLevelDuty[ledblock]) / (255/PUSHED_LEVEL_MAX);
-    					/*if(pushedLevel_prev != tinyPushedLevel){
-    						DEBUG_PRINT(("---------------------------------decrease tinyPushedLevel : %d, life : %d\n", tinyPushedLevel, tinyPushedLevelDuty));
-    						pushedLevel_prev = tinyPushedLevel;
-    					}*/
-    				}
-    			}
-    			else
-    			{
-    				tinyPushedLevel[ledblock] = 0;
-    				tinyPwmCounter[ledblock] = 0;
     			}
     		}
     		tiny_led_wave_set(ledblock, tinyPushedLevelDuty[ledblock]);
-
+            tiny_led_wave_on(ledblock);
     	}
     	else
         {
@@ -1295,11 +1301,23 @@ void tiny_led_mode_change (TINY_LED_BLOCK ledblock, int mode)
             break;
         case LED_EFFECT_PUSH_ON :
         case LED_EFFECT_OFF :
-        case LED_EFFECT_PUSHED_LEVEL :
-        case LED_EFFECT_BASECAPS :
             tiny_led_wave_set(ledblock,0);
             tiny_led_wave_off(ledblock);
             tiny_led_off(ledblock);
+            break;
+
+        case LED_EFFECT_PUSHED_LEVEL :
+            tiny_led_wave_set(ledblock,0);
+            tiny_led_wave_on(ledblock);
+            
+        case LED_EFFECT_BASECAPS :
+            if(NCSLock[1] != 0)
+            {
+                tiny_led_on(ledblock);
+            }else
+            {
+            tiny_led_off(ledblock);
+            }
             break;
         default :
             tinyLedmode[tinyLedmodeIndex][ledblock] = LED_EFFECT_FADING;
@@ -1358,13 +1376,12 @@ void tiny_led_pushed_level_cal(void)
     LED_BLOCK ledblock;
     // update pushed level
 
-    for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
+    for (ledblock = TINY_LED_PIN_BASE; ledblock <= TINY_LED_PIN_WASD; ledblock++)
     { 
-        if(tinyPushedLevel[ledblock] < PUSHED_LEVEL_MAX)
+        tinyPushedLevelStay[ledblock] = 180;
+        if((tinyPushedLevelDuty[ledblock] += 15) >= 255)
         {
-            tinyPushedLevelStay[ledblock] = 511;
-            tinyPushedLevel[ledblock]++;
-            tinyPushedLevelDuty[ledblock] = (255 * tinyPushedLevel[ledblock]) / PUSHED_LEVEL_MAX;
+            tinyPushedLevelDuty[ledblock] = 255;
         }
     }
 }
@@ -1409,11 +1426,14 @@ int main(void)
         {
             count++;
             effect_count++;
+            if(gcounter++ > 0xfffff)
+            {
+                gcounter = 0xfffff;
+            }
             if(tinyConfig.comm_init)
             {
                 if(count%150 == 0)
                 {
-                    tiny_led_blink(scanDirty);
                     tiny_led_fader();
                 }
 
