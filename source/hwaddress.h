@@ -59,13 +59,7 @@ typedef struct kbd_conf
     rgb_effect_param_type rgb_effect_param; // RGB effect parameter
 }kbd_configuration_t;
 
-
-#define KEYMAP_LAYER0         0x6300
-#define KEYMAP_LAYER1         0x6400
-#define KEYMAP_LAYER2         0x6500
-#define KEYMAP_LAYER3         0x6600
-#define LEDMODE_ADDRESS       0x6800      // 0x9800:0x98FF  (256Bytes)
-#define MACRO_ADDR_START      0x4400     // 0x4400 ~ 0x5FFF  (7KBytes - 256B x 28)
+#define MACRO_ADDR_START      0x4400     // 0x4400 ~ 0x6FFF  (7KBytes - 256B x 44)
 
 extern kbd_configuration_t kbdConf;
 extern void updateConf(void);

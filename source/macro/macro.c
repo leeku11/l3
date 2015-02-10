@@ -26,10 +26,11 @@
 
 uint8_t macrobuffer[256] = {};
 
-const char PROGMEM macrostart[20] = "MACRO record mode@";
-const char PROGMEM macroend[20] = "@record done@";
-const char PROGMEM mresetstart[20] = "MACRO erase";
-const char PROGMEM macroresetdone[20]  = "done@";
+const char PROGMEM macrostart[] = "MACRO record mode@";
+const char PROGMEM macroend[] = "@record done@";
+const char PROGMEM mresetstart[] = "MACRO erase";
+const char PROGMEM macroresetdone[]  = "done@";
+extern MODIFIERS modifierBitmap[];
 
 
 /**
@@ -47,17 +48,7 @@ void usbSendReport(uint8_t mode, uint8_t key) {
     usbSetInterrupt(repBuffer, sizeof(repBuffer)); // send
 }
 
-/**
- * This structure can be used as a container for a single 'key'. It consists of
- * the key-code and the modifier-code.
- */
-typedef struct {
-    uint8_t mode;
-    uint8_t key;
-} Key;
 
-
-extern MODIFIERS modifierBitmap[];
 /**
  * Convert an ASCII-character to the corresponding key-code and modifier-code
  * combination.
@@ -306,7 +297,7 @@ void sendString(uint16_t pString) {
     uint8_t i = 0;
     uint8_t keychar, oldkeychar = 0;
     Key key;
-    while((keychar = pgm_read_byte(pString))!= (uint16_t)NULL && i < 32) // limit to 64 charater to send at once.
+    while((keychar = pgm_read_byte(pString))!= 0 && i < 32) // limit to 64 charater to send at once.
     {
         key = charToKey(keychar);
 
@@ -323,18 +314,18 @@ void sendString(uint16_t pString) {
     clearKey();
 }
 
-void sendMatrix(char col, char row)
+void sendMatrix(char row, char col)
 {
     Key a;
     
     a.mode = 0;
-    a.key = K_A + col;
+    a.key = K_A + row;
     sendKey(a);
 
     a.key = K_MINUS;
     sendKey(a);
 
-    a.key = K_A + row;
+    a.key = K_A + col;
     sendKey(a);
 
     a.key = K_SPACE;
@@ -573,6 +564,7 @@ uint8_t flash_writeinpage (uint8_t *data, uint16_t addr)
    }
    return 0;
 }
+#endif
 
 
 
@@ -584,7 +576,7 @@ void resetMacro(void)
     for (mIndex = 0; mIndex < MAX_MACRO_INDEX; mIndex++)
     {
       wdt_reset();
-      eeprom_write_byte(EEPADDR_MACRO_SET+mIndex, ~(EEPVAL_MACRO_BIT));
+      eeprom_write_byte(EEPADDR_MACRO_SET+mIndex, (uint8_t)~(EEPVAL_MACRO_BIT));
       sendString((uint16_t) "-");
     }
     sendString((uint16_t) &macroresetdone);
@@ -617,19 +609,15 @@ void recordMacro(uint8_t macrokey)
    
    cntKey(K_FN, 0x0000);
 
-//   for (i = 0; i <= 255; i++)
-//      macrobuffer[i] = 0x00;
-   for(col = 0; col < MAX_COL; col++)
+
+   for(row = 0; row < MATRIX_MAX_ROW; row++)
    {
-      for(row = 0; row < MAX_ROW; row++)
+      for(col = 0; col < MATRIX_MAX_COL; col++)
       {
-         debounceMATRIX[col][row] = -1;
+         debounceMATRIX[row][col] = -1;
       }
    }
-
    sendString((uint16_t) &macrostart[0]);
-
-
 
    while(1)
    {
@@ -638,37 +626,35 @@ void recordMacro(uint8_t macrokey)
       matrixState = scanmatrix();
       
       // debounce cleared => compare last matrix and current matrix
-      for(col = 0; col < MAX_COL; col++)
+      for(row = 0; row < MATRIX_MAX_ROW; row++)
       {
-         prev = MATRIX[col];
-         cur  = curMATRIX[col];
-         MATRIX[col] = curMATRIX[col];
-         for(i = 0; i < MAX_ROW; i++)
+         prev = MATRIX[row];
+         cur  = curMATRIX[row];
+         MATRIX[row] = curMATRIX[row];
+         for(col = 0; col < MATRIX_MAX_COL; col++)
          {
             prevBit = (uint8_t)prev & 0x01;
             curBit = (uint8_t)cur & 0x01;
             prev >>= 1;
             cur >>= 1;
 
-            row = i;
-
-            keyidx = currentLayer[col][row];
+              keyidx = currentLayer[row][col];
 
          if ((keyidx <= ErrorUndefined) || (K_Modifiers_end <= keyidx))
             continue;
 
-         if (!prevBit && curBit)   //pushed
+         if (!prevBit && curBit)                //pushed
          {
-            debounceMATRIX[col][row] = 0;    //triger
+            debounceMATRIX[row][col] = 0;       //triger
 
-         }else if (prevBit && !curBit)  //released
+         }else if (prevBit && !curBit)          //released
          {
-            debounceMATRIX[col][row] = 0;    //triger
+            debounceMATRIX[row][col] = 0;    //triger
          }
 
-         if(debounceMATRIX[col][row] >= 0)
+         if(debounceMATRIX[row][col] >= 0)
          {                
-            if(debounceMATRIX[col][row]++ >= DEBOUNCE_MAX)
+            if(debounceMATRIX[row][col]++ >= DEBOUNCE_MAX)
             {
                if(curBit)
                {
@@ -697,7 +683,6 @@ void recordMacro(uint8_t macrokey)
                         clearKey();
                      }
 
-
                      if(index == 0x7F)
                      {
                          flash_writeinpage(macrobuffer, address+(page*128));
@@ -715,16 +700,13 @@ void recordMacro(uint8_t macrokey)
                      macrobuffer[index++] = keyidx;
                      printModifier(keyidx, 0);
                      
-
-
                   }
                }
 
-               debounceMATRIX[col][row] = -1;
+               debounceMATRIX[row][col] = -1;
             }
          }
       }
       }
    }
 }
-#endif

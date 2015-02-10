@@ -3,8 +3,8 @@
 
 #include <avr/pgmspace.h>
 
-#define MAX_COL     6
-#define MAX_ROW     20
+#define MATRIX_MAX_ROW     6
+#define MATRIX_MAX_COL     20
 
 #define MAX_KEY     256
 
@@ -387,5 +387,4 @@ extern const uint8_t PROGMEM keycode_set2_makeonly[];
 extern const uint8_t PROGMEM keycode_set2_make_break[];
 extern const uint8_t PROGMEM keycode_set2_extend[];
 extern const uint8_t PROGMEM keycode_set2_proc_shift[];
-extern const uint8_t PROGMEM keymap_code[MAX_LAYER][MAX_COL][MAX_ROW];
 #endif

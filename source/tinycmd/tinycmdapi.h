@@ -19,6 +19,7 @@ void tinycmd_led_level(uint8_t channel, uint8_t level);
 void tinycmd_led_set_effect(uint8_t index);
 void tinycmd_led_set_preset(uint8_t preset, uint8_t block, uint8_t mode);
 void tinycmd_led_config_preset(uint8_t *p_led_mode_array);
+void tinycmd_led_preset_config(uint8_t *p_led_mode_array);
 
 
 #endif // TINYCMDAPI_H

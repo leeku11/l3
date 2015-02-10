@@ -22,25 +22,16 @@
 
 #include "ps2main.h"
 #include "tinycmdapi.h"
-#define STANDBY_LOOP    130000  // scan matix entry is 2.2msec @ 12Mh x-tal : 5min
-
-typedef enum KEY_LAYER_NUM{
-    KEY_LAYER_0,
-    KEY_LAYER_1,
-    KEY_LAYER_2,
-    KEY_LAYER_FN
-}KEY_LAYER_NUM_E;
 
 uint32_t scankeycntms = 0;
 	
 // 17*8 bit matrix
-uint32_t MATRIX[MAX_COL];
-uint32_t curMATRIX[MAX_COL];
-int8_t debounceMATRIX[MAX_COL][MAX_ROW];
-uint8_t svkeyidx[MAX_COL][MAX_ROW];
-uint8_t currentLayer[MAX_COL][MAX_ROW];
+uint32_t MATRIX[MATRIX_MAX_ROW];
+uint32_t curMATRIX[MATRIX_MAX_ROW];
+int8_t debounceMATRIX[MATRIX_MAX_ROW][MATRIX_MAX_COL];
+uint8_t svkeyidx[MATRIX_MAX_ROW][MATRIX_MAX_COL];
+uint8_t currentLayer[MATRIX_MAX_ROW][MATRIX_MAX_COL];
 uint8_t matrixFN[MAX_LAYER];           // (col << 4 | row)
-//uint8_t layer = 0;
 uint8_t kbdsleepmode = 0;
 uint16_t macrokeypushedcnt;
 uint16_t ledkeypushedcnt;
@@ -48,10 +39,6 @@ uint16_t macroresetcnt;
 uint16_t winkeylockcnt;
 uint16_t keylockcnt;
 uint8_t keylock = 0;
-#define SWAP_TIMER  0x400
-#define KEYLOCK_TIMER  0x600
-#define KEYLOCK_COUNTER_START 0x8000
-
 
 uint16_t cntLcaps = 0;
 uint16_t cntLctrl = 0;
@@ -68,26 +55,16 @@ static uint8_t findFNkey(void)
     uint8_t i;
     for(i = 0; i < MAX_LAYER; i++)
     {
-#if 0     
-///////////////////SHOULD BE REMOVED ////////////////
-        pBuf = &currentLayer[0][0];
-        for(j = 0; j < MAX_ROW*MAX_COL; j++)
-        {
-            *pBuf++ = pgm_read_byte(keylayer(i) + j);
-        }
-        eeprom_update_block(currentLayer, EEP_KEYMAP_ADDR(i), sizeof(currentLayer));
-///////////////////SHOULD BE REMOVED ////////////////
-#endif
         eeprom_read_block(currentLayer, EEP_KEYMAP_ADDR(i), sizeof(currentLayer));
         matrixFN[i] = 0x00;
-    	for(col=0;col<MAX_COL;col++)
+    	for(row=0;row<MATRIX_MAX_ROW;row++)
     	{
-    		for(row=0;row<MAX_ROW;row++)
+    		for(col=0;col<MATRIX_MAX_COL;col++)
             {
-                keyidx = currentLayer[col][row];
+                keyidx = currentLayer[row][col];
     			if(keyidx == K_FN)
     			{
-                    matrixFN[i] = col << 5 | row;
+                    matrixFN[i] = row << 5 | col;
     			}
     		}
         }
@@ -125,31 +102,20 @@ void keymap_init(void)
 		KFLA[keyidx] |= KFLA_PROC_SHIFT;
 
 
-
-
-	for(i=0;i<MAX_ROW;i++)
+	for(i=0; i<MATRIX_MAX_ROW; i++)
 		MATRIX[i]=0;
 
 
-    findFNkey();
-
-	for(i=0;i<MAX_COL;i++)
+	for(i=0;i<MATRIX_MAX_ROW;i++)
 	{
-        for(j=0;j<MAX_ROW;j++)
+        for(j=0;j<MATRIX_MAX_COL;j++)
         {
             debounceMATRIX[i][j] = -1;
         }
         curMATRIX[i] = 0;
 	}
-
-#ifdef FLASH_KEYMAP
-    pBuf = &currentLayer[0][0];
-
-    for(i = 0; i < MAX_ROW*MAX_COL; i++)
-    {
-        *pBuf++ = pgm_read_byte(keylayer(kbdConf.keymapLayerIndex) + i);
-    }
-#endif
+    
+    findFNkey();
 }
 
 
@@ -222,39 +188,43 @@ uint8_t processReleasedFNkeys(uint8_t keyidx)
     return retVal;
 }
 
-
+uint32_t scanRow(uint8_t row)
+{
+    uint8_t vPinA, vPinB, vPinD;
+    uint32_t rowValue;
+        // Col -> set only one port as input and all others as output low
+    MATRIX_COL_DDR  = BV(row+MATRIX_COL_PIN0);        //  only target col bit is output and others are input
+    MATRIX_COL_PORT &= ~(BV(row+MATRIX_COL_PIN0));   // only target col bit is LOW and other are pull-up
+    _delay_us(10);
+    vPinA = ~MATRIX_ROW_PIN0;
+    vPinB = ~MATRIX_ROW_PIN1;
+    vPinD = (~MATRIX_ROW_PIN2 & 0xf0) >> 4;    // MSB 4bit
+    
+    rowValue = (uint32_t)(vPinD) << 16 | (uint32_t)vPinB << 8 | (uint32_t)vPinA;
+    
+    return rowValue;
+}
 
 uint8_t getLayer(uint8_t FNcolrow)
 {
     uint8_t col;
     uint8_t row;
-    uint8_t vPinA, vPinB, vPinD;
     uint32_t tmp;
-    col = (FNcolrow >> 5) & 0x0f;
-    row = FNcolrow & 0x1f;
+    row = (FNcolrow >> 5) & 0x07;
+    col = FNcolrow & 0x1f;
 	
-    DDRC  = BV(col+2);        //  only target col bit is output and others are input
-    PORTC &= ~BV(col+2);       //  only target col bit is LOW and other are pull-up
-	
-	_delay_us(10);
-        
-    vPinA = ~PINA;
-    vPinB = ~PINB;
-    vPinD = (~PIND & 0xf0) >> 4;
-    
-    tmp = (uint32_t)(vPinD) << 16 | (uint32_t)vPinB << 8 | (uint32_t)vPinA;
+    tmp = scanRow(row);
 
-
-    if((tmp >> row) & 0x00000001)
+    if((tmp >> col) & 0x00000001)
     {
       isFNpushed = DEBOUNCE_MAX*2;
-      return 3;        // FN layer or beyondFN layer
+      return KEY_LAYER_FN;          // FN layer
     }
     else
     {
       if(isFNpushed)
       {
-         return KEY_LAYER_FN;        // FN layer or beyondFN layer
+         return KEY_LAYER_FN;        // FN layer
       }else
       {
          return kbdConf.keymapLayerIndex;                   // Normal layer
@@ -263,10 +233,10 @@ uint8_t getLayer(uint8_t FNcolrow)
 }
 
 
+
 uint8_t scanmatrix(void)
 {
-   uint8_t col;
-   uint8_t vPinA, vPinB, vPinD;
+   uint8_t row;
 
    uint8_t matrixState = 0;
 
@@ -281,21 +251,11 @@ uint8_t scanmatrix(void)
     
 
 	// scan matrix 
-	for(col=0; col<MAX_COL; col++)
+	for(row=0; row<MATRIX_MAX_ROW; row++)
 	{
-      // Col -> set only one port as input and all others as output low
-        DDRC  = BV(col+2);        //  only target col bit is output and others are input
-        PORTC &= ~BV(col+2);       //  only target col bit is LOW and other are pull-up
-        _delay_us(10);
-
-      vPinA = ~PINA;
-      vPinB = ~PINB;
-      vPinD = (~PIND & 0xf0) >> 4;
-      
-      curMATRIX[col] = (uint32_t)(vPinD) << 16 | (uint32_t)vPinB << 8 | (uint32_t)vPinA;
-
-      
-      if(curMATRIX[col])
+      curMATRIX[row] = scanRow(row);
+     
+      if(curMATRIX[row])
       {
          matrixState |= SCAN_DIRTY;
          
@@ -484,13 +444,13 @@ uint8_t scankey(void)
 	uint8_t t_layer = getLayer(matrixFN[kbdConf.keymapLayerIndex]);
 
 	// debounce cleared => compare last matrix and current matrix
-	for(col = 0; col < MAX_COL; col++)
+	for(row = 0; row < MATRIX_MAX_ROW; row++)
 	{
 
-        prev = MATRIX[col];
-        cur  = curMATRIX[col];
-        MATRIX[col] = curMATRIX[col];
-		for(row = 0; row < MAX_ROW; row++)
+        prev = MATRIX[row];
+        cur  = curMATRIX[row];
+        MATRIX[row] = curMATRIX[row];
+		for(col = 0; col < MATRIX_MAX_COL; col++)
 		{
             prevBit = (uint8_t)(prev & 0x01);
             curBit = (uint8_t)(cur & 0x01);
@@ -500,15 +460,15 @@ uint8_t scankey(void)
             if (reportMatrix == HID_REPORT_MATRIX)
             {
                 if(prevBit && !curBit)
-                    sendMatrix(col, row);
+                    sendMatrix(row, col);
                 continue;
             }
 
 
             if(t_layer != KEY_LAYER_FN)
-                keyidx = currentLayer[col][row];
+                keyidx = currentLayer[row][col];
             else
-                keyidx = eeprom_read_byte(EEP_KEYMAP_ADDR(t_layer)+(col*MAX_ROW)+row);
+                keyidx = eeprom_read_byte(EEP_KEYMAP_ADDR(t_layer)+(row*MATRIX_MAX_COL)+col);
             
 
             if (keyidx == K_NONE)
@@ -538,47 +498,47 @@ uint8_t scankey(void)
             {
                 if(curBit)
                 {
-                    if(debounceMATRIX[col][row]++ >= DEBOUNCE_MAX)
+                    if(debounceMATRIX[row][col]++ >= DEBOUNCE_MAX)
                     {
                         retVal = buildHIDreports(keyidx);
-                        debounceMATRIX[col][row] = DEBOUNCE_MAX*2;
+                        debounceMATRIX[row][col] = DEBOUNCE_MAX*2;
                     }
                 }else
                 {
-                    if(debounceMATRIX[col][row]-- >= DEBOUNCE_MAX)
+                    if(debounceMATRIX[row][col]-- >= DEBOUNCE_MAX)
                     {
                         retVal = buildHIDreports(keyidx);
                     }else
                     {
-                        debounceMATRIX[col][row] = 0;
+                        debounceMATRIX[row][col] = 0;
                     }
                 }
             }else
             {
                 if (!prevBit && curBit)   //pushed
                 {
-                    debounceMATRIX[col][row] = 0;    //triger
+                    debounceMATRIX[row][col] = 0;    //triger
 
                 }else if (prevBit && !curBit)  //released
                 {
-                    debounceMATRIX[col][row] = 0;    //triger
+                    debounceMATRIX[row][col] = 0;    //triger
     			   }
                 
-                if(debounceMATRIX[col][row] >= 0)
+                if(debounceMATRIX[row][col] >= 0)
                 {                
-                   if(debounceMATRIX[col][row]++ >= DEBOUNCE_MAX)
+                   if(debounceMATRIX[row][col]++ >= DEBOUNCE_MAX)
                    {
                         if(curBit)
                         {
                             putKey(keyidx, 1);
-                            svkeyidx[col][row] = keyidx;
+                            svkeyidx[row][col] = keyidx;
                         }else
                         {
                             if (keyidx <= K_M01)  // ignore FN keys
-                              putKey(svkeyidx[col][row], 0);
+                              putKey(svkeyidx[row][col], 0);
                         }
                                                
-                        debounceMATRIX[col][row] = -1;
+                        debounceMATRIX[row][col] = -1;
                    }
   
                 }

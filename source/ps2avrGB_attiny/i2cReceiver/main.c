@@ -889,7 +889,7 @@ uint8_t handlecmd_led_config_preset(tinycmd_pkt_req_type *p_req)
     //memcpy(tinyLedmode, p_cfg_preset_req->data, sizeof(tinyLedmode));
     for(i = 0; i < LEDMODE_INDEX_MAX; i++)
     {
-        pTmp+=3;
+        pTmp += 3;
         for(j = 0; j < TINY_LED_BLOCK_MAX; j++)
         {
             tinyLedmode[i][j] = *pTmp++;
@@ -928,7 +928,7 @@ uint8_t handlecmd_dirty(tinycmd_pkt_req_type *p_req)
     if(p_req->cmd_code & TINY_CMD_KEY_MASK) // down
     {
         scanDirty |= SCAN_DIRTY;
-        led_pushed_level_cal();
+        tiny_led_pushed_level_cal();
     }
     else
     {
@@ -1301,18 +1301,22 @@ void tiny_led_mode_change (TINY_LED_BLOCK ledblock, int mode)
     {
         case LED_EFFECT_FADING :
         case LED_EFFECT_FADING_PUSH_ON :
+            tiny_led_wave_set(ledblock,0);
+            tiny_led_wave_on(ledblock);
             break;
         case LED_EFFECT_PUSH_OFF :
         case LED_EFFECT_ALWAYS :
+            tiny_led_wave_set(ledblock,0);
+            tiny_led_wave_off(ledblock);
             tiny_led_on(ledblock);
             break;
         case LED_EFFECT_PUSH_ON :
         case LED_EFFECT_OFF :
         case LED_EFFECT_PUSHED_LEVEL :
         case LED_EFFECT_BASECAPS :
-            tiny_led_off(ledblock);
             tiny_led_wave_set(ledblock,0);
-            tiny_led_wave_on(ledblock);
+            tiny_led_wave_off(ledblock);
+            tiny_led_off(ledblock);
             break;
         default :
             tinyLedmode[tinyLedmodeIndex][ledblock] = LED_EFFECT_FADING;
@@ -1366,7 +1370,7 @@ void TinyInitEffect(void)
     memset(&tinyRgbEffect, 0, sizeof(rgb_effect_param_type));
 }
 
-void led_pushed_level_cal(void)
+void tiny_led_pushed_level_cal(void)
 {
     LED_BLOCK ledblock;
     // update pushed level

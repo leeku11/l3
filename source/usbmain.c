@@ -23,41 +23,47 @@
 
 #define HID_DEBUG_CMD
 
-uint8_t interfaceReady = 0;
 
 
 /* ------------------------------------------------------------------------- */
 /* ----------------------------- USB interface ----------------------------- */
 /* ------------------------------------------------------------------------- */
+uint8_t interfaceReady = 0;
 
 static uint8_t keyboardReport[8]; ///< buffer for HID reports
 static uint8_t oldReportBuffer[8]; ///< buufer for HID reports save on Overflower
 uint8_t reportIndex; // keyboardReport[0] contains modifiers
-
-typedef enum HID_DEBUG_SUB_CMD{
-    HID_DEBUG_LED,
-    HID_DEBUG_RGB,
-    HID_DEBUG_KEYMAPER,
-    HID_DEBUG_JMP_BOOTLOADER
-}HID_DEBUG_SUB_CMD_E;
-
-
 uint8_t reportMatrix = 0 ;
-
 report_extra_t extraReport;
 report_extra_t oldextraReport;
-
-
-
 static uint8_t idleRate = 0;        ///< in 4ms units
 static uint8_t protocolVer = 1; ///< 0 = boot protocol, 1 = report protocol
 uint8_t expectReport = 0;       ///< flag to indicate if we expect an USB-report
-
 AppPtr_t Bootloader = (void *)BOOTLOADER_ADDRESS; 
+uint8_t bootRxRemains;
+HIDcommand_t hidCmd;
+HIDData_t hidData;
+uint8_t gbootCmdoffset;
+uint8_t version[] = "L150205";          // must be length of 7 bytes    HID report size
+
+
+MODIFIERS modifierBitmap[] = {
+    MOD_NONE ,
+    MOD_CONTROL_LEFT ,
+    MOD_SHIFT_LEFT ,
+    MOD_ALT_LEFT ,
+    MOD_GUI_LEFT ,
+    MOD_CONTROL_RIGHT ,
+    MOD_SHIFT_RIGHT ,
+    MOD_ALT_RIGHT ,
+    MOD_GUI_RIGHT
+};
 
 
 
-#define MOUSE_ENABLE 1
+
+
+
 
 /*------------------------------------------------------------------*
  * Descriptors                                                      *
@@ -167,7 +173,7 @@ PROGMEM uchar mouse_hid_report[] = {
     0xc0,                          // END_COLLECTION
 
 #else
-    /* consumer */
+    /* Boot HID */
     0x06, 0x00, 0xff,              // USAGE_PAGE (Generic Desktop)
     0x09, 0x01,                    // USAGE (Vendor Usage 1)
     0xa1, 0x01,                    // COLLECTION (Application)
@@ -357,113 +363,6 @@ USB_PUBLIC usbMsgLen_t usbFunctionDescriptor(struct usbRequest *rq)
     return len;
 }
 
-
-MODIFIERS modifierBitmap[] = {
-    MOD_NONE ,
-    MOD_CONTROL_LEFT ,
-    MOD_SHIFT_LEFT ,
-    MOD_ALT_LEFT ,
-    MOD_GUI_LEFT ,
-    MOD_CONTROL_RIGHT ,
-    MOD_SHIFT_RIGHT ,
-    MOD_ALT_RIGHT ,
-    MOD_GUI_RIGHT
-};
-
-
-#define HID_REPORT_KEBOARD  0x0200
-
-
-#define HID_BOOT_CMD_LEN    0x07
-#define HID_BOOT_DATA_LEN   0x83
-uint8_t bootRxRemains;
-
-
-typedef enum
-{
-    CMD_DEBUG = 1,
-    CMD_CONFIG = 2,
-    CMD_KEYMAP = 3,
-    CMD_MACRO  = 4
-}BOOT_HID_CMD;
-
-#define HID_REPORT_CMD      (0x0300 | REPORT_ID_CMD)
-#define HID_REPORT_DATA     (0x0300 | REPORT_ID_DATA)
-
-
-typedef struct HIDCMD_debug{
-    uint8_t reportID;
-    uint8_t cmd;
-    uint8_t subcmd;
-    uint8_t arg3;
-    uint8_t arg4;
-    uint8_t arg5;
-    uint8_t arg6;
-    uint8_t arg7;
-}HIDCMD_debug_t;
-
-
-typedef struct HIDCMD_config{
-    uint8_t reportID;
-    uint8_t cmd;
-    uint8_t rsvd2;
-    uint8_t rsvd3;   
-    uint8_t rsvd4;
-    uint8_t rsvd5;
-    uint8_t rsvd6;
-    uint8_t rsvd7;
-}HIDCMD_config_t;
-
-
-typedef struct HIDCMD_keymap{
-    uint8_t reportID;
-    uint8_t cmd;
-    uint8_t index;
-    uint8_t row;   
-    uint8_t col;
-    uint8_t reportMatrix;
-    uint8_t rsvd6;
-    uint8_t rsvd7;
-}HIDCMD_keymap_t;
-
-typedef struct HIDCMD_macro{
-    uint8_t reportID;
-    uint8_t cmd;
-    uint8_t index;
-    uint8_t length;   
-    uint8_t rsvd4;
-    uint8_t rsvd5;
-    uint8_t rsvd6;
-    uint8_t rsvd7;
-}HIDCMD_macro_t;
-
-typedef union HIDcommand
-{
-  uint8_t   byte[8];
-  HIDCMD_debug_t debug;
-  HIDCMD_config_t config;
-  HIDCMD_keymap_t keymap;
-  HIDCMD_macro_t macrodata;
-} HIDcommand_t;
-
-typedef struct HIDdata{
-    uint8_t reportID;
-    uint8_t cmd;
-    uint8_t parm0;
-    uint8_t parm1;   
-    uint8_t data[128];
-}HIDData_t;
-
-HIDcommand_t hidCmd;
-HIDData_t hidData;
-
-uint8_t gbootCmdoffset;
-
-uint8_t version[] = "L150205";          // must be length of 7 bytes    HID report size
-
-
-#define DEBUG_LED   tinycmd_rgb_pos
-
     
 
 uint8_t txHIDCmd(void)
@@ -527,7 +426,6 @@ void rxHIDCmd(void)
             {
                eeprom_update_block(hidData.data, EEPADDR_KEYMAP_LAYER0 + (0x80 * hidCmd.keymap.index), sizeof(currentLayer));
                 // TO DO reload key map
-                //DEBUG_LED(6, 200, 0, 0);
                 
             }
             break;
@@ -572,11 +470,9 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
                 return sizeof(version);                
             }else if (rq->wValue.word == HID_REPORT_DATA)
             {
-
                 txHIDCmd();
                 usbMsgPtr = (usbMsgPtr_t)&hidData;
                 return sizeof(hidData);
-
             }
         }
 
@@ -898,6 +794,13 @@ void rgb_set_effect_param(uint8_t effect, rgb_effect_param_type *p_param)
 }
 #endif
 
+
+static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS},
+                {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSHED_LEVEL, LED_EFFECT_PUSHED_LEVEL},
+                {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_OFF, LED_EFFECT_BASECAPS}};
+
+
+
 uint8_t buildHIDreports(uint8_t keyidx)
 {
     uint8_t retval = 0;
@@ -973,16 +876,24 @@ uint8_t buildHIDreports(uint8_t keyidx)
                     case K_F10:
                         //rgb_set_effect_param(9, &kbdConf.rgb_effect_param);
                         //tinycmd_rgb_set_effect(9, &kbdConf.rgb_effect_param); // RGB_EFFECT_SWIPE
+                        
+
+                        tinycmd_led_preset_config((uint8_t *)&tmpled_preset[0][0]);
+                        tinycmd_led_set_effect(0);
                         tinycmd_rgb_all(1, 100, 100, 0);
                         break;
                     case K_F11:
                         //rgb_set_effect_param(10, &kbdConf.rgb_effect_param);
                         //tinycmd_rgb_set_effect(10, &kbdConf.rgb_effect_param); // RGB_EFFECT_SWIPE_BUF
+                        
+                        tinycmd_led_set_effect(1);
                         tinycmd_rgb_all(1, 0, 100, 100);
                         break;
                     case K_F12:
                         //rgb_set_effect_param(11, &kbdConf.rgb_effect_param);
                         //tinycmd_rgb_set_effect(11, &kbdConf.rgb_effect_param); // RGB_EFFECT_SWIPE_LOOP
+                        
+                        tinycmd_led_set_effect(2);
                         //tinycmd_rgb_all(1, 100, 0, 100);
                         {
                             // set rgb leds

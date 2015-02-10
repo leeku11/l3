@@ -28,7 +28,7 @@ ARCH_COMPILE=
 ARCH_LINK=		
 
 OBJ=		main.o usbcalls.o
-PROGRAM=	cmdHID$(EXE_SUFFIX)
+PROGRAM=	cmdHID1$(EXE_SUFFIX)
 
 all: $(PROGRAM)
 

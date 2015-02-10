@@ -239,6 +239,11 @@ int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
     len = sizeof(bootCmd_t);
 
     cmdBuffer->reportId = 1;
+
+    printf("report ID   : %d \n", cmdBuffer->reportId);
+    printf("cmd         : %d \n", cmdBuffer->cmd);
+    printf("index       : %d \n", cmdBuffer->index);
+    printf("length      : %d \n", cmdBuffer->length);
     
     if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, cmdBuffer, 8)) != 0){
         fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
@@ -293,6 +298,15 @@ int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
         goto errorOccurred;
     }
     
+
+
+
+    cmdBuffer->reportId = 1;
+    if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, cmdBuffer, 8)) != 0){
+    fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
+    goto errorOccurred;
+    }
+
     cmdBuffer->reportId = 2;
     printf("Send Command ==============\n");
     printf("report ID   : %d \n", cmdBuffer->reportId);
@@ -300,7 +314,6 @@ int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
     printf("index       : %d \n", cmdBuffer->index);
     printf("length      : %d \n", cmdBuffer->length);
     printf("data[0]     : %d \n", cmdBuffer->data[0]);
-
     for (i = 0; i < 6; i++)
     {
         printf("\n");
@@ -309,13 +322,6 @@ int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
             printf("0x%2x|", cmdBuffer->data[offset++]);
         }
     }
-
-    cmdBuffer->reportId = 1;
-    if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, cmdBuffer, 8)) != 0){
-    fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
-    goto errorOccurred;
-    }
-
     if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, cmdBuffer, sizeof(bootCmd_t))) != 0){
         fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
         goto errorOccurred;
@@ -392,6 +398,7 @@ typedef struct kbd_conf
 }kbd_configuration_t;
 
 kbd_configuration_t kbdConf;
+kbd_configuration_t *pkbdConf;
 
 
 typedef struct HIDCMD_debug{
@@ -416,14 +423,14 @@ typedef enum
 
 typedef enum
 {
-    LED_EFFECT_FADING          = 0,
-    LED_EFFECT_FADING_PUSH_ON  = 1,
-    LED_EFFECT_PUSHED_LEVEL    = 2,
-    LED_EFFECT_PUSH_ON         = 3,
-    LED_EFFECT_PUSH_OFF        = 4,
-    LED_EFFECT_ALWAYS          = 5,
-    LED_EFFECT_BASECAPS        = 6,
-    LED_EFFECT_OFF             = 7,
+    LED_EFFECT_FADING          = 0, //ok
+    LED_EFFECT_FADING_PUSH_ON  = 1, //?
+    LED_EFFECT_PUSHED_LEVEL    = 2, //?
+    LED_EFFECT_PUSH_ON         = 3, //ok
+    LED_EFFECT_PUSH_OFF        = 4, //ok
+    LED_EFFECT_ALWAYS          = 5, //ok
+    LED_EFFECT_BASECAPS        = 6, //?
+    LED_EFFECT_OFF             = 7, //?
     LED_EFFECT_NONE
 }LED_MODE;
 
@@ -457,6 +464,7 @@ int setConfig(void)
     if(sendCmd(&cmdData))
         return 1;
 }
+unsigned char buffer[512];
 
 int main(int argc, char **argv)
 {
@@ -464,6 +472,7 @@ char    *file = NULL;
 char    a = 0, i = 0;
 volatile int     sleep = 0xFFFF;
 
+int len;
 #if 0
     if(argc < 2){
         printUsage(argv[0]);
@@ -510,7 +519,7 @@ return 0;
     return 1;
 #endif
 
-#if 1 //def HIDDEBUG
+#if 0 //def HIDDEBUG
     HIDCMD_debug_t dbgCmd;
     unsigned char buffer[8];
 
@@ -529,6 +538,8 @@ if (strtoi(argv[1], 10) == CMD_DEBUG)
     sendDBGCmd(buffer);
     return 1;
 #endif
+
+#if 0
     cmdData.cmd = strtoi(argv[1], 10);
     cmdData.index = strtoi(argv[2], 10);
     cmdData.length = strtoi(argv[3], 10);
@@ -536,11 +547,44 @@ if (strtoi(argv[1], 10) == CMD_DEBUG)
 
     if(receiveCmd(&cmdData))
         return 1;
-
-        
+return 0;
+    pkbdConf = (kbd_configuration_t *)cmdData.data;
+    pkbdConf->led_preset_index = 1;
+      
     if(sendCmd(&cmdData))
         return 1;
+#endif  
+
+    FILE *fp = fopen("tmpKeymap.bin", "rb");
+    int fsize;
+    fseek(fp, 0, SEEK_END);         // 파일포인터를 파일의 끝으로 이동
+    fsize = ftell(fp);              // 현재 파일포인터를 읽으면 파일크기가 됨
+       
+    fseek(fp, 0, SEEK_SET);         // 파일포인터를 파일의 끝으로 이동
+
+    printf("fsize = %d \n", fsize);
+    char *pbuf;
+    int readLen;
+    pbuf = buffer;
     
+    readLen = fread(pbuf, 1, fsize, fp);
+    
+    printf("read len = %d \n", readLen);
+    cmdData.cmd = CMD_KEYMAP;
+        
+
+    for (i = 0; i < 4; i++)
+    {
+        cmdData.index = i;
+        memcpy(cmdData.data, &buffer[120*i], 120);
+        if(sendCmd(&cmdData))
+        {
+            fclose(fp);
+            return 1;
+
+        }
+    }
+    fclose(fp);
     return 0;
 }
 

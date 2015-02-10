@@ -87,7 +87,7 @@ void clear(void) {
 	lastMAKE_IDX=0;
 	loopCnt=0;
 
-	for(i=0;i<MAX_COL;i++)
+	for(i=0;i<MATRIX_MAX_COL;i++)
 		MATRIX[i] = 0x00;
 }
 

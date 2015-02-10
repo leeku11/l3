@@ -380,8 +380,8 @@ void led_mode_init(void)
     
     led_3lockupdate(gLEDstate);
 
-#if 0 //def LED_CONTROL_SLAVE
-    tinycmd_led_preset_config((uint8_t*)ledmode);
+#ifdef LED_CONTROL_SLAVE
+    tinycmd_led_preset_config((uint8_t *)&kbdConf.led_preset[0][0]);
     tinycmd_led_set_effect(kbdConf.led_preset_index);
 
 #endif // LED_CONTROL_SLAVE
@@ -467,9 +467,9 @@ void recordLED(uint8_t ledkey)
     sendString(ledstart);
     wdt_reset();
 
-    for(col = 0; col < MAX_COL; col++)
+    for(col = 0; col < MATRIX_MAX_COL; col++)
     {
-        for(row = 0; row < MAX_ROW; row++)
+        for(row = 0; row < MATRIX_MAX_ROW; row++)
         {
             debounceMATRIX[col][row] = -1;
         }
@@ -491,12 +491,12 @@ void recordLED(uint8_t ledkey)
 
 
     // debounce cleared => compare last matrix and current matrix
-    for(col = 0; col < MAX_COL; col++)
+    for(col = 0; col < MATRIX_MAX_COL; col++)
     {
      prev = MATRIX[col];
      cur  = curMATRIX[col];
      MATRIX[col] = curMATRIX[col];
-     for(i = 0; i < MAX_ROW; i++)
+     for(i = 0; i < MATRIX_MAX_ROW; i++)
      {
         prevBit = (uint8_t)prev & 0x01;
         curBit = (uint8_t)cur & 0x01;
