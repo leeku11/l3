@@ -590,7 +590,6 @@ void recordMacro(uint8_t macrokey)
    uint8_t prevBit, curBit;
    uint8_t keyidx;
    uint8_t matrixState = 0;
-   int16_t i;
    int16_t index;
    uint8_t mIndex;
    long page;
