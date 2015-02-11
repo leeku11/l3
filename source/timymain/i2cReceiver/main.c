@@ -28,9 +28,10 @@
 #define I2C_SEND_DATA_BUFFER_SIZE		I2C_RDSIZE	//0x5A
 #define I2C_RECEIVE_DATA_BUFFER_SIZE	I2C_WRSIZE	//0x5A	//30 led
 
-#define CLED_NUM           21           // (NCS)x1 + (RGB5050)x20
-#define CLED_ELEMENT       3
-#define CLED_ARRAY_SIZE    ((CLED_NUM)*CLED_ELEMENT)
+#define CLED_NUM                        21           // (NCS)x1 + (RGB5050)x20
+#define CLED_ELEMENT                    3
+#define CLED_ARRAY_SIZE                 (CLED_NUM*CLED_ELEMENT)
+#define CLED_GET_ARRAY_SIZE(num)        (num*CLED_ELEMENT)
 
 #define CHANNEL_MODE_SYNC               0
 #define CHANNEL_MODE_ASYNC              1
@@ -51,7 +52,9 @@
 typedef struct {
     uint8_t comm_init;
     uint8_t rgb_num;
-    uint8_t led_preset_num;
+    uint8_t rgb_effect_on;
+    uint8_t led_effect_on;
+    uint8_t is_sleep;
 } tiny_config_type;
 
 typedef uint8_t (*tiny_effector_func)(rgb_effect_param_type *); 
@@ -88,7 +91,6 @@ uint8_t rgbBuffer[CLED_NUM][CLED_ELEMENT] = {{200,0,0},{200,0,50},{200,0,100},{2
                     {0,0,200},{50,0,200},{100,0,200},{150,0,200},{200,0,200},
                     {200,0,0},{200,50,0},{200,100,0},{200,150,0},{200,200,0}, {200,200,200}};;
 uint8_t tmprgbBuffer[CLED_NUM][CLED_ELEMENT];
-uint8_t rgbBufferLength = CLED_ARRAY_SIZE;
 
 uint8_t cmdBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
 
@@ -104,8 +106,8 @@ static uint16_t tinyPushedLevelStay[TINY_LED_BLOCK_MAX] = {0, 0};
 static uint8_t tinyPushedLevel[TINY_LED_BLOCK_MAX] = {0, 0};
 static uint16_t tinyPushedLevelDuty[TINY_LED_BLOCK_MAX] = {0, 0};
 
-rgb_effect_param_type tinyRgbEffect; // current rgb effect
-//rgb_effect_param_type tinyRgbEffectPreset[2];
+uint8_t tinyRgbmodeIndex = 0; // effect preset index
+rgb_effect_param_type tinyRgbEffect[RGBMODE_INDEX_MAX]; // rgb effect preset buffer
 
 uint8_t scanDirty;
 uint32_t gcounter = 0;
@@ -139,7 +141,7 @@ const tinycmd_handler_array_type cmdhandler[] = {
     {TINY_CMD_VER_F, handlecmd_ver},                    // TINY_CMD_VER_F
     {TINY_CMD_RESET_F,handlecmd_reset},                  // TINY_CMD_RESET_F
     {TINY_CMD_THREE_LOCK_F,handlecmd_three_lock},             // TINY_CMD_THREE_LOCK_F
-    {TINY_CMD_DIRTY,handlecmd_dirty},                  // TINY_CMD_DIRTY_F
+    {TINY_CMD_DIRTY_F,handlecmd_dirty},                  // TINY_CMD_DIRTY_F
 
     {TINY_CMD_RGB_ALL_F,handlecmd_rgb_all},                // TINY_CMD_RGB_ALL_F
     {TINY_CMD_RGB_POS_F,handlecmd_rgb_pos},                // TINY_CMD_RGB_POS_F
@@ -184,16 +186,17 @@ const tiny_effector_func effectHandler[] = {
 #if 0
 void set_effect_temp(void)
 {
-    memset(&tinyRgbEffect, 0, sizeof(rgb_effect_param_type));
-    tinyRgbEffect.index = RGB_EFFECT_BASIC;
-    tinyRgbEffect.max.r = 50;
-    tinyRgbEffect.max.g = 50;
-    //tinyRgbEffect.max.b = 50;
+    tinyRgbmodeIndex = RGB_EFFECT_BASIC;
+    memset(&tinyRgbEffect[0], 0, sizeof(rgb_effect_param_type));
+    tinyRgbEffect[0].index = RGB_EFFECT_BASIC;
+    tinyRgbEffect[0].max.r = 50;
+    tinyRgbEffect[0].max.g = 50;
+    //tinyRgbEffect[0].max.b = 50;
     //p_param->max.g = 0;
     //p_param->max.b = 0;
-    //tinyRgbEffect.high_hold = 50;
-    //tinyRgbEffect.low_hold = 12;
-    //tinyRgbEffect.accel_mode = 1; // quadratic
+    //tinyRgbEffect[0].high_hold = 50;
+    //tinyRgbEffect[0].low_hold = 12;
+    //tinyRgbEffect[0].accel_mode = 1; // quadratic
     //p_param->dir = 0;
     //p_param->level = 0;
     //p_param->cnt = 0;
@@ -222,7 +225,7 @@ void rgb_array_on(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
         rgbBuffer[i][1] = r;
         rgbBuffer[i][2] = b;
     }
-    ws2812_sendarray((uint8_t *)rgbBuffer, rgbBufferLength);
+    ws2812_sendarray((uint8_t *)rgbBuffer, CLED_GET_ARRAY_SIZE(tinyConfig.rgb_num));
 }
 
 void rgb_pos_on(uint8_t pos, uint8_t on, uint8_t r, uint8_t g, uint8_t b)
@@ -240,7 +243,7 @@ void rgb_pos_on(uint8_t pos, uint8_t on, uint8_t r, uint8_t g, uint8_t b)
     rgbBuffer[pos][1] = r;
     rgbBuffer[pos][2] = b;
 
-    ws2812_sendarray((uint8_t *)rgbBuffer, rgbBufferLength);
+    ws2812_sendarray((uint8_t *)rgbBuffer, CLED_GET_ARRAY_SIZE(tinyConfig.rgb_num));
 }
 
 uint8_t rgb_effect_null(rgb_effect_param_type *p_effect)
@@ -765,9 +768,6 @@ uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req)
     tinycmd_config_req_type *p_config_req = (tinycmd_config_req_type *)p_req;
 
     tinyConfig.rgb_num = p_config_req->rgb_num;
-    tinyConfig.led_preset_num = p_config_req->led_preset_num;
-
-    tinyLedmodeIndex = p_config_req->led_preset_index;
     
     return 0;
 }
@@ -779,6 +779,7 @@ uint8_t handlecmd_ver(tinycmd_pkt_req_type *p_req)
 
 uint8_t handlecmd_reset(tinycmd_pkt_req_type *p_req)
 {
+    while(1); // wait for watchdog reset
     return 0;
 }
 
@@ -820,6 +821,7 @@ uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
     
 
     ws2812_sendarray(NCSLock,CLED_ELEMENT);        // output message data to port D
+
     return 0;
 }
 
@@ -845,7 +847,7 @@ uint8_t handlecmd_rgb_pos(tinycmd_pkt_req_type *p_req)
     rgbBuffer[tmpPos][1] = p_rgb_pos_req->led.r;
     rgbBuffer[tmpPos][2] = p_rgb_pos_req->led.g;
         
-    ws2812_sendarray((uint8_t *)rgbBuffer,rgbBufferLength);        // output message data to port D
+    ws2812_sendarray((uint8_t *)rgbBuffer, CLED_GET_ARRAY_SIZE(tinyConfig.rgb_num));        // output message data to port D
 
     return 0;
 }
@@ -869,7 +871,7 @@ uint8_t handlecmd_rgb_range(tinycmd_pkt_req_type *p_req)
         rgbBuffer[tmpPos+i][2] = pLed[i].g;
     }
 
-    ws2812_sendarray((uint8_t *)rgbBuffer,rgbBufferLength);        // output message data to port D
+    ws2812_sendarray((uint8_t *)rgbBuffer, CLED_GET_ARRAY_SIZE(tinyConfig.rgb_num));        // output message data to port D
 
     return 0;
 }
@@ -886,7 +888,7 @@ uint8_t handlecmd_rgb_buffer(tinycmd_pkt_req_type *p_req)
 
     memcpy(&rgbBuffer[tmpPos][0], p_rgb_buffer_req->data, p_rgb_buffer_req->num * CLED_ELEMENT);
 
-    ws2812_sendarray((uint8_t *)rgbBuffer,rgbBufferLength);        // output message data to port D
+    ws2812_sendarray((uint8_t *)rgbBuffer, CLED_GET_ARRAY_SIZE(tinyConfig.rgb_num));        // output message data to port D
 
     return 0;
 }
@@ -894,8 +896,7 @@ uint8_t handlecmd_rgb_buffer(tinycmd_pkt_req_type *p_req)
 uint8_t handlecmd_rgb_set_effect(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_rgb_set_effect_req_type *p_set_effect_req = (tinycmd_rgb_set_effect_req_type *)p_req;
-    //tinyRgbEffect = p_set_effect_req->effect_param;
-    memcpy(&tinyRgbEffect, &p_set_effect_req->effect_param, sizeof(rgb_effect_param_type));
+    tinyRgbmodeIndex = p_set_effect_req->index;
     memset(&tmprgbBuffer, 0, CLED_ARRAY_SIZE);
 
     return 0;
@@ -903,9 +904,15 @@ uint8_t handlecmd_rgb_set_effect(tinycmd_pkt_req_type *p_req)
 
 uint8_t handlecmd_rgb_set_preset(tinycmd_pkt_req_type *p_req)
 {
-    tinycmd_rgb_set_preset_req_type *pset_preset_req = (tinycmd_rgb_set_preset_req_type *)p_req;
+    uint8_t index;
+    tinycmd_rgb_set_preset_req_type *p_set_preset_req = (tinycmd_rgb_set_preset_req_type *)p_req;
 
-    memcpy(rgbBuffer[1], pset_preset_req->data, tinyConfig.rgb_num);
+    index = p_set_preset_req->index;
+    if(index >= RGBMODE_INDEX_MAX)
+    {
+        index = 0;
+    }
+    memcpy(&tinyRgbEffect[index], &p_set_preset_req->effect_param, sizeof(rgb_effect_param_type));
 
     return 0;
 }
@@ -1308,14 +1315,15 @@ void tiny_led_fader(void)
 
 void tiny_rgb_effector(void)
 {
+    rgb_effect_param_type *pEffect = &tinyRgbEffect[tinyLedmodeIndex];
     uint8_t update = 0;
-    uint8_t index = tinyRgbEffect.index;
+    uint8_t index = pEffect->index;
 
     if(index < RGB_EFFECT_MAX)
     {
         if(effectHandler[index] != 0)
         {
-            update = effectHandler[index](&tinyRgbEffect);
+            update = effectHandler[index](pEffect);
         }
     }
 
@@ -1400,15 +1408,23 @@ void TinyInitTimer(void)
 
 void TinyInitCfg(void)
 {
-    tinyConfig.comm_init = 0;
+    memset(&tinyConfig, 0, sizeof(tiny_config_type));
+    tinyConfig.rgb_num = CLED_NUM;
+    //tinyConfig.led_effect_on = 0; // default on
+    //tinyConfig.rgb_effect_on = 0; // default off
+    memset(rgbBuffer, 0, CLED_ARRAY_SIZE);
     NCSLock = &rgbBuffer[0][0];           // 0'st RGB is NCR indicator 
-    //set_effect_temp();
 }
 
 void TinyInitEffect(void)
 {
+    uint8_t i;
     // init effect. firstly go to boot hid mode
-    memset(&tinyRgbEffect, 0, sizeof(rgb_effect_param_type));
+    tinyRgbmodeIndex = 0;
+    for(i = 0; i < RGBMODE_INDEX_MAX; i++)
+    {
+        memset(&tinyRgbEffect[i], 0, sizeof(rgb_effect_param_type));
+    }
 }
 
 void tiny_led_pushed_level_cal(void)

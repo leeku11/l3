@@ -10,7 +10,8 @@
 #define TINY_CMD_VER_F                  1
 #define TINY_CMD_RESET_F                2
 #define TINY_CMD_THREE_LOCK_F           3
-#define TINY_CMD_DIRTY                  4
+#define TINY_CMD_DIRTY_F                4
+#define TINY_CMD_SLEEP_F                5
 
 // RGB Command
 #define TINY_CMD_RGB_ALL_F              20

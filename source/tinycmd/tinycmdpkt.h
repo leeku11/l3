@@ -28,9 +28,6 @@ typedef struct
   uint8_t cmd_code;
   uint8_t pkt_len;
   uint8_t rgb_num;
-  uint8_t rgb_preset_index;
-  uint8_t led_preset_num;
-  uint8_t led_preset_index;
 } tinycmd_config_req_type;
 
 typedef struct
@@ -97,7 +94,7 @@ typedef struct
   uint8_t cmd_code;
   uint8_t pkt_len;
   uint8_t index;
-  rgb_effect_param_type effect_param;
+  uint8_t on;
 } tinycmd_rgb_set_effect_req_type;
 
 // TINY_CMD_RGB_SET_PRESET_F
@@ -105,8 +102,8 @@ typedef struct
 {
   uint8_t cmd_code;
   uint8_t pkt_len;
-  uint8_t preset;
-  uint8_t data[TINYCMD_LED_MAX*3];
+  uint8_t index;
+  rgb_effect_param_type effect_param;
 } tinycmd_rgb_set_preset_req_type;
 
 // TINY_CMD_LED_LEVEL_F
@@ -144,11 +141,19 @@ typedef struct
   uint8_t data[15];
 } tinycmd_led_config_preset_req_type;
 
-// TINY_CMD_DIRTY
+// TINY_CMD_DIRTY_F
 typedef struct
 {
   uint8_t cmd_code;
 } tinycmd_dirty_req_type;
+
+// TINY_CMD_SLEEP_F
+typedef struct
+{
+  uint8_t cmd_code;
+  uint8_t pkt_len;
+  uint8_t sleep; // 1 means sleep
+} tinycmd_sleep_req_type;
 
 typedef union
 {
@@ -167,7 +172,8 @@ typedef union
   tinycmd_led_set_effect_req_type      led_set_effect;           // TINY_CMD_LED_SET_EFFECT_F
   tinycmd_led_set_preset_req_type      led_set_preset;           // TINY_CMD_LED_SET_PRESET_F
   tinycmd_led_config_preset_req_type   led_cfg_preset;           // TINY_CMD_LED_CONFIG_PRESET_F
-  tinycmd_dirty_req_type               dirty;                    // TINY_CMD_DIRTY
+  tinycmd_dirty_req_type               dirty;                    // TINY_CMD_DIRTY_F
+  tinycmd_sleep_req_type               sleep;                    // TINY_CMD_SLEEP_F
 } tinycmd_pkt_req_type;
 
 

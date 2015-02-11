@@ -415,7 +415,8 @@ void rxHIDCmd(void)
             {
                 eeprom_update_block(&hidData.data[0], EEPADDR_KBD_CONF, sizeof(kbdConf));
                 tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
-                tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, &kbdConf.rgb_effect_param, TRUE);
+                tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE);
+                tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, TRUE, TRUE);
             }
             break;
         case CMD_KEYMAP :
@@ -836,39 +837,48 @@ uint8_t buildHIDreports(uint8_t keyidx)
                 {
                     case K_F1:
                         rgb_set_effect_param(0, &kbdConf.rgb_effect_param);
-                        tinycmd_rgb_set_effect(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+                        tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+                        tinycmd_rgb_set_effect(0, TRUE, TRUE); // RGB_EFFECT_BOOTHID
                         break;
                     case K_F2:
                         rgb_set_effect_param(1, &kbdConf.rgb_effect_param);
-                        tinycmd_rgb_set_effect(1, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BASIC
+                        tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+                        tinycmd_rgb_set_effect(0, TRUE, TRUE); // RGB_EFFECT_BOOTHID
                         break;
                     case K_F3:
                         rgb_set_effect_param(2, &kbdConf.rgb_effect_param);
-                        tinycmd_rgb_set_effect(2, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BASIC_LOOP
+                        tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+                        tinycmd_rgb_set_effect(0, TRUE, TRUE); // RGB_EFFECT_BOOTHID
                         break;
                     case K_F4:
                         rgb_set_effect_param(3, &kbdConf.rgb_effect_param);
-                        tinycmd_rgb_set_effect(3, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_FADE
+                        tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+                        tinycmd_rgb_set_effect(0, TRUE, TRUE); // RGB_EFFECT_BOOTHID
                         break;
                     case K_F5:
                         rgb_set_effect_param(4, &kbdConf.rgb_effect_param);
-                        tinycmd_rgb_set_effect(4, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_FADE_BUF
+                        tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+                        tinycmd_rgb_set_effect(0, TRUE, TRUE); // RGB_EFFECT_BOOTHID
                         break;
                     case K_F6:
                         rgb_set_effect_param(5, &kbdConf.rgb_effect_param);
-                        tinycmd_rgb_set_effect(5, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_FADE_LOOP
+                        tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+                        tinycmd_rgb_set_effect(0, TRUE, TRUE); // RGB_EFFECT_BOOTHID
                         break;
                     case K_F7:
                         rgb_set_effect_param(6, &kbdConf.rgb_effect_param);
-                        tinycmd_rgb_set_effect(6, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_HEARTBEAT
+                        tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+                        tinycmd_rgb_set_effect(0, TRUE, TRUE); // RGB_EFFECT_BOOTHID
                         break;
                     case K_F8:
                         rgb_set_effect_param(7, &kbdConf.rgb_effect_param);
-                        tinycmd_rgb_set_effect(7, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_HEARTBEAT_BUF
+                        tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+                        tinycmd_rgb_set_effect(0, TRUE, TRUE); // RGB_EFFECT_BOOTHID
                         break;
                     case K_F9:
                         rgb_set_effect_param(8, &kbdConf.rgb_effect_param);
-                        tinycmd_rgb_set_effect(8, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_HEARTBEAT_LOOP
+                        tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+                        tinycmd_rgb_set_effect(0, TRUE, TRUE); // RGB_EFFECT_BOOTHID
                         break;
                     case K_F10:
                         //rgb_set_effect_param(9, &kbdConf.rgb_effect_param);

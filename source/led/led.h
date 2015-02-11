@@ -37,6 +37,8 @@ typedef enum
 #define LED_BLOCK_MAX           5
 #define LEDMODE_ARRAY_SIZE      (LEDMODE_INDEX_MAX*LED_BLOCK_MAX)
 
+#define RGBMODE_INDEX_MAX       1
+
 #define PUSHED_LEVEL_MAX        20
 
 extern uint8_t tinyExist;

@@ -36,13 +36,14 @@ static uint8_t waitResponse(uint8_t cmd)
     return ret;
 }
 
-uint8_t tinycmd_config(uint8_t rsp)
+uint8_t tinycmd_config(uint8_t rgb_num, uint8_t rsp)
 {
     tinycmd_config_req_type *p_cfg_req = (tinycmd_config_req_type *)localBuffer;
     uint8_t ret = 0;
     
     p_cfg_req->cmd_code = TINY_CMD_CONFIG_F;
     p_cfg_req->pkt_len = sizeof(tinycmd_ver_req_type);
+    p_cfg_req->rgb_num = rgb_num;
 
     // If need to wait response from the slave
     if(rsp)
@@ -153,14 +154,38 @@ uint8_t tinycmd_dirty(uint8_t down)
 
     if(down)
     {
-        p_dirty_req->cmd_code = TINY_CMD_DIRTY | TINY_CMD_KEY_MASK;
+        p_dirty_req->cmd_code = TINY_CMD_DIRTY_F | TINY_CMD_KEY_MASK;
     }
     else
     {
-        p_dirty_req->cmd_code = TINY_CMD_DIRTY;
+        p_dirty_req->cmd_code = TINY_CMD_DIRTY_F;
     }
 
     i2cMasterSend(TARGET_ADDR, sizeof(tinycmd_dirty_req_type), (uint8_t *)p_dirty_req);
+
+    return 1;
+}
+
+uint8_t tinycmd_sleep(uint8_t sleep, uint8_t rsp)
+{
+    tinycmd_sleep_req_type *p_sleep_req = (tinycmd_sleep_req_type *)localBuffer;
+    uint8_t ret = 0;
+    
+    p_sleep_req->cmd_code = TINY_CMD_SLEEP_F;
+    p_sleep_req->pkt_len = sizeof(tinycmd_sleep_req_type);
+
+    // If need to wait response from the slave
+    if(rsp)
+    {
+        p_sleep_req->cmd_code |= TINY_CMD_RSP_MASK;
+        i2cMasterSendNI(TARGET_ADDR, p_sleep_req->pkt_len, (uint8_t *)p_sleep_req);
+        ret = waitResponse(TINY_CMD_SLEEP_F);
+    }
+    else
+    {
+        i2cMasterSend(TARGET_ADDR, p_sleep_req->pkt_len, (uint8_t *)p_sleep_req);
+        ret = 1;
+    }
 
     return 1;
 }
@@ -300,7 +325,7 @@ uint8_t tinycmd_rgb_buffer(uint8_t num, uint8_t offset, uint8_t *data, uint8_t r
 }
 
 
-uint8_t tinycmd_rgb_set_effect(uint8_t index, rgb_effect_param_type *p_param, uint8_t rsp)
+uint8_t tinycmd_rgb_set_effect(uint8_t index, uint8_t on, uint8_t rsp)
 {
     tinycmd_rgb_set_effect_req_type *p_rgb_set_effect = (tinycmd_rgb_set_effect_req_type *)localBuffer;
     uint8_t ret = 0;
@@ -308,8 +333,7 @@ uint8_t tinycmd_rgb_set_effect(uint8_t index, rgb_effect_param_type *p_param, ui
     p_rgb_set_effect->cmd_code = TINY_CMD_RGB_SET_EFFECT_F;
     p_rgb_set_effect->pkt_len = sizeof(tinycmd_rgb_set_effect_req_type);
     p_rgb_set_effect->index = index;
-    //p_rgb_set_effect->effect_param = *p_param;
-    memcpy(&p_rgb_set_effect->effect_param, p_param, sizeof(rgb_effect_param_type));
+    p_rgb_set_effect->on = on;
 
     // If need to wait response from the slave
     if(rsp)
@@ -327,14 +351,16 @@ uint8_t tinycmd_rgb_set_effect(uint8_t index, rgb_effect_param_type *p_param, ui
     return ret;
 }
 
-uint8_t tinycmd_rgb_set_preset(uint8_t preset, uint8_t effect, uint8_t rsp)
+uint8_t tinycmd_rgb_set_preset(uint8_t index, rgb_effect_param_type *p_param, uint8_t rsp)
 {
     tinycmd_rgb_set_preset_req_type *p_rgb_set_preset = (tinycmd_rgb_set_preset_req_type *)localBuffer;
     uint8_t ret = 0;
 
     p_rgb_set_preset->cmd_code = TINY_CMD_RGB_SET_PRESET_F;
     p_rgb_set_preset->pkt_len = sizeof(tinycmd_rgb_set_preset_req_type);
-    p_rgb_set_preset->preset = preset;
+    p_rgb_set_preset->index = index;
+    //p_rgb_set_effect->effect_param = *p_param;
+    memcpy(&p_rgb_set_preset->effect_param, p_param, sizeof(rgb_effect_param_type));
     
     // If need to wait response from the slave
     if(rsp)
@@ -430,7 +456,7 @@ uint8_t tinycmd_led_set_preset(uint8_t preset, uint8_t block, uint8_t effect, ui
     return ret;
 }
 
-uint8_t tinycmd_led_preset_config(uint8_t *p_led_mode_array, uint8_t rsp)
+uint8_t tinycmd_led_config_preset(uint8_t *p_led_mode_array, uint8_t rsp)
 {
     tinycmd_led_config_preset_req_type *p_led_cfg_preset = (tinycmd_led_config_preset_req_type *)localBuffer;
     uint8_t i, ret = 0;

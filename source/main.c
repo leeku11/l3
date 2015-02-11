@@ -239,13 +239,13 @@ uint8_t establishSlaveComm(void)
     //initI2C();
 
     // Establish a communication with tiny slave
-    while(ret == 0 && (retry++ < 1000))
+    while(ret == 0 && (retry++ < 100))
     {
         // proving
         ret = tinycmd_ver(TRUE);
         if(ret)
         {
-            tinycmd_config(TRUE);
+            tinycmd_config(kbdConf.rgb_chain, TRUE);
             break;
         }
     }
@@ -268,15 +268,14 @@ uint8_t tiny_init(void)
             kbdConf.rgb_effect_param.high_hold = 5;
             kbdConf.rgb_effect_param.accel_mode = 1; // quadratic
         }
-        tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, &kbdConf.rgb_effect_param, TRUE);
+        tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE);
+        // now kbdConf.rgb_effect_index should be 0.
+        tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, TRUE, TRUE);
 
         // Init LED Effect
-        tinycmd_led_preset_config((uint8_t *)kbdConf.led_preset, TRUE);
         tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
+        tinycmd_led_config_preset(kbdConf.led_preset, TRUE);
 
-/*
-              kbdConf.rgb_chain = 14;
-*/
         ret = 1;
     }
     return ret;

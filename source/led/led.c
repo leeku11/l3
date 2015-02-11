@@ -381,7 +381,7 @@ void led_mode_init(void)
     led_3lockupdate(gLEDstate);
 
 #if 0//def LED_CONTROL_SLAVE
-    tinycmd_led_preset_config((uint8_t *)&kbdConf.led_preset[0][0]);
+    tinycmd_led_config_preset((uint8_t *)&kbdConf.led_preset[0][0]);
     tinycmd_led_set_effect(kbdConf.led_preset_index);
 
 #endif // LED_CONTROL_SLAVE
