@@ -29,7 +29,8 @@
 
 //#define I2C_DEBUG
 
-#define I2C_1BYTE_TIMEOUT       0x100
+
+#define I2C_1BYTE_TIMEOUT       CYCLES_PER_US * 1000 *10   // 20ms timeout for 1Byte transfer
 // I2C state and address variables
 static volatile eI2cStateType I2cState;
 static volatile uint32_t I2cTimeout = I2C_1BYTE_TIMEOUT;   // default time out for 1Bytes transfer
@@ -66,8 +67,8 @@ void i2cInit(void)
 	// clear SlaveReceive and SlaveTransmit handler to null
 	i2cSlaveReceive = 0;
 	i2cSlaveTransmit = 0;
-	// set i2c bit rate to 100KHz
-	i2cSetBitrate(100);
+	// set i2c bit rate to 400KHz
+	i2cSetBitrate(400);
 	// enable TWI (two-wire interface)
 	sbi(TWCR, TWEN);
 	// set state

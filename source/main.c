@@ -271,8 +271,8 @@ uint8_t tiny_init(void)
         tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, &kbdConf.rgb_effect_param, TRUE);
 
         // Init LED Effect
-        tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
         tinycmd_led_preset_config((uint8_t *)kbdConf.led_preset, TRUE);
+        tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
 
 /*
               kbdConf.rgb_chain = 14;
