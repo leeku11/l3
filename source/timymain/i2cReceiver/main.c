@@ -47,11 +47,16 @@
 #define ws2812_pin3                     4       // PB4 -> OC1B
 //#define ws2812_pin4                                      5           //reset... do not use!!
 
+#define RGB_EFFECT_SPEED_FAST           2
+#define RGB_EFFECT_SPEED_NORMAL         5
+#define RGB_EFFECT_SPEED_SLOW           8
+
 #define DEBUG_LED_ON(p, o, r, g, b)    // rgb_pos_on(p, o, r, g, b)
 
 typedef struct {
     uint8_t comm_init;
     uint8_t rgb_num;
+    uint8_t rgb_effect_speed;
     uint8_t rgb_effect_on;
     uint8_t led_effect_on;
     uint8_t is_sleep;
@@ -111,6 +116,7 @@ rgb_effect_param_type tinyRgbEffect[RGBMODE_INDEX_MAX]; // rgb effect preset buf
 
 uint8_t scanDirty;
 uint32_t gcounter = 0;
+uint8_t effect_speed_counter = 0;
 
 tiny_config_type tinyConfig;
 
@@ -119,6 +125,11 @@ void key_led_pwm_on(uint8_t channel, uint8_t on);
 void key_led_pwm_duty(uint8_t channel, uint8_t duty);
 void tiny_led_mode_change (TINY_LED_BLOCK ledblock, int mode);
 void tiny_led_pushed_level_cal(void);
+void tiny_led_off(TINY_LED_BLOCK block);
+void tiny_led_on(TINY_LED_BLOCK block);
+void tiny_led_wave_on(TINY_LED_BLOCK block);
+void tiny_led_wave_off(TINY_LED_BLOCK block);
+void tiny_led_blink(int matrixState);
 
 uint8_t handlecmd_ver(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_reset(tinycmd_pkt_req_type *p_req);
@@ -129,32 +140,38 @@ uint8_t handlecmd_rgb_range(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_rgb_buffer(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_rgb_set_effect(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_rgb_set_preset(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_rgb_effect_speed(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_rgb_effect_on(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_led_level(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_led_set_effect(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_led_set_preset(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_led_config_preset(tinycmd_pkt_req_type *p_req);
+uint8_t handlecmd_led_effect_on(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req);
 uint8_t handlecmd_dirty(tinycmd_pkt_req_type *p_req);
 
 const tinycmd_handler_array_type cmdhandler[] = {
-    {TINY_CMD_CONFIG_F, handlecmd_config},                 // TINY_CMD_CONFIG
-    {TINY_CMD_VER_F, handlecmd_ver},                    // TINY_CMD_VER_F
-    {TINY_CMD_RESET_F,handlecmd_reset},                  // TINY_CMD_RESET_F
-    {TINY_CMD_THREE_LOCK_F,handlecmd_three_lock},             // TINY_CMD_THREE_LOCK_F
-    {TINY_CMD_DIRTY_F,handlecmd_dirty},                  // TINY_CMD_DIRTY_F
+    {TINY_CMD_CONFIG_F, handlecmd_config},
+    {TINY_CMD_VER_F, handlecmd_ver},
+    {TINY_CMD_RESET_F,handlecmd_reset},
+    {TINY_CMD_THREE_LOCK_F,handlecmd_three_lock},
+    {TINY_CMD_DIRTY_F,handlecmd_dirty},
 
-    {TINY_CMD_RGB_ALL_F,handlecmd_rgb_all},                // TINY_CMD_RGB_ALL_F
-    {TINY_CMD_RGB_POS_F,handlecmd_rgb_pos},                // TINY_CMD_RGB_POS_F
-    {TINY_CMD_RGB_RANGE_F,handlecmd_rgb_range},              // TINY_CMD_RGB_RANGE_F
-    {TINY_CMD_RGB_BUFFER_F,handlecmd_rgb_buffer},              // TINY_CMD_RGB_BUFFER_F
-    {TINY_CMD_RGB_SET_EFFECT_F,handlecmd_rgb_set_effect},         // TINY_CMD_RGB_SET_EFFECT_F
-    {TINY_CMD_RGB_SET_PRESET_F,handlecmd_rgb_set_preset},         // TINY_CMD_RGB_SET_PRESET_F
+    {TINY_CMD_RGB_ALL_F,handlecmd_rgb_all},
+    {TINY_CMD_RGB_POS_F,handlecmd_rgb_pos},
+    {TINY_CMD_RGB_RANGE_F,handlecmd_rgb_range},
+    {TINY_CMD_RGB_BUFFER_F,handlecmd_rgb_buffer},
+    {TINY_CMD_RGB_SET_EFFECT_F,handlecmd_rgb_set_effect},
+    {TINY_CMD_RGB_SET_PRESET_F,handlecmd_rgb_set_preset},
+    {TINY_CMD_RGB_EFFECT_SPEED_F,handlecmd_rgb_effect_speed},
+    {TINY_CMD_RGB_EFFECT_ON_F,handlecmd_rgb_effect_on},
 
-    {TINY_CMD_LED_LEVEL_F,handlecmd_led_level},              // TINY_CMD_LED_LEVEL_F
-    {TINY_CMD_LED_SET_EFFECT_F,handlecmd_led_set_effect},         // TINY_CMD_LED_SET_EFFECT_F
-    {TINY_CMD_LED_SET_PRESET_F,handlecmd_led_set_preset},         // TINY_CMD_LED_SET_PRESET_F
-    {TINY_CMD_LED_CONFIG_PRESET_F,handlecmd_led_config_preset}      // TINY_CMD_LED_CONFIG_PRESET_F
-                                // TINY_CMD_MAX
+    {TINY_CMD_LED_LEVEL_F,handlecmd_led_level},
+    {TINY_CMD_LED_SET_EFFECT_F,handlecmd_led_set_effect},
+    {TINY_CMD_LED_SET_PRESET_F,handlecmd_led_set_preset},
+    {TINY_CMD_LED_CONFIG_PRESET_F,handlecmd_led_config_preset},
+    {TINY_CMD_LED_EFFECT_ON_F,handlecmd_led_effect_on}
+    // TINY_CMD_MAX
 };
 #define CMD_HANDLER_TABLE_SIZE            (sizeof(handle_cmd_func)/sizeof(tinycmd_handler_func))
 
@@ -168,7 +185,7 @@ uint8_t rgb_effect_fade_inout_buf(rgb_effect_param_type *p_effect);
 uint8_t rgb_effect_fade_inout_loop(rgb_effect_param_type *p_effect);
 
 const tiny_effector_func effectHandler[] = {
-    rgb_effect_snake,               // RGB_EFFECT_BOOTHID
+    rgb_effect_snake,              // RGB_EFFECT_BOOTHID
     rgb_effect_basic,              // RGB_EFFECT_BASIC
     rgb_effect_basic_loop,         // RGB_EFFECT_BASIC_LOOP
     rgb_effect_fade_inout,         // RGB_EFFECT_FADE
@@ -917,6 +934,34 @@ uint8_t handlecmd_rgb_set_preset(tinycmd_pkt_req_type *p_req)
     return 0;
 }
 
+uint8_t handlecmd_rgb_effect_speed(tinycmd_pkt_req_type *p_req)
+{
+    uint8_t speed;
+    tinycmd_rgb_effect_speed_req_type *p_effect_speed_req = (tinycmd_rgb_effect_speed_req_type *)p_req;
+
+    speed = p_effect_speed_req->speed;
+    if(speed < RGB_EFFECT_SPEED_FAST)
+    {
+        speed = RGB_EFFECT_SPEED_FAST;
+    }
+    else if(speed > RGB_EFFECT_SPEED_SLOW)
+    {
+        speed = RGB_EFFECT_SPEED_SLOW;
+    }
+    tinyConfig.rgb_effect_speed = speed;
+
+    return 0;
+}
+
+uint8_t handlecmd_rgb_effect_on(tinycmd_pkt_req_type *p_req)
+{
+    tinycmd_rgb_effect_on_req_type *p_effect_on_req = (tinycmd_rgb_effect_on_req_type *)p_req;
+
+    tinyConfig.rgb_effect_on = p_effect_on_req->on;
+
+    return 0;
+}
+
 uint8_t handlecmd_led_level(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_led_level_req_type *p_led_level_req = (tinycmd_led_level_req_type *)p_req;
@@ -972,6 +1017,15 @@ uint8_t handlecmd_led_config_preset(tinycmd_pkt_req_type *p_req)
         tiny_led_mode_change(i, tinyLedmode[tinyLedmodeIndex][i]);
     }
     tinyConfig.comm_init = 1;
+
+    return 0;
+}
+
+uint8_t handlecmd_led_effect_on(tinycmd_pkt_req_type *p_req)
+{
+    tinycmd_led_effect_on_req_type *p_effect_on_req = (tinycmd_led_effect_on_req_type *)p_req;
+
+    tinyConfig.led_effect_on = p_effect_on_req->on;
 
     return 0;
 }
@@ -1315,9 +1369,22 @@ void tiny_led_fader(void)
 
 void tiny_rgb_effector(void)
 {
-    rgb_effect_param_type *pEffect = &tinyRgbEffect[tinyLedmodeIndex];
-    uint8_t update = 0;
-    uint8_t index = pEffect->index;
+    rgb_effect_param_type *pEffect;
+    uint8_t update, index;
+
+    if(!tinyConfig.rgb_effect_on)
+    {
+        return;
+    }
+
+    if(++effect_speed_counter % tinyConfig.rgb_effect_speed)
+    {
+        return;
+    }
+    
+    pEffect = &tinyRgbEffect[tinyLedmodeIndex];
+    update = 0;
+    index = pEffect->index;
 
     if(index < RGB_EFFECT_MAX)
     {
@@ -1410,8 +1477,9 @@ void TinyInitCfg(void)
 {
     memset(&tinyConfig, 0, sizeof(tiny_config_type));
     tinyConfig.rgb_num = CLED_NUM;
-    //tinyConfig.led_effect_on = 0; // default on
-    //tinyConfig.rgb_effect_on = 0; // default off
+    tinyConfig.led_effect_on = 1; // default on
+    tinyConfig.rgb_effect_on = 1; // default on
+    tinyConfig.rgb_effect_speed = RGB_EFFECT_SPEED_NORMAL;
     memset(rgbBuffer, 0, CLED_ARRAY_SIZE);
     NCSLock = &rgbBuffer[0][0];           // 0'st RGB is NCR indicator 
 }
@@ -1487,12 +1555,12 @@ int main(void)
                 gcounter = 0xfffff;
             }
 
-            if((count%150 == 0) && (tinyConfig.comm_init))
+            if((count%131 == 0) && (tinyConfig.comm_init))
             {
                 tiny_led_fader();
             }
 
-            if(effect_count%777 == 0)
+            if(effect_count%131 == 0)
             {
                 tiny_rgb_effector();
             }

@@ -29,6 +29,8 @@
 #include "i2c.h"        // include i2c support
 #include "tinycmdapi.h"
 
+#define TINY_DETECT_RETRY        10
+
 // local data buffer
 uint8_t tinyExist = 0;
 unsigned char localBuffer[0x4B];
@@ -239,7 +241,7 @@ uint8_t establishSlaveComm(void)
     //initI2C();
 
     // Establish a communication with tiny slave
-    while(ret == 0 && (retry++ < 100))
+    while(ret == 0 && (retry++ < TINY_DETECT_RETRY))
     {
         // proving
         ret = tinycmd_ver(TRUE);
@@ -261,20 +263,25 @@ uint8_t tiny_init(void)
     {
         // Init RGB Effect
         tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
+#if 0
         { // temporary
             kbdConf.rgb_effect_index = 5; // RGB_EFFECT_FADE_LOOP
             memset(&kbdConf.rgb_effect_param, 0, sizeof(rgb_effect_param_type));
             kbdConf.rgb_effect_param.index = 5;  // RGB_EFFECT_FADE_LOOP
+            kbdConf.rgb_effect_param.max.g = 70;
+            kbdConf.rgb_effect_param.max.r = 70;
+            kbdConf.rgb_effect_param.max.b = 70;
             kbdConf.rgb_effect_param.high_hold = 5;
             kbdConf.rgb_effect_param.accel_mode = 1; // quadratic
         }
+#endif
         tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE);
         // now kbdConf.rgb_effect_index should be 0.
-        tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, TRUE, TRUE);
+        tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, TRUE);
 
         // Init LED Effect
         tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
-        tinycmd_led_config_preset(kbdConf.led_preset, TRUE);
+        tinycmd_led_config_preset((uint8_t*)kbdConf.led_preset, TRUE);
 
         ret = 1;
     }

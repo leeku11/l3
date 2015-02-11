@@ -94,7 +94,6 @@ typedef struct
   uint8_t cmd_code;
   uint8_t pkt_len;
   uint8_t index;
-  uint8_t on;
 } tinycmd_rgb_set_effect_req_type;
 
 // TINY_CMD_RGB_SET_PRESET_F
@@ -105,6 +104,22 @@ typedef struct
   uint8_t index;
   rgb_effect_param_type effect_param;
 } tinycmd_rgb_set_preset_req_type;
+
+// TINY_CMD_RGB_EFFECT_SPEED_F
+typedef struct
+{
+  uint8_t cmd_code;
+  uint8_t pkt_len;
+  uint8_t speed; // 1: fast, 2: normal, 3: slow
+} tinycmd_rgb_effect_speed_req_type;
+
+// TINY_CMD_RGB_EFFECT_ON_F
+typedef struct
+{
+  uint8_t cmd_code;
+  uint8_t pkt_len;
+  uint8_t on; // 0: off, TRUE: on
+} tinycmd_rgb_effect_on_req_type;
 
 // TINY_CMD_LED_LEVEL_F
 typedef struct
@@ -141,6 +156,14 @@ typedef struct
   uint8_t data[15];
 } tinycmd_led_config_preset_req_type;
 
+// TINY_CMD_LED_EFFECT_ON_F
+typedef struct
+{
+  uint8_t cmd_code;
+  uint8_t pkt_len;
+  uint8_t on; // 0: off TRUE: on
+} tinycmd_led_effect_on_req_type;
+
 // TINY_CMD_DIRTY_F
 typedef struct
 {
@@ -168,10 +191,13 @@ typedef union
   tinycmd_rgb_buffer_req_type          rgb_buffer;               // TINY_CMD_RGB_BUFFER_F
   tinycmd_rgb_set_effect_req_type      rgb_set_effect;           // TINY_CMD_RGB_SET_EFFECT_F
   tinycmd_rgb_set_preset_req_type      rgb_set_preset;           // TINY_CMD_RGB_SET_PRESET_F
+  tinycmd_rgb_effect_speed_req_type    rgb_effect_speed;         // TINY_CMD_RGB_EFFECT_SPEED_F
+  tinycmd_rgb_effect_on_req_type       rgb_effect_on;            // TINY_CMD_RGB_EFFECT_ON_F
   tinycmd_led_level_req_type           led_level;                // TINY_CMD_LED_LEVEL_F
   tinycmd_led_set_effect_req_type      led_set_effect;           // TINY_CMD_LED_SET_EFFECT_F
   tinycmd_led_set_preset_req_type      led_set_preset;           // TINY_CMD_LED_SET_PRESET_F
   tinycmd_led_config_preset_req_type   led_cfg_preset;           // TINY_CMD_LED_CONFIG_PRESET_F
+  tinycmd_led_effect_on_req_type       led_effect_on;            // TINY_CMD_LED_EFFECT_ON_F
   tinycmd_dirty_req_type               dirty;                    // TINY_CMD_DIRTY_F
   tinycmd_sleep_req_type               sleep;                    // TINY_CMD_SLEEP_F
 } tinycmd_pkt_req_type;
