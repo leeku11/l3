@@ -884,7 +884,7 @@ uint8_t buildHIDreports(uint8_t keyidx)
                         //rgb_set_effect_param(9, &kbdConf.rgb_effect_param);
                         //tinycmd_rgb_set_effect(9, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_SWIPE
                         tinycmd_rgb_all(1, 100, 100, 0, FALSE);
-                        tinycmd_led_preset_config((uint8_t *)&tmpled_preset[0][0], FALSE);
+                        tinycmd_led_config_preset((uint8_t *)&tmpled_preset[0][0], FALSE);
                         tinycmd_led_set_effect(0, FALSE);
                         break;
                     case K_F11:
