@@ -377,7 +377,7 @@ uint8_t txHIDCmd(void)
             hidData.reportID = 2;
             hidData.cmd = hidCmd.keymap.cmd;
             hidData.parm1 = sizeof(kbdConf);
-            eeprom_read_block(hidData.data, EEPADDR_KBD_CONF, sizeof(kbdConf));
+            memcpy(hidData.data, &kbdConf, sizeof(kbdConf));
             break;
         }
         case CMD_KEYMAP :
@@ -416,7 +416,6 @@ void rxHIDCmd(void)
                 eeprom_update_block(&hidData.data[0], EEPADDR_KBD_CONF, sizeof(kbdConf));
                 tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
                 tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, &kbdConf.rgb_effect_param, TRUE);
-                led_mode_init();
             }
             break;
         case CMD_KEYMAP :
@@ -889,11 +888,13 @@ uint8_t buildHIDreports(uint8_t keyidx)
                         //rgb_set_effect_param(11, &kbdConf.rgb_effect_param);
                         //tinycmd_rgb_set_effect(11, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_SWIPE_LOOP
                         //tinycmd_rgb_all(1, 100, 0, 100);
+
                         {
                             // set rgb leds
-                            tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, FALSE);
+                            tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
                         }
-                            tinycmd_led_set_effect(2, FALSE);
+                        
+                        tinycmd_led_set_effect(2, FALSE);
                         break;
                 }
             }

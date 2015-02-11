@@ -357,19 +357,12 @@ int main(void)
     
    if(kbdConf.ps2usb_mode)
    {
-      led_check(1);
-
-      led_off(LED_PIN_BASE);
-      led_off(LED_PIN_WASD);
-    
       led_mode_init();
-      
       usbmain();
    }
    else
    {
     
-      led_check(0);
       led_mode_init();
       ps2main();
    }

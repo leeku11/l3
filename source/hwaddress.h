@@ -48,7 +48,7 @@ typedef struct {
 typedef struct kbd_conf
 {
     uint8_t ps2usb_mode;                    // 0: PS2, 1: USB
-    uint8_t keymapLayerIndex;                     // KEYMAP layer index;
+    uint8_t keymapLayerIndex;               // KEYMAP layer index;
     uint8_t swapCtrlCaps;                   // 1: Swap Capslock <-> Left Ctrl
     uint8_t swapAltGui;                     // 1: Swap Alt <-> GUI(WIN) 
     uint8_t led_preset_index;               // LED effect  preset index
