@@ -37,7 +37,7 @@ static uint8_t waitResponse(uint8_t cmd)
     return ret;
 }
 
-static uint8_t sendResponse(tinycmd_pkt_req_type *p_req, uint8_t len, uint8_t rsp)
+static uint8_t sendCommand(tinycmd_pkt_req_type *p_req, uint8_t len, uint8_t rsp)
 {
     uint8_t ret = 0;
     uint8_t cmd = p_req->cmd_code;
@@ -67,7 +67,7 @@ uint8_t tinycmd_config(uint8_t rgb_num, uint8_t rsp)
     p_cfg_req->pkt_len = sizeof(tinycmd_ver_req_type);
     p_cfg_req->rgb_num = rgb_num;
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_cfg_req, p_cfg_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_cfg_req, p_cfg_req->pkt_len, rsp);
 
     return ret;
 }
@@ -80,7 +80,7 @@ uint8_t tinycmd_ver(uint8_t rsp)
     p_ver_req->cmd_code = TINY_CMD_VER_F;
     p_ver_req->pkt_len = sizeof(tinycmd_ver_req_type);
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_ver_req, p_ver_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_ver_req, p_ver_req->pkt_len, rsp);
 
     return ret;
 }
@@ -94,7 +94,7 @@ uint8_t tinycmd_reset(uint8_t type, uint8_t rsp)
     p_reset_req->pkt_len = sizeof(tinycmd_reset_req_type);
     p_reset_req->type = 0;
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_reset_req, p_reset_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_reset_req, p_reset_req->pkt_len, rsp);
 
     return rsp;
 }
@@ -121,7 +121,7 @@ uint8_t tinycmd_three_lock(uint8_t num, uint8_t caps, uint8_t scroll, uint8_t rs
     }
     p_three_lock_req->lock = lock;
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_three_lock_req, p_three_lock_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_three_lock_req, p_three_lock_req->pkt_len, rsp);
 
     return ret;
 }
@@ -152,7 +152,7 @@ uint8_t tinycmd_sleep(uint8_t sleep, uint8_t rsp)
     p_sleep_req->cmd_code = TINY_CMD_SLEEP_F;
     p_sleep_req->pkt_len = sizeof(tinycmd_sleep_req_type);
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_sleep_req, p_sleep_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_sleep_req, p_sleep_req->pkt_len, rsp);
 
     return 1;
 }
@@ -171,7 +171,7 @@ uint8_t tinycmd_rgb_all(uint8_t on, uint8_t r, uint8_t g, uint8_t b, uint8_t rsp
     p_rgb_all_req->led.r = r;
     p_rgb_all_req->led.b = b;
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_rgb_all_req, p_rgb_all_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_rgb_all_req, p_rgb_all_req->pkt_len, rsp);
 
     return ret;
 }
@@ -190,7 +190,7 @@ uint8_t tinycmd_rgb_pos(uint8_t pos, uint8_t r, uint8_t g, uint8_t b, uint8_t rs
     p_rgb_pos_req->led.r = r;
     p_rgb_pos_req->led.b = b;
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_rgb_pos_req, p_rgb_pos_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_rgb_pos_req, p_rgb_pos_req->pkt_len, rsp);
 
     return ret;
 }
@@ -220,7 +220,7 @@ uint8_t tinycmd_rgb_range(uint8_t num, uint8_t offset, uint8_t r, uint8_t g, uin
        p_rgb_range_req->led[i] = led;
     }
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_rgb_range_req, p_rgb_range_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_rgb_range_req, p_rgb_range_req->pkt_len, rsp);
 
     return ret;
 }
@@ -242,7 +242,7 @@ uint8_t tinycmd_rgb_buffer(uint8_t num, uint8_t offset, uint8_t *data, uint8_t r
 
     memcpy(p_rgb_buffer_req->data, data, num*3);
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_rgb_buffer_req, p_rgb_buffer_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_rgb_buffer_req, p_rgb_buffer_req->pkt_len, rsp);
 
     return ret;
 }
@@ -257,7 +257,7 @@ uint8_t tinycmd_rgb_set_effect(uint8_t index, uint8_t rsp)
     p_rgb_set_effect_req->pkt_len = sizeof(tinycmd_rgb_set_effect_req_type);
     p_rgb_set_effect_req->index = index;
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_rgb_set_effect_req, p_rgb_set_effect_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_rgb_set_effect_req, p_rgb_set_effect_req->pkt_len, rsp);
 
     return ret;
 }
@@ -273,7 +273,7 @@ uint8_t tinycmd_rgb_set_preset(uint8_t index, rgb_effect_param_type *p_param, ui
     //p_rgb_set_effect->effect_param = *p_param;
     memcpy(&p_rgb_set_preset_req->effect_param, p_param, sizeof(rgb_effect_param_type));
     
-    ret = sendResponse((tinycmd_pkt_req_type *)p_rgb_set_preset_req, p_rgb_set_preset_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_rgb_set_preset_req, p_rgb_set_preset_req->pkt_len, rsp);
 
     return ret;
 }
@@ -287,7 +287,7 @@ uint8_t tinycmd_rgb_effect_speed(uint8_t speed, uint8_t rsp)
     p_rgb_effect_speed_req->pkt_len = sizeof(tinycmd_rgb_effect_speed_req_type);
     p_rgb_effect_speed_req->speed = speed;
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_rgb_effect_speed_req, p_rgb_effect_speed_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_rgb_effect_speed_req, p_rgb_effect_speed_req->pkt_len, rsp);
 
     return ret;
 }
@@ -301,7 +301,7 @@ uint8_t tinycmd_rgb_effect_on(uint8_t on, uint8_t rsp)
     p_rgb_effect_on_req->pkt_len = sizeof(tinycmd_rgb_effect_on_req_type);
     p_rgb_effect_on_req->on = on;
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_rgb_effect_on_req, p_rgb_effect_on_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_rgb_effect_on_req, p_rgb_effect_on_req->pkt_len, rsp);
 
     return ret;
 }
@@ -316,7 +316,7 @@ uint8_t tinycmd_led_level(uint8_t channel, uint8_t level, uint8_t rsp)
     p_led_level_req->channel = channel;
     p_led_level_req->level = level;
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_led_level_req, p_led_level_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_led_level_req, p_led_level_req->pkt_len, rsp);
 
     return ret;
 }
@@ -330,7 +330,7 @@ uint8_t tinycmd_led_set_effect(uint8_t index, uint8_t rsp)
     p_rgb_set_effect_req->pkt_len = sizeof(tinycmd_led_set_effect_req_type);
     p_rgb_set_effect_req->preset = index;
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_rgb_set_effect_req, p_rgb_set_effect_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_rgb_set_effect_req, p_rgb_set_effect_req->pkt_len, rsp);
 
     return ret;
 }
@@ -346,7 +346,7 @@ uint8_t tinycmd_led_set_preset(uint8_t preset, uint8_t block, uint8_t effect, ui
     p_led_set_preset_mode_req->block = block;
     p_led_set_preset_mode_req->effect = effect;
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_led_set_preset_mode_req, p_led_set_preset_mode_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_led_set_preset_mode_req, p_led_set_preset_mode_req->pkt_len, rsp);
 
     return ret;
 }
@@ -364,7 +364,7 @@ uint8_t tinycmd_led_config_preset(uint8_t *p_led_mode_array, uint8_t rsp)
         p_led_cfg_preset_req->data[i] = p_led_mode_array[i];
     }
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_led_cfg_preset_req, p_led_cfg_preset_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_led_cfg_preset_req, p_led_cfg_preset_req->pkt_len, rsp);
 
     return ret;
 }
@@ -378,7 +378,7 @@ uint8_t tinycmd_led_effect_on(uint8_t on, uint8_t rsp)
     p_led_effect_on_req->pkt_len = sizeof(tinycmd_led_effect_on_req_type);
     p_led_effect_on_req->on = on;
 
-    ret = sendResponse((tinycmd_pkt_req_type *)p_led_effect_on_req, p_led_effect_on_req->pkt_len, rsp);
+    ret = sendCommand((tinycmd_pkt_req_type *)p_led_effect_on_req, p_led_effect_on_req->pkt_len, rsp);
 
     return ret;
 }

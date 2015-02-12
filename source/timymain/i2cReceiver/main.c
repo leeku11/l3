@@ -236,7 +236,7 @@ void rgb_array_on(uint8_t on, uint8_t r, uint8_t g, uint8_t b)
         r = g = b = 0;
     }
 
-    for(i = 1; i < CLED_NUM; i++)
+    for(i = 1; i < tinyConfig.rgb_num; i++)
     {
         rgbBuffer[i][0] = g;
         rgbBuffer[i][1] = r;
@@ -282,20 +282,20 @@ uint8_t rgb_effect_snake(rgb_effect_param_type *p_effect)
             tmprgbBuffer[i][1] = rgbBuffer[i][1];
             tmprgbBuffer[i][2] = rgbBuffer[i][2];
         }
-        if(pos++ > CLED_NUM)
+        if(pos++ > tinyConfig.rgb_num)
         {
             pos = 0;
             state = 1;
         }
     }else
     {
-        for(i = pos; i < CLED_NUM; i++)     // turn on from pos to end
+        for(i = pos; i < tinyConfig.rgb_num; i++)     // turn on from pos to end
         {
             tmprgbBuffer[i][0] = rgbBuffer[i][0];
             tmprgbBuffer[i][1] = rgbBuffer[i][1];
             tmprgbBuffer[i][2] = rgbBuffer[i][2];
         }
-        if(pos++ > CLED_NUM)
+        if(pos++ > tinyConfig.rgb_num)
         {
             pos = 0;
             state = 0;
@@ -310,7 +310,7 @@ uint8_t rgb_effect_snake(rgb_effect_param_type *p_effect)
 uint8_t rgb_effect_crazy(rgb_effect_param_type *p_effect)
 {
     uint8_t i;
-    for(i = 0; i < CLED_NUM; i++)            
+    for(i = 0; i < tinyConfig.rgb_num; i++)            
     {
         tmprgbBuffer[i][0] = TCNT0;
         tmprgbBuffer[i][1] = TCNT1;
@@ -329,7 +329,7 @@ uint8_t rgb_effect_basic(rgb_effect_param_type *p_effect)
     tmprgbBuffer[i][2] = NCSLock[2];
     i++;
 
-    for(; i < CLED_NUM; i++)
+    for(; i < tinyConfig.rgb_num; i++)
     {
         for(j = 0; j < 3; j++)
         {
@@ -384,7 +384,7 @@ uint8_t rgb_effect_basic_loop(rgb_effect_param_type *p_effect)
     rgb[1] = rgbBuffer[p_effect->cnt + i][1];
     rgb[2] = rgbBuffer[p_effect->cnt + i][2];
 
-    for(; i < CLED_NUM; i++)
+    for(; i < tinyConfig.rgb_num; i++)
     {
         for(j = 0; j < 3; j++)
         {
@@ -403,7 +403,7 @@ uint8_t rgb_effect_basic_loop(rgb_effect_param_type *p_effect)
     if(++p_effect->hcnt > p_effect->high_hold)
     {
         p_effect->hcnt = 0;
-        if(++p_effect->cnt == (CLED_NUM - 1))
+        if(++p_effect->cnt == (tinyConfig.rgb_num - 1))
         {
             p_effect->cnt = 0;
         }
@@ -431,7 +431,7 @@ uint8_t rgb_effect_fade_inout(rgb_effect_param_type *p_effect)
     max = 0;
     if(p_effect->dir == 0) // ASCENDING
     {
-        for(; i < CLED_NUM; i++)
+        for(; i < tinyConfig.rgb_num; i++)
         {
             for(j = 0; j < 3; j++)
             {
@@ -496,7 +496,7 @@ uint8_t rgb_effect_fade_inout(rgb_effect_param_type *p_effect)
     }
     else // DESCENDING
     {
-        for(; i < CLED_NUM; i++)
+        for(; i < tinyConfig.rgb_num; i++)
         {
             for(j = 0; j < 3; j++)
             {
@@ -539,7 +539,7 @@ uint8_t rgb_effect_fade_inout_buf(rgb_effect_param_type *p_effect)
     max = 0;
     if(p_effect->dir == 0) // ASCENDING
     {
-        for(; i < CLED_NUM; i++)
+        for(; i < tinyConfig.rgb_num; i++)
         {
             for(j = 0; j < 3; j++)
             {
@@ -609,7 +609,7 @@ uint8_t rgb_effect_fade_inout_buf(rgb_effect_param_type *p_effect)
     }
     else // DESCENDING
     {
-        for(; i < CLED_NUM; i++)
+        for(; i < tinyConfig.rgb_num; i++)
         {
             for(j = 0; j < 3; j++)
             {
@@ -657,7 +657,7 @@ uint8_t rgb_effect_fade_inout_loop(rgb_effect_param_type *p_effect)
     max = 0;
     if(p_effect->dir == 0) // ASCENDING
     {
-        for(; i < CLED_NUM; i++)
+        for(; i < tinyConfig.rgb_num; i++)
         {
             for(j = 0; j < 3; j++)
             {
@@ -727,7 +727,7 @@ uint8_t rgb_effect_fade_inout_loop(rgb_effect_param_type *p_effect)
     }
     else // DESCENDING
     {
-        for(; i < CLED_NUM; i++)
+        for(; i < tinyConfig.rgb_num; i++)
         {
             for(j = 0; j < 3; j++)
             {
@@ -751,7 +751,7 @@ uint8_t rgb_effect_fade_inout_loop(rgb_effect_param_type *p_effect)
                 p_effect->dir = (!p_effect->dir);
                 p_effect->lcnt = 0;
 
-                if(++p_effect->cnt == (CLED_NUM - 1))
+                if(++p_effect->cnt == (tinyConfig.rgb_num - 1))
                 {
                     p_effect->cnt = 0;
                 }
