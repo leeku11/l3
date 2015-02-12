@@ -13,14 +13,13 @@ extern unsigned char localBuffer[0x4B]; // I2C_WRSIZE
 extern unsigned char localBufferLength;
 
 #define TARGET_ADDR     0xB0
-#define WAIT_RETRY      5
+#define WAIT_RETRY      100
 
 #if 1//def SUPPORT_TINY_CMD
 static uint8_t waitResponse(uint8_t cmd)
 {
     tinycmd_rsp_type *p_rsp = 0;
     uint8_t i, ret = 0;
-    
     for(i = 0; i < WAIT_RETRY; i++)
     {
         // then read n byte(s) from the selected MegaIO register
@@ -33,7 +32,6 @@ static uint8_t waitResponse(uint8_t cmd)
             break;
         }
     }
-
     return ret;
 }
 
@@ -41,18 +39,20 @@ static uint8_t sendCommand(tinycmd_pkt_req_type *p_req, uint8_t len, uint8_t rsp
 {
     uint8_t ret = 0;
     uint8_t cmd = p_req->cmd_code;
-
-    // If need to wait response from the slave
-    if(rsp)
+    if (tinyExist == 1)                 // attiny85 is soldered
     {
-        p_req->cmd_code |= TINY_CMD_RSP_MASK;
-        i2cMasterSendNI(TARGET_ADDR, len, (uint8_t *)p_req);
-        ret = waitResponse(cmd);
-    }
-    else
-    {
-        i2cMasterSend(TARGET_ADDR, len, (uint8_t *)p_req);
-        ret = 1;
+        // If need to wait response from the slave
+        if(rsp)
+        {
+            p_req->cmd_code |= TINY_CMD_RSP_MASK;
+            i2cMasterSendNI(TARGET_ADDR, len, (uint8_t *)p_req);
+            ret = waitResponse(cmd);
+        }
+        else
+        {
+            i2cMasterSend(TARGET_ADDR, len, (uint8_t *)p_req);
+            ret = 1;
+        }
     }
 
     return ret;
