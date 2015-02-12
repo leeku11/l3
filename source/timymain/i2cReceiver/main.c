@@ -905,7 +905,7 @@ uint8_t handlecmd_rgb_buffer(tinycmd_pkt_req_type *p_req)
 
     memcpy(&rgbBuffer[tmpPos][0], p_rgb_buffer_req->data, p_rgb_buffer_req->num * CLED_ELEMENT);
 
-    ws2812_sendarray((uint8_t *)rgbBuffer, CLED_GET_ARRAY_SIZE(tinyConfig.rgb_num));        // output message data to port D
+//    ws2812_sendarray((uint8_t *)rgbBuffer, CLED_GET_ARRAY_SIZE(tinyConfig.rgb_num));        // output message data to port D
 
     return 0;
 }
@@ -1035,7 +1035,6 @@ uint8_t handlecmd_dirty(tinycmd_pkt_req_type *p_req)
     if(p_req->cmd_code & TINY_CMD_KEY_MASK) // down
     {
         scanDirty |= SCAN_DIRTY;
-
         gcounter = 0;
         tiny_led_pushed_level_cal();
     }
@@ -1381,7 +1380,7 @@ void tiny_rgb_effector(void)
         return;
     }
     
-    pEffect = &tinyRgbEffect[tinyLedmodeIndex];
+    pEffect = &tinyRgbEffect[tinyRgbmodeIndex];
     update = 0;
     index = pEffect->index;
 
@@ -1479,7 +1478,7 @@ void TinyInitCfg(void)
     tinyConfig.led_effect_on = 1; // default on
     tinyConfig.rgb_effect_on = 1; // default on
     tinyConfig.rgb_effect_speed = RGB_EFFECT_SPEED_NORMAL;
-    memset(rgbBuffer, 0, CLED_ARRAY_SIZE);
+    memset(rgbBuffer, 0xff, CLED_ARRAY_SIZE);
     NCSLock = &rgbBuffer[0][0];           // 0'st RGB is NCR indicator 
 }
 
@@ -1490,7 +1489,7 @@ void TinyInitEffect(void)
     tinyRgbmodeIndex = 0;
     for(i = 0; i < RGBMODE_INDEX_MAX; i++)
     {
-        memset(&tinyRgbEffect[i], 0, sizeof(rgb_effect_param_type));
+        memset(&tinyRgbEffect[i], 0xff, sizeof(rgb_effect_param_type));
     }
 }
 
@@ -1513,9 +1512,8 @@ void tiny_led_pushed_level_cal(void)
 int main(void)
 {
     uint8_t i = 0;
-    volatile uint8_t *pTmp;
+    uint8_t *pTmp;
     uint8_t rcvlen;
-
     uint16_t count = 0;
     uint16_t effect_count = 0;
 

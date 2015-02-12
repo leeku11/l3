@@ -32,7 +32,7 @@
 #define TINY_DETECT_RETRY        10
 
 // local data buffer
-uint8_t tinyExist = 0;
+uint8_t tinyExist = 1;
 unsigned char localBuffer[0x4B];
 unsigned char localBufferLength;
 #endif // SUPPORT_I2C
@@ -239,15 +239,14 @@ uint8_t establishSlaveComm(void)
     uint16_t retry = 0;
 
     //initI2C();
-
     // Establish a communication with tiny slave
     while(ret == 0 && (retry++ < TINY_DETECT_RETRY))
     {
         // proving
         ret = tinycmd_ver(TRUE);
         if(ret)
-        {
-            tinycmd_config(kbdConf.rgb_chain, TRUE);
+        { 
+            tinycmd_config(15/*kbdConf.rgb_chain*/, TRUE);
             break;
         }
     }

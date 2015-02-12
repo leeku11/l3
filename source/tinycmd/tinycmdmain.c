@@ -7,13 +7,14 @@
 #include "i2c.h"
 #include "led.h"
 #include "hwaddress.h"
+#include <util/delay.h>     /* for _delay_ms() */
 
 extern uint8_t tinyExist;           // 1 : attiny85 is exist, 0 : not
 extern unsigned char localBuffer[0x4B]; // I2C_WRSIZE
 extern unsigned char localBufferLength;
 
 #define TARGET_ADDR     0xB0
-#define WAIT_RETRY      100
+#define WAIT_RETRY      10
 
 #if 1//def SUPPORT_TINY_CMD
 static uint8_t waitResponse(uint8_t cmd)
@@ -31,6 +32,7 @@ static uint8_t waitResponse(uint8_t cmd)
             ret = 1;
             break;
         }
+        _delay_us(100);     // wait 100us
     }
     return ret;
 }
@@ -45,12 +47,14 @@ static uint8_t sendCommand(tinycmd_pkt_req_type *p_req, uint8_t len, uint8_t rsp
         if(rsp)
         {
             p_req->cmd_code |= TINY_CMD_RSP_MASK;
-            i2cMasterSendNI(TARGET_ADDR, len, (uint8_t *)p_req);
-            ret = waitResponse(cmd);
+            if(i2cMasterSendNI(TARGET_ADDR, len, (uint8_t *)p_req) == I2C_OK)
+            {
+                ret = waitResponse(cmd & TINY_CMD_CMD_MASK);
+            }
         }
         else
         {
-            i2cMasterSend(TARGET_ADDR, len, (uint8_t *)p_req);
+            i2cMasterSendNI(TARGET_ADDR, len, (uint8_t *)p_req);
             ret = 1;
         }
     }
@@ -64,7 +68,7 @@ uint8_t tinycmd_config(uint8_t rgb_num, uint8_t rsp)
     uint8_t ret = 0;
     
     p_cfg_req->cmd_code = TINY_CMD_CONFIG_F;
-    p_cfg_req->pkt_len = sizeof(tinycmd_ver_req_type);
+    p_cfg_req->pkt_len = sizeof(tinycmd_config_req_type);
     p_cfg_req->rgb_num = rgb_num;
 
     ret = sendCommand((tinycmd_pkt_req_type *)p_cfg_req, p_cfg_req->pkt_len, rsp);
@@ -138,9 +142,7 @@ uint8_t tinycmd_dirty(uint8_t down)
     {
         p_dirty_req->cmd_code = TINY_CMD_DIRTY_F;
     }
-
-    i2cMasterSend(TARGET_ADDR, sizeof(tinycmd_dirty_req_type), (uint8_t *)p_dirty_req);
-
+    sendCommand(p_dirty_req, sizeof(tinycmd_dirty_req_type), FALSE);
     return 1;
 }
 

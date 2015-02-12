@@ -411,7 +411,103 @@ uint8_t swap_key(uint8_t keyidx)
     return keyidx;
 }
 
+void testTinyCmd(uint8_t keyidx)
+{
 
+    
+#if 1//def SUPPORT_TINY_CMD
+    switch (keyidx)
+    {
+        case K_F1:
+            rgb_set_effect_param(0, &kbdConf.rgb_effect_param);
+            tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+            tinycmd_rgb_set_effect(0, TRUE); // RGB_EFFECT_BOOTHID
+            break;
+        case K_F2:
+#if 0
+            rgb_set_effect_param(1, &kbdConf.rgb_effect_param);
+            tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+            tinycmd_rgb_set_effect(0, TRUE); // RGB_EFFECT_BOOTHID
+#else
+            tinycmd_rgb_effect_on(FALSE, TRUE);
+            tinycmd_rgb_all(0, 0, 0, 0, TRUE);
+#endif
+            break;
+        case K_F3:
+#if 0
+            rgb_set_effect_param(2, &kbdConf.rgb_effect_param);
+            tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+            tinycmd_rgb_set_effect(0, TRUE); // RGB_EFFECT_BOOTHID
+#else
+            tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
+            tinycmd_rgb_effect_on(TRUE, TRUE);
+#endif
+            break;
+        case K_F4:
+            rgb_set_effect_param(3, &kbdConf.rgb_effect_param);
+            tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+            tinycmd_rgb_set_effect(0, TRUE); // RGB_EFFECT_BOOTHID
+            break;
+        case K_F5:
+            rgb_set_effect_param(4, &kbdConf.rgb_effect_param);
+            tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+            tinycmd_rgb_set_effect(0, TRUE); // RGB_EFFECT_BOOTHID
+            break;
+        case K_F6:
+            rgb_set_effect_param(5, &kbdConf.rgb_effect_param);
+            tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+            tinycmd_rgb_set_effect(0, TRUE); // RGB_EFFECT_BOOTHID
+            break;
+        case K_F7:
+            rgb_set_effect_param(6, &kbdConf.rgb_effect_param);
+            tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+            tinycmd_rgb_set_effect(0, TRUE); // RGB_EFFECT_BOOTHID
+            break;
+        case K_F8:
+            rgb_set_effect_param(7, &kbdConf.rgb_effect_param);
+            tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+            tinycmd_rgb_set_effect(0, TRUE); // RGB_EFFECT_BOOTHID
+            break;
+        case K_F9:
+            rgb_set_effect_param(8, &kbdConf.rgb_effect_param);
+            tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
+            tinycmd_rgb_set_effect(0, TRUE); // RGB_EFFECT_BOOTHID
+            break;
+        case K_F10:
+            //rgb_set_effect_param(9, &kbdConf.rgb_effect_param);
+            //tinycmd_rgb_set_effect(9, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_SWIPE
+            //tinycmd_rgb_all(1, 100, 100, 0, FALSE);
+            
+  //          tinycmd_led_config_preset((uint8_t *)&tmpled_preset[0][0], TRUE);
+            tinycmd_led_set_effect(0, TRUE);
+            tinycmd_rgb_effect_speed(2, TRUE); // fast
+            break;
+        case K_F11:
+            //rgb_set_effect_param(10, &kbdConf.rgb_effect_param);
+            //tinycmd_rgb_set_effect(10, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_SWIPE_BUF
+            //tinycmd_rgb_all(1, 0, 100, 100, FALSE);
+            
+               tinycmd_led_set_effect(1, TRUE);
+            tinycmd_rgb_effect_speed(3, TRUE); // normal
+
+            break;
+        case K_F12:
+            //rgb_set_effect_param(11, &kbdConf.rgb_effect_param);
+            //tinycmd_rgb_set_effect(11, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_SWIPE_LOOP
+            //tinycmd_rgb_all(1, 100, 0, 100);
+
+            {
+                // set rgb leds
+                //tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
+            }
+            
+               tinycmd_led_set_effect(2, TRUE);
+            tinycmd_rgb_effect_speed(4, TRUE); //slow
+            break;
+    }
+#endif // SUPPORT_TINY_CMD
+
+}
 // return : key modified
 uint8_t scankey(void)
 {
@@ -482,6 +578,7 @@ uint8_t scankey(void)
             
             if (!prevBit && curBit)   //pushed
             {
+//                testTinyCmd(keyidx);
 //                led_pushed_level_cal();          /* LED_EFFECT_PUSHED_LEVEL calculate */        
                 if (processPushedFNkeys(keyidx))
                     continue;
