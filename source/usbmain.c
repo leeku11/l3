@@ -852,8 +852,8 @@ uint8_t buildHIDreports(uint8_t keyidx)
                         tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_BOOTHID
                         tinycmd_rgb_set_effect(0, TRUE); // RGB_EFFECT_BOOTHID
 #else
-                        tinycmd_rgb_all(0, 0, 0, 0, TRUE);
                         tinycmd_rgb_effect_on(FALSE, TRUE);
+                        tinycmd_rgb_all(0, 0, 0, 0, TRUE);
 #endif
                         break;
                     case K_F3:
@@ -900,16 +900,18 @@ uint8_t buildHIDreports(uint8_t keyidx)
                         //rgb_set_effect_param(9, &kbdConf.rgb_effect_param);
                         //tinycmd_rgb_set_effect(9, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_SWIPE
                         //tinycmd_rgb_all(1, 100, 100, 0, FALSE);
-                        tinycmd_led_config_preset((uint8_t *)&tmpled_preset[0][0], FALSE);
-                        tinycmd_led_set_effect(0, FALSE);
-                        tinycmd_rgb_effect_speed(5, TRUE); // normal
+                        
+                        //tinycmd_led_config_preset((uint8_t *)&tmpled_preset[0][0], FALSE);
+                        //tinycmd_led_set_effect(0, TRUE);
+                        tinycmd_rgb_effect_speed(2, TRUE); // fast
                         break;
                     case K_F11:
                         //rgb_set_effect_param(10, &kbdConf.rgb_effect_param);
                         //tinycmd_rgb_set_effect(10, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_SWIPE_BUF
                         //tinycmd_rgb_all(1, 0, 100, 100, FALSE);
-                        tinycmd_led_set_effect(1, FALSE);
-                        tinycmd_rgb_effect_speed(2, TRUE); // fast
+                        
+                        //tinycmd_led_set_effect(1, TRUE);
+                        tinycmd_rgb_effect_speed(3, TRUE); // normal
 
                         break;
                     case K_F12:
@@ -922,8 +924,8 @@ uint8_t buildHIDreports(uint8_t keyidx)
                             //tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
                         }
                         
-                        tinycmd_led_set_effect(2, FALSE);
-                        tinycmd_rgb_effect_speed(8, TRUE); //slow
+                        //tinycmd_led_set_effect(2, TRUE);
+                        tinycmd_rgb_effect_speed(4, TRUE); //slow
                         break;
                 }
             }

@@ -264,6 +264,7 @@ uint8_t tiny_init(void)
         // Init RGB Effect
         tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
 #if 0
+        kbdConf.rgb_chain = 14;
         { // temporary
             kbdConf.rgb_effect_index = 5; // RGB_EFFECT_FADE_LOOP
             memset(&kbdConf.rgb_effect_param, 0, sizeof(rgb_effect_param_type));

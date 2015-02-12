@@ -48,8 +48,8 @@
 //#define ws2812_pin4                                      5           //reset... do not use!!
 
 #define RGB_EFFECT_SPEED_FAST           2
-#define RGB_EFFECT_SPEED_NORMAL         5
-#define RGB_EFFECT_SPEED_SLOW           8
+#define RGB_EFFECT_SPEED_NORMAL         3
+#define RGB_EFFECT_SPEED_SLOW           4
 
 #define DEBUG_LED_ON(p, o, r, g, b)    // rgb_pos_on(p, o, r, g, b)
 
@@ -1060,13 +1060,12 @@ uint8_t handlecmd(tinycmd_pkt_req_type *p_req)
         if(cmdhandler[i].cmd == cmd)
         {
             ret = cmdhandler[i].p_func(p_req);
+            if((p_req->cmd_code & TINY_CMD_RSP_MASK) != 0)
+            {
+                sendResponse(cmd);
+            }
             break;
         }
-    }
-
-    if((p_req->cmd_code & TINY_CMD_RSP_MASK) != 0)
-    {
-        sendResponse(cmd);
     }
 
     return ret;
@@ -1560,7 +1559,7 @@ int main(void)
                 tiny_led_fader();
             }
 
-            if(effect_count%131 == 0)
+            if(effect_count%251 == 0)
             {
                 tiny_rgb_effector();
             }
