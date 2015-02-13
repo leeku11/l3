@@ -90,7 +90,6 @@ typedef enum
 #define TINY_LED_BLOCK_MAX              TINY_LED_PIN_MAX
 
 // local data buffer
-uint8_t *NCSLock; // initial level
 uint8_t rgbBuffer[CLED_NUM][CLED_ELEMENT] = {{200,0,0},{200,0,50},{200,0,100},{200,0,150},{200,0,200},
                     {0,200,0},{0,200,50},{0,200,100},{0,200,150},{0,200,200},
                     {0,0,200},{50,0,200},{100,0,200},{150,0,200},{200,0,200},
@@ -273,7 +272,7 @@ uint8_t rgb_effect_snake(rgb_effect_param_type *p_effect)
     static uint8_t pos, state;
     uint8_t i;
 
-    memset(&tmprgbBuffer[0][0], 0x00, CLED_ARRAY_SIZE);
+    memset(&tmprgbBuffer[1][0], 0x00, CLED_ARRAY_SIZE);
     if(state == 0)
     {
         for(i = 0; i < pos; i++)            // turn on from 0 to pos
@@ -324,9 +323,9 @@ uint8_t rgb_effect_basic(rgb_effect_param_type *p_effect)
 {
     uint8_t i = 0, j;
 
-    tmprgbBuffer[i][0] = NCSLock[0];
-    tmprgbBuffer[i][1] = NCSLock[1];
-    tmprgbBuffer[i][2] = NCSLock[2];
+    tmprgbBuffer[i][0] = rgbBuffer[0][0];
+    tmprgbBuffer[i][1] = rgbBuffer[0][1];
+    tmprgbBuffer[i][2] = rgbBuffer[0][2];
     i++;
 
     for(; i < tinyConfig.rgb_num; i++)
@@ -359,11 +358,11 @@ uint8_t rgb_effect_basic_loop(rgb_effect_param_type *p_effect)
     tmprgbBuffer[i][1] = rgbBuffer[0][1];
     tmprgbBuffer[i][2] = rgbBuffer[0][2];
 
-    if(NCSLock == 0)
+    if(rgbBuffer[0] == 0)
     {
         rgb_array_on(1, 0, 100, 0);
     }
-    else if(NCSLock != addr)
+    else if(rgbBuffer[0] != addr)
     {
         rgb_array_on(1, 100, 0, 0);
     }
@@ -375,9 +374,9 @@ uint8_t rgb_effect_basic_loop(rgb_effect_param_type *p_effect)
     return 0;
 
 #else
-    tmprgbBuffer[i][0] = NCSLock[0];
-    tmprgbBuffer[i][1] = NCSLock[1];
-    tmprgbBuffer[i][2] = NCSLock[2];
+    tmprgbBuffer[i][0] = rgbBuffer[0][0];
+    tmprgbBuffer[i][1] = rgbBuffer[0][1];
+    tmprgbBuffer[i][2] = rgbBuffer[0][2];
     i++;
 
     rgb[0] = rgbBuffer[p_effect->cnt + i][0];
@@ -419,9 +418,9 @@ uint8_t rgb_effect_fade_inout(rgb_effect_param_type *p_effect)
     uint8_t max, limit;
     uint8_t rgb[3];
 
-    tmprgbBuffer[i][0] = NCSLock[0];
-    tmprgbBuffer[i][1] = NCSLock[1];
-    tmprgbBuffer[i][2] = NCSLock[2];
+    tmprgbBuffer[i][0] = rgbBuffer[0][0];
+    tmprgbBuffer[i][1] = rgbBuffer[0][1];
+    tmprgbBuffer[i][2] = rgbBuffer[0][2];
     i++;
 
     rgb[0] = p_effect->max_rgb[0];
@@ -531,9 +530,9 @@ uint8_t rgb_effect_fade_inout_buf(rgb_effect_param_type *p_effect)
     uint8_t i = 0, j;
     uint8_t max, limit;
 
-    tmprgbBuffer[i][0] = NCSLock[0];
-    tmprgbBuffer[i][1] = NCSLock[1];
-    tmprgbBuffer[i][2] = NCSLock[2];
+    tmprgbBuffer[i][0] = rgbBuffer[0][0];
+    tmprgbBuffer[i][1] = rgbBuffer[0][1];
+    tmprgbBuffer[i][2] = rgbBuffer[0][2];
     i++;
 
     max = 0;
@@ -645,9 +644,9 @@ uint8_t rgb_effect_fade_inout_loop(rgb_effect_param_type *p_effect)
     uint8_t max, limit;
     uint8_t rgb[3];
 
-    tmprgbBuffer[i][0] = NCSLock[0];
-    tmprgbBuffer[i][1] = NCSLock[1];
-    tmprgbBuffer[i][2] = NCSLock[2];
+    tmprgbBuffer[i][0] = rgbBuffer[0][0];
+    tmprgbBuffer[i][1] = rgbBuffer[0][1];
+    tmprgbBuffer[i][2] = rgbBuffer[0][2];
     i++;
 
     rgb[0] = rgbBuffer[p_effect->cnt + i][0];
@@ -805,28 +804,39 @@ uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
     uint8_t i;
     tinycmd_three_lock_req_type *p_three_lock_req = (tinycmd_three_lock_req_type *)p_req;
 
-    NCSLock[0] = 0;     // Num
-    NCSLock[1] = 0;     // Caps
-    NCSLock[2] = 0;     // Scrl
-    
+    rgbBuffer[0][0] = 0;     // Num
+    rgbBuffer[0][1] = 0;     // Caps
+    rgbBuffer[0][2] = 0;     // Scrl
+    tmprgbBuffer[0][0] = 0;     // Num
+    tmprgbBuffer[0][1] = 0;     // Caps
+    tmprgbBuffer[0][2] = 0;     // Scrl
+
+  
     if(p_three_lock_req->lock & (1<<2))
     {
-        NCSLock[0] = 240;
+        rgbBuffer[0][0] = 250;
+        tmprgbBuffer[0][0] = 250;
     }
     if(p_three_lock_req->lock & (1<<1))
     {
-        NCSLock[1] = 240;
+        rgbBuffer[0][1] = 250;
+        tmprgbBuffer[0][1] = 250;
     }
+    
+
     if(p_three_lock_req->lock & (1<<0))
     {
-        NCSLock[2] = 240;
+        rgbBuffer[0][2] = 250;
+        tmprgbBuffer[0][2] = 250;
+
     }
+  
 
     for (i=TINY_LED_PIN_BASE; i<=TINY_LED_PIN_WASD; i++)
     {
         if(tinyLedmode[tinyLedmodeIndex][i] == LED_EFFECT_BASECAPS)
         {
-            if(NCSLock[1] != 0)
+            if(rgbBuffer[0][1] != 0)
             {
                 tiny_led_on(i);
             }else
@@ -835,11 +845,10 @@ uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
             }
         }
     }
-    
 
-    ws2812_sendarray(NCSLock,CLED_ELEMENT);        // output message data to port D
+//    ws2812_sendarray(&rgbBuffer[0][0],CLED_ELEMENT);        // output message data to port D
 
-    return 0;
+    return 1;
 }
 
 uint8_t handlecmd_rgb_all(tinycmd_pkt_req_type *p_req)
@@ -914,7 +923,7 @@ uint8_t handlecmd_rgb_set_effect(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_rgb_set_effect_req_type *p_set_effect_req = (tinycmd_rgb_set_effect_req_type *)p_req;
     tinyRgbmodeIndex = p_set_effect_req->index;
-    memset(&tmprgbBuffer, 0, CLED_ARRAY_SIZE);
+    //memset(&tmprgbBuffer, 0, CLED_ARRAY_SIZE);
 
     return 0;
 }
@@ -1426,7 +1435,7 @@ void tiny_led_mode_change (TINY_LED_BLOCK ledblock, int mode)
             break;
             
         case LED_EFFECT_BASECAPS :
-            if(NCSLock[1] != 0)
+            if(rgbBuffer[0][1] != 0)
             {
                 tiny_led_on(ledblock);
             }else
@@ -1479,7 +1488,6 @@ void TinyInitCfg(void)
     tinyConfig.rgb_effect_on = 1; // default on
     tinyConfig.rgb_effect_speed = RGB_EFFECT_SPEED_NORMAL;
     memset(rgbBuffer, 0xff, CLED_ARRAY_SIZE);
-    NCSLock = &rgbBuffer[0][0];           // 0'st RGB is NCR indicator 
 }
 
 void TinyInitEffect(void)

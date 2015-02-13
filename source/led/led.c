@@ -317,7 +317,6 @@ void led_3lockupdate(uint8_t LEDstate)
     {
         tinycmd_three_lock((LEDstate & LED_NUM), (LEDstate & LED_CAPS), (LEDstate & LED_SCROLL), FALSE);
     }
-#ifdef LED_CONTROL_MASTER
     else
     {
         if (LEDstate & LED_NUM)
@@ -345,7 +344,6 @@ void led_3lockupdate(uint8_t LEDstate)
             }
         }
     }
-#endif // LED_CONTROL_MASTER
 }
 
 

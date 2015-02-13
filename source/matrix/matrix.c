@@ -411,6 +411,14 @@ uint8_t swap_key(uint8_t keyidx)
     return keyidx;
 }
 
+
+
+
+static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING, LED_EFFECT_FADING_PUSH_ON},
+                {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSHED_LEVEL, LED_EFFECT_PUSH_ON},
+                {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSH_OFF, LED_EFFECT_BASECAPS}};
+                
+
 void testTinyCmd(uint8_t keyidx)
 {
 
@@ -477,8 +485,10 @@ void testTinyCmd(uint8_t keyidx)
             //rgb_set_effect_param(9, &kbdConf.rgb_effect_param);
             //tinycmd_rgb_set_effect(9, &kbdConf.rgb_effect_param, TRUE); // RGB_EFFECT_SWIPE
             //tinycmd_rgb_all(1, 100, 100, 0, FALSE);
-            
-  //          tinycmd_led_config_preset((uint8_t *)&tmpled_preset[0][0], TRUE);
+
+
+
+            tinycmd_led_config_preset((uint8_t *)&tmpled_preset[0][0], TRUE);
             tinycmd_led_set_effect(0, TRUE);
             tinycmd_rgb_effect_speed(2, TRUE); // fast
             break;

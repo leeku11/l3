@@ -132,8 +132,8 @@ inline void i2cSendStop(void)
 inline void i2cWaitForComplete(void)
 {
 	// wait for i2c interface to complete operation
-	I2cTimeout = I2C_1BYTE_TIMEOUT;
-	while( !(inb(TWCR) & BV(TWINT)) && I2cTimeout-- );
+	volatile uint16_t byteTimeout = I2C_1BYTE_TIMEOUT;
+	while( !(inb(TWCR) & BV(TWINT)) && byteTimeout-- );
 }
 
 inline void i2cSendByte(u08 data)
