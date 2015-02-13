@@ -1497,7 +1497,7 @@ void TinyInitEffect(void)
     tinyRgbmodeIndex = 0;
     for(i = 0; i < RGBMODE_INDEX_MAX; i++)
     {
-        memset(&tinyRgbEffect[i], 0xff, sizeof(rgb_effect_param_type));
+        memset(&tinyRgbEffect[i], 0, sizeof(rgb_effect_param_type));
     }
 }
 
