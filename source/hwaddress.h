@@ -23,25 +23,29 @@
 
 #define MAX_RGB_CHAIN       20
 
+enum
+{
+    RGB_EFFECT_BOOTHID = 0,
+    RGB_EFFECT_FADE_BUF,
+    RGB_EFFECT_FADE_LOOP,
+    RGB_EFFECT_HEARTBEAT_BUF,
+    RGB_EFFECT_HEARTBEAT_LOOP,
+    RGB_EFFECT_MAX
+};
+
+#define FADE_HIGH_HOLD             5
+#define FADE_LOW_HOLD              0
+#define FADE_IN_ACCEL              0  // normal ascending
+
+#define HEARTBEAT_HIGH_HOLD        1
+#define HEARTBEAT_LOW_HOLD         5
+#define HEARTBEAT_IN_ACCEL         1  // 1: weighted ascending. 2: quadratic ascending 
 
 typedef struct {
     uint8_t index;
-    union {
-       uint8_t max_rgb[3]; // grb
-       struct {
-          uint8_t g;
-          uint8_t r;
-          uint8_t b;
-       }max;
-    };
     uint8_t high_hold;
     uint8_t low_hold;
     uint8_t accel_mode;
-    uint8_t dir;
-    uint8_t level;
-    uint8_t cnt;
-    uint8_t hcnt;
-    uint8_t lcnt;
 } rgb_effect_param_type;
 
 
@@ -57,6 +61,7 @@ typedef struct kbd_conf
     uint8_t rgb_chain;                      // RGB5050 numbers (H/W dependent)
     uint8_t rgb_preset[MAX_RGB_CHAIN][3];   // Chain color
     rgb_effect_param_type rgb_effect_param; // RGB effect parameter
+    uint8_t rgb_limit;
 }kbd_configuration_t;
 
 #define MACRO_ADDR_START      0x4400     // 0x4400 ~ 0x6FFF  (7KBytes - 256B x 44)

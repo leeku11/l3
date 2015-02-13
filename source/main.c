@@ -40,9 +40,15 @@ unsigned char localBufferLength;
 extern uint8_t usbmain(void);
 extern uint8_t ps2main(void);
 
-
 kbd_configuration_t kbdConf;
-
+rgb_effect_param_type kbdRgbEffect[RGB_EFFECT_MAX] = 
+{
+    { RGB_EFFECT_BOOTHID, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_BOOTHID
+    { RGB_EFFECT_FADE_BUF, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_FADE_BUF
+    { RGB_EFFECT_FADE_LOOP, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_FADE_LOOP
+    { RGB_EFFECT_HEARTBEAT_BUF, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_BUF
+    { RGB_EFFECT_HEARTBEAT_LOOP, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_LOOP
+};
 
 #ifdef DEBUG
 void enable_printf(void)
@@ -246,7 +252,7 @@ uint8_t establishSlaveComm(void)
         ret = tinycmd_ver(TRUE);
         if(ret)
         { 
-            tinycmd_config(15/*kbdConf.rgb_chain*/, TRUE);
+            tinycmd_config(15/*kbdConf.rgb_chain*/, 150/*kbdConf.rgb_limit*/, TRUE);
             break;
         }
     }
@@ -319,6 +325,7 @@ kbdConf.led_preset_index = 0;
 memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
 kbdConf.rgb_effect_index = 0;
 kbdConf.rgb_chain = 14;
+kbdConf.rgb_limit = 150;
 memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
 updateConf();       // should be removed
 ///////////////////SHOULD BE REMOVED ////////////////

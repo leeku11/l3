@@ -51,6 +51,9 @@
 #define RGB_EFFECT_SPEED_NORMAL         3
 #define RGB_EFFECT_SPEED_SLOW           4
 
+#define TINY_LED_EFFECT_COUNT           131
+#define TINY_RGB_EFFECT_COUNT           251
+
 #define DEBUG_LED_ON(p, o, r, g, b)    // rgb_pos_on(p, o, r, g, b)
 
 typedef struct {
@@ -60,26 +63,30 @@ typedef struct {
     uint8_t rgb_effect_on;
     uint8_t led_effect_on;
     uint8_t is_sleep;
+    uint8_t rgb_limit;
 } tiny_config_type;
 
-typedef uint8_t (*tiny_effector_func)(rgb_effect_param_type *); 
+typedef struct {
+    uint8_t index;
+    union {
+       uint8_t max_rgb[3]; // grb
+       struct {
+          uint8_t g;
+          uint8_t r;
+          uint8_t b;
+       }max;
+    };
+    uint8_t high_hold;
+    uint8_t low_hold;
+    uint8_t accel_mode;
+    uint8_t dir;
+    uint8_t level;
+    uint8_t cnt;
+    uint8_t hcnt;
+    uint8_t lcnt;
+} tiny_rgb_effect_type;
 
-enum
-{
-    RGB_EFFECT_BOOTHID = 0,
-    RGB_EFFECT_BASIC,
-    RGB_EFFECT_BASIC_LOOP,
-    RGB_EFFECT_FADE,
-    RGB_EFFECT_FADE_BUF,
-    RGB_EFFECT_FADE_LOOP,
-    RGB_EFFECT_HEARTBEAT,
-    RGB_EFFECT_HEARTBEAT_BUF,
-    RGB_EFFECT_HEARTBEAT_LOOP,
-    RGB_EFFECT_SWIPE,
-    RGB_EFFECT_SWIPE_BUF,
-    RGB_EFFECT_SWIPE_LOOP,
-    RGB_EFFECT_MAX
-};
+typedef uint8_t (*tiny_effector_func)(tiny_rgb_effect_type *); 
 
 typedef enum
 {
@@ -111,7 +118,7 @@ static uint8_t tinyPushedLevel[TINY_LED_BLOCK_MAX] = {0, 0};
 static uint16_t tinyPushedLevelDuty[TINY_LED_BLOCK_MAX] = {0, 0};
 
 uint8_t tinyRgbmodeIndex = 0; // effect preset index
-rgb_effect_param_type tinyRgbEffect[RGBMODE_INDEX_MAX]; // rgb effect preset buffer
+tiny_rgb_effect_type tinyRgbEffect[RGBMODE_INDEX_MAX]; // rgb effect preset buffer
 
 uint8_t scanDirty;
 uint32_t gcounter = 0;
@@ -174,52 +181,23 @@ const tinycmd_handler_array_type cmdhandler[] = {
 };
 #define CMD_HANDLER_TABLE_SIZE            (sizeof(handle_cmd_func)/sizeof(tinycmd_handler_func))
 
-uint8_t rgb_effect_snake(rgb_effect_param_type *p_effect);
-uint8_t rgb_effect_crazy(rgb_effect_param_type *p_effect);
-uint8_t rgb_effect_null(rgb_effect_param_type *p_effect);
-uint8_t rgb_effect_basic(rgb_effect_param_type *p_effect);
-uint8_t rgb_effect_basic_loop(rgb_effect_param_type *p_effect);
-uint8_t rgb_effect_fade_inout(rgb_effect_param_type *p_effect);
-uint8_t rgb_effect_fade_inout_buf(rgb_effect_param_type *p_effect);
-uint8_t rgb_effect_fade_inout_loop(rgb_effect_param_type *p_effect);
+uint8_t rgb_effect_snake(tiny_rgb_effect_type *p_effect);
+uint8_t rgb_effect_crazy(tiny_rgb_effect_type *p_effect);
+uint8_t rgb_effect_null(tiny_rgb_effect_type *p_effect);
+uint8_t rgb_effect_basic(tiny_rgb_effect_type *p_effect);
+uint8_t rgb_effect_basic_loop(tiny_rgb_effect_type *p_effect);
+uint8_t rgb_effect_fade_inout(tiny_rgb_effect_type *p_effect);
+uint8_t rgb_effect_fade_inout_buf(tiny_rgb_effect_type *p_effect);
+uint8_t rgb_effect_fade_inout_loop(tiny_rgb_effect_type *p_effect);
 
 const tiny_effector_func effectHandler[] = {
     rgb_effect_snake,              // RGB_EFFECT_BOOTHID
-    rgb_effect_basic,              // RGB_EFFECT_BASIC
-    rgb_effect_basic_loop,         // RGB_EFFECT_BASIC_LOOP
-    rgb_effect_fade_inout,         // RGB_EFFECT_FADE
     rgb_effect_fade_inout_buf,     // RGB_EFFECT_FADE_BUF
     rgb_effect_fade_inout_loop,    // RGB_EFFECT_FADE_LOOP
-    rgb_effect_fade_inout,         // RGB_EFFECT_HEARTBEAT
     rgb_effect_fade_inout_buf,     // RGB_EFFECT_HEARTBEAT_BUF
-    rgb_effect_fade_inout_loop,    // RGB_EFFECT_HEARTBEAT_LOOP
-    rgb_effect_null,               // RGB_EFFECT_SWIPE
-    rgb_effect_null,               // RGB_EFFECT_SWIPE_BUF
-    rgb_effect_null,               // RGB_EFFECT_SWIPE_LOOP
+    rgb_effect_fade_inout_loop     // RGB_EFFECT_HEARTBEAT_LOOP
 };
 #define EFFECT_HANDLER_TABLE_SIZE            (sizeof(effectHandler)/sizeof(tiny_effector_func))
-
-#if 0
-void set_effect_temp(void)
-{
-    tinyRgbmodeIndex = RGB_EFFECT_BASIC;
-    memset(&tinyRgbEffect[0], 0, sizeof(rgb_effect_param_type));
-    tinyRgbEffect[0].index = RGB_EFFECT_BASIC;
-    tinyRgbEffect[0].max.r = 50;
-    tinyRgbEffect[0].max.g = 50;
-    //tinyRgbEffect[0].max.b = 50;
-    //p_param->max.g = 0;
-    //p_param->max.b = 0;
-    //tinyRgbEffect[0].high_hold = 50;
-    //tinyRgbEffect[0].low_hold = 12;
-    //tinyRgbEffect[0].accel_mode = 1; // quadratic
-    //p_param->dir = 0;
-    //p_param->level = 0;
-    //p_param->cnt = 0;
-    //p_param->hcnt = 0;
-    //p_param->lcnt = 0;
-}
-#endif
 
 void rgb_array_clear(void)
 {
@@ -262,12 +240,12 @@ void rgb_pos_on(uint8_t pos, uint8_t on, uint8_t r, uint8_t g, uint8_t b)
     ws2812_sendarray((uint8_t *)rgbBuffer, CLED_GET_ARRAY_SIZE(tinyConfig.rgb_num));
 }
 
-uint8_t rgb_effect_null(rgb_effect_param_type *p_effect)
+uint8_t rgb_effect_null(tiny_rgb_effect_type *p_effect)
 {
     return 0;
 }
 
-uint8_t rgb_effect_snake(rgb_effect_param_type *p_effect)
+uint8_t rgb_effect_snake(tiny_rgb_effect_type *p_effect)
 {
     static uint8_t pos, state;
     uint8_t i;
@@ -306,7 +284,7 @@ uint8_t rgb_effect_snake(rgb_effect_param_type *p_effect)
 
 
 
-uint8_t rgb_effect_crazy(rgb_effect_param_type *p_effect)
+uint8_t rgb_effect_crazy(tiny_rgb_effect_type *p_effect)
 {
     uint8_t i;
     for(i = 0; i < tinyConfig.rgb_num; i++)            
@@ -319,7 +297,7 @@ uint8_t rgb_effect_crazy(rgb_effect_param_type *p_effect)
 }
 
 
-uint8_t rgb_effect_basic(rgb_effect_param_type *p_effect)
+uint8_t rgb_effect_basic(tiny_rgb_effect_type *p_effect)
 {
     uint8_t i = 0, j;
 
@@ -346,7 +324,7 @@ uint8_t rgb_effect_basic(rgb_effect_param_type *p_effect)
     return 1;
 }
 
-uint8_t rgb_effect_basic_loop(rgb_effect_param_type *p_effect)
+uint8_t rgb_effect_basic_loop(tiny_rgb_effect_type *p_effect)
 {
     uint8_t i = 0, j;
     uint8_t rgb[3];
@@ -412,7 +390,7 @@ uint8_t rgb_effect_basic_loop(rgb_effect_param_type *p_effect)
     return 1;
 }
 
-uint8_t rgb_effect_fade_inout(rgb_effect_param_type *p_effect)
+uint8_t rgb_effect_fade_inout(tiny_rgb_effect_type *p_effect)
 {
     uint8_t i = 0, j;
     uint8_t max, limit;
@@ -525,7 +503,7 @@ uint8_t rgb_effect_fade_inout(rgb_effect_param_type *p_effect)
     return 1;
 }
 
-uint8_t rgb_effect_fade_inout_buf(rgb_effect_param_type *p_effect)
+uint8_t rgb_effect_fade_inout_buf(tiny_rgb_effect_type *p_effect)
 {
     uint8_t i = 0, j;
     uint8_t max, limit;
@@ -638,7 +616,7 @@ uint8_t rgb_effect_fade_inout_buf(rgb_effect_param_type *p_effect)
     return 1;
 }
 
-uint8_t rgb_effect_fade_inout_loop(rgb_effect_param_type *p_effect)
+uint8_t rgb_effect_fade_inout_loop(tiny_rgb_effect_type *p_effect)
 {
     uint8_t i = 0, j;
     uint8_t max, limit;
@@ -784,6 +762,7 @@ uint8_t handlecmd_config(tinycmd_pkt_req_type *p_req)
     tinycmd_config_req_type *p_config_req = (tinycmd_config_req_type *)p_req;
 
     tinyConfig.rgb_num = p_config_req->rgb_num;
+    tinyConfig.rgb_limit = p_config_req->rgb_limit;
     
     return 0;
 }
@@ -795,6 +774,7 @@ uint8_t handlecmd_ver(tinycmd_pkt_req_type *p_req)
 
 uint8_t handlecmd_reset(tinycmd_pkt_req_type *p_req)
 {
+    wdt_enable(WDTO_250MS);
     while(1); // wait for watchdog reset
     return 0;
 }
@@ -822,8 +802,6 @@ uint8_t handlecmd_three_lock(tinycmd_pkt_req_type *p_req)
         rgbBuffer[0][1] = 250;
         tmprgbBuffer[0][1] = 250;
     }
-    
-
     if(p_three_lock_req->lock & (1<<0))
     {
         rgbBuffer[0][2] = 250;
@@ -938,7 +916,16 @@ uint8_t handlecmd_rgb_set_preset(tinycmd_pkt_req_type *p_req)
     {
         index = 0;
     }
-    memcpy(&tinyRgbEffect[index], &p_set_preset_req->effect_param, sizeof(rgb_effect_param_type));
+    // Zero init.
+    memset(&tinyRgbEffect[index], 0, sizeof(tiny_rgb_effect_type));
+    // Fill parameter from command
+    tinyRgbEffect[index].index = p_set_preset_req->effect_param.index;
+    tinyRgbEffect[index].max.r = tinyConfig.rgb_limit;
+    tinyRgbEffect[index].max.g = tinyConfig.rgb_limit;
+    tinyRgbEffect[index].max.b = tinyConfig.rgb_limit;
+    tinyRgbEffect[index].high_hold = p_set_preset_req->effect_param.high_hold;
+    tinyRgbEffect[index].low_hold = p_set_preset_req->effect_param.low_hold;
+    tinyRgbEffect[index].accel_mode = p_set_preset_req->effect_param.accel_mode;
 
     return 0;
 }
@@ -1376,7 +1363,7 @@ void tiny_led_fader(void)
 
 void tiny_rgb_effector(void)
 {
-    rgb_effect_param_type *pEffect;
+    tiny_rgb_effect_type *pEffect;
     uint8_t update, index;
 
     if(!tinyConfig.rgb_effect_on)
@@ -1487,6 +1474,7 @@ void TinyInitCfg(void)
     tinyConfig.led_effect_on = 1; // default on
     tinyConfig.rgb_effect_on = 1; // default on
     tinyConfig.rgb_effect_speed = RGB_EFFECT_SPEED_NORMAL;
+    tinyConfig.rgb_limit = 255;
     memset(rgbBuffer, 0xff, CLED_ARRAY_SIZE);
 }
 
@@ -1497,7 +1485,7 @@ void TinyInitEffect(void)
     tinyRgbmodeIndex = 0;
     for(i = 0; i < RGBMODE_INDEX_MAX; i++)
     {
-        memset(&tinyRgbEffect[i], 0, sizeof(rgb_effect_param_type));
+        memset(&tinyRgbEffect[i], 0, sizeof(tiny_rgb_effect_type));
     }
 }
 
@@ -1560,12 +1548,12 @@ int main(void)
                 gcounter = 0xfffff;
             }
 
-            if((count%131 == 0) && (tinyConfig.comm_init))
+            if((count%TINY_LED_EFFECT_COUNT == 0) && (tinyConfig.comm_init))
             {
                 tiny_led_fader();
             }
 
-            if(effect_count%251 == 0)
+            if(effect_count%TINY_RGB_EFFECT_COUNT == 0)
             {
                 tiny_rgb_effector();
             }

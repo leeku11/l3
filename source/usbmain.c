@@ -700,100 +700,25 @@ uint8_t cmpReportBuffer(void)
 
 // _lkh debug
 #if 1//def SUPPORT_TINY_CMD
-/*
-    RGB_EFFECT_BOOTHID = 0,
-    RGB_EFFECT_BASIC,
-    RGB_EFFECT_BASIC_LOOP,
-    RGB_EFFECT_FADE,
-    RGB_EFFECT_FADE_BUF,
-    RGB_EFFECT_FADE_LOOP,
-    RGB_EFFECT_HEARTBEAT,
-    RGB_EFFECT_HEARTBEAT_BUF,
-    RGB_EFFECT_HEARTBEAT_LOOP,
-    RGB_EFFECT_SWIPE,
-    RGB_EFFECT_SWIPE_BUF,
-    RGB_EFFECT_SWIPE_LOOP,
-    RGB_EFFECT_MAX
-
-*/
-
 void rgb_set_effect_param(uint8_t effect, rgb_effect_param_type *p_param)
 {
     memset(p_param, 0, sizeof(rgb_effect_param_type));
-    if(effect == 0)
+    if(effect == RGB_EFFECT_BOOTHID)
     {
         p_param->index = effect;
-        p_param->max.r = 50;
-        //p_param->max.g = 0;
-        //p_param->max.b = 0;
-        p_param->high_hold = 25;
-        p_param->low_hold = 12;
-        p_param->accel_mode = 1; // quadratic
-        //p_param->dir = 0;
-        //p_param->level = 0;
-        //p_param->cnt = 0;
-        //p_param->hcnt = 0;
-        //p_param->lcnt = 0;
     }
-    else if((effect == 1) || (effect == 2))
+    else if((effect == RGB_EFFECT_FADE_BUF) || (effect == RGB_EFFECT_FADE_LOOP))
     {
         p_param->index = effect;
-        p_param->max.r = 70;
-        p_param->max.g = 70;
-        p_param->max.b = 70;
-        p_param->high_hold = 50;
-        //p_param->low_hold = 0;
-        //p_param->accel_mode = 0; // linear
-        //p_param->dir = 0;
-        //p_param->level = 0;
-        //p_param->cnt = 0;
-        //p_param->hcnt = 0;
-        //p_param->lcnt = 0;
-    }
-    else if((effect == 3) || (effect == 4) || (effect == 5))
-    {
-        p_param->index = effect;
-        p_param->max.r = 100;
-        p_param->max.g = 100;
-        p_param->max.b = 100;
         p_param->high_hold = 5;
         p_param->low_hold = 0;
-        //p_param->accel_mode = 0; // linear
-        //p_param->dir = 0;
-        //p_param->level = 0;
-        //p_param->cnt = 0;
-        //p_param->hcnt = 0;
-        //p_param->lcnt = 0;
     }
-    else if((effect == 6) || (effect == 7) || (effect == 8))
+    else if((effect == RGB_EFFECT_HEARTBEAT_BUF) || (effect == RGB_EFFECT_HEARTBEAT_LOOP))
     {
         p_param->index = effect;
-        p_param->max.r = 100;
-        p_param->max.g = 100;
-        p_param->max.b = 100;
         p_param->high_hold = 1;
         p_param->low_hold = 5;
         p_param->accel_mode = 2; // quadratic
-        //p_param->dir = 0;
-        //p_param->level = 0;
-        //p_param->cnt = 0;
-        //p_param->hcnt = 0;
-        //p_param->lcnt = 0;
-    }
-    else if((effect == 9) || (effect == 10) || (effect == 11))
-    {
-        p_param->index = effect;
-        //p_param->max.r = 70;
-        //p_param->max.g = 70;
-        //p_param->max.b = 70;
-        //vp_param->high_hold = 0;
-        //p_param->low_hold = 250;
-        //p_param->accel_mode = 1; // quadratic
-        //p_param->dir = 0;
-        //p_param->level = 0;
-        //p_param->cnt = 0;
-        //p_param->hcnt = 0;
-        //p_param->lcnt = 0;
     }
 }
 #endif
