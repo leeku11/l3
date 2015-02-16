@@ -41,14 +41,7 @@ extern uint8_t usbmain(void);
 extern uint8_t ps2main(void);
 
 kbd_configuration_t kbdConf;
-rgb_effect_param_type kbdRgbEffect[RGB_EFFECT_MAX] = 
-{
-    { RGB_EFFECT_BOOTHID, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_BOOTHID
-    { RGB_EFFECT_FADE_BUF, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_FADE_BUF
-    { RGB_EFFECT_FADE_LOOP, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_FADE_LOOP
-    { RGB_EFFECT_HEARTBEAT_BUF, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_BUF
-    { RGB_EFFECT_HEARTBEAT_LOOP, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_LOOP
-};
+
 
 #ifdef DEBUG
 void enable_printf(void)
@@ -252,7 +245,7 @@ uint8_t establishSlaveComm(void)
         ret = tinycmd_ver(TRUE);
         if(ret)
         { 
-            tinycmd_config(15/*kbdConf.rgb_chain*/, 150/*kbdConf.rgb_limit*/, TRUE);
+            tinycmd_config(kbdConf.rgb_chain + 1, kbdConf.rgb_limit, TRUE);
             break;
         }
     }
@@ -268,20 +261,7 @@ uint8_t tiny_init(void)
     {
         // Init RGB Effect
         tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
-#if 0
-        kbdConf.rgb_chain = 14;
-        { // temporary
-            kbdConf.rgb_effect_index = 5; // RGB_EFFECT_FADE_LOOP
-            memset(&kbdConf.rgb_effect_param, 0, sizeof(rgb_effect_param_type));
-            kbdConf.rgb_effect_param.index = 5;  // RGB_EFFECT_FADE_LOOP
-            kbdConf.rgb_effect_param.max.g = 70;
-            kbdConf.rgb_effect_param.max.r = 70;
-            kbdConf.rgb_effect_param.max.b = 70;
-            kbdConf.rgb_effect_param.high_hold = 5;
-            kbdConf.rgb_effect_param.accel_mode = 1; // quadratic
-        }
-#endif
-        tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE);
+        tinycmd_rgb_set_preset(kbdConf.rgb_effect_index, &kbdConf.rgb_effect_param[kbdConf.rgb_effect_index], TRUE); // RGB_EFFECT_BOOTHID
         // now kbdConf.rgb_effect_index should be 0.
         tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, TRUE);
 
@@ -299,39 +279,63 @@ void updateConf(void)
     eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
 }
 
+void kbdActivation(void)
+{
+    
+#if 1
+    ///////////////////SHOULD BE REMOVED ////////////////
+    
+    static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING, LED_EFFECT_FADING_PUSH_ON},
+                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSHED_LEVEL, LED_EFFECT_PUSH_ON},
+                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSH_OFF, LED_EFFECT_BASECAPS}};
+
+    
+    static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] = {{200,0,0},{200,0,50},{200,0,100},{200,0,150},{200,0,200},
+                            {0,200,0},{0,200,50},{0,200,100},{0,200,150},{0,200,200},
+                            {0,0,200},{50,0,200},{100,0,200},{150,0,200},{200,0,200},
+                            {200,0,0},{200,50,0},{200,100,0},{200,150,0},{200,200,0}};
+    
+    // TODO : LOAD to E2P
+    rgb_effect_param_type kbdRgbEffectParam[RGB_EFFECT_MAX] = 
+    {
+        { RGB_EFFECT_BOOTHID, 0, 0, 0 },    // RGB_EFFECT_BOOTHID
+        { RGB_EFFECT_FADE_BUF, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_FADE_BUF
+        { RGB_EFFECT_FADE_LOOP, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_FADE_LOOP
+        { RGB_EFFECT_HEARTBEAT_BUF, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_BUF
+        { RGB_EFFECT_HEARTBEAT_LOOP, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_LOOP
+        { RGB_EFFECT_BASIC, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_LOOP
+    };
+
+    
+    if(eeprom_read_byte(KBD_ACTIVATION) != KBD_ACTIVATION_BIT)
+    {
+        kbdConf.ps2usb_mode = 1;
+        kbdConf.keymapLayerIndex = 0;
+        kbdConf.swapCtrlCaps = 0;
+        kbdConf.swapAltGui = 0;
+        kbdConf.led_preset_index = 1;
+        memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
+        kbdConf.rgb_effect_index = 3;
+        kbdConf.rgb_chain = 14;
+        kbdConf.rgb_limit = 250;
+        memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
+        memcpy(kbdConf.rgb_effect_param, kbdRgbEffectParam, sizeof(kbdRgbEffectParam));
+        
+        updateConf();       // should be removed
+        
+        eeprom_write_byte(KBD_ACTIVATION, KBD_ACTIVATION_BIT);
+    }
+    
+    ///////////////////SHOULD BE REMOVED ////////////////
+#endif
+}
 
 
 void kbd_init(void)
 {
-#if 0
-///////////////////SHOULD BE REMOVED ////////////////
 
-static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING, LED_EFFECT_FADING},
-                        {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING_PUSH_ON, LED_EFFECT_FADING_PUSH_ON},
-                        {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSH_OFF, LED_EFFECT_PUSH_OFF}};
-
-
-static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] = {{200,0,0},{200,0,50},{200,0,100},{200,0,150},{200,0,200},
-                        {0,200,0},{0,200,50},{0,200,100},{0,200,150},{0,200,200},
-                        {0,0,200},{50,0,200},{100,0,200},{150,0,200},{200,0,200},
-                        {200,0,0},{200,50,0},{200,100,0},{200,150,0},{200,200,0}};
-
-
-kbdConf.ps2usb_mode = 1;
-kbdConf.keymapLayerIndex = 0;
-kbdConf.swapCtrlCaps = 0;
-kbdConf.swapAltGui = 0;
-kbdConf.led_preset_index = 0;
-memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
-kbdConf.rgb_effect_index = 0;
-kbdConf.rgb_chain = 14;
-kbdConf.rgb_limit = 150;
-memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
-updateConf();       // should be removed
-///////////////////SHOULD BE REMOVED ////////////////
-#endif
-
-
+    kbdActivation();
+        
     portInit();
     initI2C();
     enable_printf();

@@ -698,32 +698,6 @@ uint8_t cmpReportBuffer(void)
 }
 
 
-// _lkh debug
-#if 1//def SUPPORT_TINY_CMD
-void rgb_set_effect_param(uint8_t effect, rgb_effect_param_type *p_param)
-{
-    memset(p_param, 0, sizeof(rgb_effect_param_type));
-    if(effect == RGB_EFFECT_BOOTHID)
-    {
-        p_param->index = effect;
-    }
-    else if((effect == RGB_EFFECT_FADE_BUF) || (effect == RGB_EFFECT_FADE_LOOP))
-    {
-        p_param->index = effect;
-        p_param->high_hold = 5;
-        p_param->low_hold = 0;
-    }
-    else if((effect == RGB_EFFECT_HEARTBEAT_BUF) || (effect == RGB_EFFECT_HEARTBEAT_LOOP))
-    {
-        p_param->index = effect;
-        p_param->high_hold = 1;
-        p_param->low_hold = 5;
-        p_param->accel_mode = 2; // quadratic
-    }
-}
-#endif
-
-
 extern void testTinyCmd(uint8_t keyidx);
 
 

@@ -47,9 +47,6 @@
 #define ws2812_pin3                     4       // PB4 -> OC1B
 //#define ws2812_pin4                                      5           //reset... do not use!!
 
-#define RGB_EFFECT_SPEED_FAST           2
-#define RGB_EFFECT_SPEED_NORMAL         3
-#define RGB_EFFECT_SPEED_SLOW           4
 
 #define TINY_LED_EFFECT_COUNT           131
 #define TINY_RGB_EFFECT_COUNT           251
@@ -59,7 +56,7 @@
 typedef struct {
     uint8_t comm_init;
     uint8_t rgb_num;
-    uint8_t rgb_effect_speed;
+    uint16_t rgb_effect_speed;
     uint8_t rgb_effect_on;
     uint8_t led_effect_on;
     uint8_t is_sleep;
@@ -122,7 +119,6 @@ tiny_rgb_effect_type tinyRgbEffect[RGBMODE_INDEX_MAX]; // rgb effect preset buff
 
 uint8_t scanDirty;
 uint32_t gcounter = 0;
-uint8_t effect_speed_counter = 0;
 
 tiny_config_type tinyConfig;
 
@@ -195,7 +191,8 @@ const tiny_effector_func effectHandler[] = {
     rgb_effect_fade_inout_buf,     // RGB_EFFECT_FADE_BUF
     rgb_effect_fade_inout_loop,    // RGB_EFFECT_FADE_LOOP
     rgb_effect_fade_inout_buf,     // RGB_EFFECT_HEARTBEAT_BUF
-    rgb_effect_fade_inout_loop     // RGB_EFFECT_HEARTBEAT_LOOP
+    rgb_effect_fade_inout_loop,     // RGB_EFFECT_HEARTBEAT_LOOP
+    rgb_effect_basic
 };
 #define EFFECT_HANDLER_TABLE_SIZE            (sizeof(effectHandler)/sizeof(tiny_effector_func))
 
@@ -901,7 +898,10 @@ uint8_t handlecmd_rgb_set_effect(tinycmd_pkt_req_type *p_req)
 {
     tinycmd_rgb_set_effect_req_type *p_set_effect_req = (tinycmd_rgb_set_effect_req_type *)p_req;
     tinyRgbmodeIndex = p_set_effect_req->index;
-    //memset(&tmprgbBuffer, 0, CLED_ARRAY_SIZE);
+    if(tinyRgbmodeIndex >= RGBMODE_INDEX_MAX)
+    {
+        tinyRgbmodeIndex = 0;
+    }
 
     return 0;
 }
@@ -910,12 +910,14 @@ uint8_t handlecmd_rgb_set_preset(tinycmd_pkt_req_type *p_req)
 {
     uint8_t index;
     tinycmd_rgb_set_preset_req_type *p_set_preset_req = (tinycmd_rgb_set_preset_req_type *)p_req;
+    tinyRgbmodeIndex = 
 
     index = p_set_preset_req->index;
     if(index >= RGBMODE_INDEX_MAX)
     {
         index = 0;
     }
+    tinyRgbmodeIndex = index;
     // Zero init.
     memset(&tinyRgbEffect[index], 0, sizeof(tiny_rgb_effect_type));
     // Fill parameter from command
@@ -932,19 +934,8 @@ uint8_t handlecmd_rgb_set_preset(tinycmd_pkt_req_type *p_req)
 
 uint8_t handlecmd_rgb_effect_speed(tinycmd_pkt_req_type *p_req)
 {
-    uint8_t speed;
     tinycmd_rgb_effect_speed_req_type *p_effect_speed_req = (tinycmd_rgb_effect_speed_req_type *)p_req;
-
-    speed = p_effect_speed_req->speed;
-    if(speed < RGB_EFFECT_SPEED_FAST)
-    {
-        speed = RGB_EFFECT_SPEED_FAST;
-    }
-    else if(speed > RGB_EFFECT_SPEED_SLOW)
-    {
-        speed = RGB_EFFECT_SPEED_SLOW;
-    }
-    tinyConfig.rgb_effect_speed = speed;
+    tinyConfig.rgb_effect_speed = p_effect_speed_req->speed;
 
     return 0;
 }
@@ -1371,11 +1362,6 @@ void tiny_rgb_effector(void)
         return;
     }
 
-    if(++effect_speed_counter % tinyConfig.rgb_effect_speed)
-    {
-        return;
-    }
-    
     pEffect = &tinyRgbEffect[tinyRgbmodeIndex];
     update = 0;
     index = pEffect->index;
@@ -1473,7 +1459,7 @@ void TinyInitCfg(void)
     tinyConfig.rgb_num = CLED_NUM;
     tinyConfig.led_effect_on = 1; // default on
     tinyConfig.rgb_effect_on = 1; // default on
-    tinyConfig.rgb_effect_speed = RGB_EFFECT_SPEED_NORMAL;
+    tinyConfig.rgb_effect_speed = TINY_RGB_EFFECT_COUNT;
     tinyConfig.rgb_limit = 255;
     memset(rgbBuffer, 0xff, CLED_ARRAY_SIZE);
 }
@@ -1553,7 +1539,7 @@ int main(void)
                 tiny_led_fader();
             }
 
-            if(effect_count%TINY_RGB_EFFECT_COUNT == 0)
+            if(effect_count % tinyConfig.rgb_effect_speed == 0)
             {
                 tiny_rgb_effector();
             }

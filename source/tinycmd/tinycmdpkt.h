@@ -111,7 +111,7 @@ typedef struct
 {
   uint8_t cmd_code;
   uint8_t pkt_len;
-  uint8_t speed; // 2: fast, 3: normal, 4: slow
+  uint16_t speed; // 2: fast, 3: normal, 4: slow
 } tinycmd_rgb_effect_speed_req_type;
 
 // TINY_CMD_RGB_EFFECT_ON_F

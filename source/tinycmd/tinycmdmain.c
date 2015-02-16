@@ -270,11 +270,12 @@ uint8_t tinycmd_rgb_set_preset(uint8_t index, rgb_effect_param_type *p_param, ui
 {
     tinycmd_rgb_set_preset_req_type *p_rgb_set_preset_req = (tinycmd_rgb_set_preset_req_type *)localBuffer;
     uint8_t ret = 0;
+    if(index >= RGB_EFFECT_MAX)
+        index = RGB_EFFECT_BASIC;
 
     p_rgb_set_preset_req->cmd_code = TINY_CMD_RGB_SET_PRESET_F;
     p_rgb_set_preset_req->pkt_len = sizeof(tinycmd_rgb_set_preset_req_type);
     p_rgb_set_preset_req->index = index;
-    //p_rgb_set_effect->effect_param = *p_param;
     memcpy(&p_rgb_set_preset_req->effect_param, p_param, sizeof(rgb_effect_param_type));
     
     ret = sendCommand((tinycmd_pkt_req_type *)p_rgb_set_preset_req, p_rgb_set_preset_req->pkt_len, rsp);
@@ -282,7 +283,7 @@ uint8_t tinycmd_rgb_set_preset(uint8_t index, rgb_effect_param_type *p_param, ui
     return ret;
 }
 
-uint8_t tinycmd_rgb_effect_speed(uint8_t speed, uint8_t rsp)
+uint8_t tinycmd_rgb_effect_speed(uint16_t speed, uint8_t rsp)
 {
     tinycmd_rgb_effect_speed_req_type *p_rgb_effect_speed_req = (tinycmd_rgb_effect_speed_req_type *)localBuffer;
     uint8_t ret = 0;

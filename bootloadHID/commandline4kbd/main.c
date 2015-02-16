@@ -384,6 +384,27 @@ int strtoi(char *str, int nsystem)
 
 #define MAX_RGB_CHAIN       20
 
+
+enum
+{
+    RGB_EFFECT_BOOTHID = 0,
+    RGB_EFFECT_FADE_BUF,
+    RGB_EFFECT_FADE_LOOP,
+    RGB_EFFECT_HEARTBEAT_BUF,
+    RGB_EFFECT_HEARTBEAT_LOOP,
+    RGB_EFFECT_BASIC,
+    RGB_EFFECT_MAX
+};
+
+
+typedef struct {
+    unsigned char index;
+    unsigned char high_hold;
+    unsigned char low_hold;
+    unsigned char accel_mode;
+} rgb_effect_param_type;
+
+
 typedef struct kbd_conf
 {
     unsigned char ps2usb_mode;                    // 0: PS2, 1: USB
@@ -395,7 +416,11 @@ typedef struct kbd_conf
     unsigned char rgb_preset_index;               // RGB effect preset
     unsigned char rgb_chain;                      // RGB5050 numbers (H/W dependent)
     unsigned char rgb_preset[MAX_RGB_CHAIN][3];   // Chain color
+    rgb_effect_param_type rgb_effect_param[RGB_EFFECT_MAX]; // RGB effect parameter
+    unsigned char  rgb_limit;
 }kbd_configuration_t;
+
+
 
 kbd_configuration_t kbdConf;
 kbd_configuration_t *pkbdConf;

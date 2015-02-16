@@ -4,6 +4,11 @@
 #define EEPADDR_BOOTLOADER_ACT      (void *)0
 #define EEPVAL_BOOTLOADER_BIT       0xCA
 
+#define KBD_ACTIVATION              (void *)1
+#define KBD_ACTIVATION_BIT          0xCC
+
+
+
 #define EEPADDR_MACRO_SET           (uint8_t *)0x100    // 256-511 (1Byte x 52)
 #define EEPVAL_MACRO_BIT            0xCA                // 0xCA :macro is recorded 
 
@@ -30,6 +35,7 @@ enum
     RGB_EFFECT_FADE_LOOP,
     RGB_EFFECT_HEARTBEAT_BUF,
     RGB_EFFECT_HEARTBEAT_LOOP,
+    RGB_EFFECT_BASIC,
     RGB_EFFECT_MAX
 };
 
@@ -60,7 +66,7 @@ typedef struct kbd_conf
     uint8_t rgb_effect_index;               // RGB effect index
     uint8_t rgb_chain;                      // RGB5050 numbers (H/W dependent)
     uint8_t rgb_preset[MAX_RGB_CHAIN][3];   // Chain color
-    rgb_effect_param_type rgb_effect_param; // RGB effect parameter
+    rgb_effect_param_type rgb_effect_param[RGB_EFFECT_MAX]; // RGB effect parameter
     uint8_t rgb_limit;
 }kbd_configuration_t;
 
