@@ -5,7 +5,7 @@
 #define EEPVAL_BOOTLOADER_BIT       0xCA
 
 #define KBD_ACTIVATION              (void *)1
-#define KBD_ACTIVATION_BIT          0xCC
+#define KBD_ACTIVATION_BIT          0x01
 
 
 

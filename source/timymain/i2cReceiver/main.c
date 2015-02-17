@@ -94,10 +94,11 @@ typedef enum
 #define TINY_LED_BLOCK_MAX              TINY_LED_PIN_MAX
 
 // local data buffer
-uint8_t rgbBuffer[CLED_NUM][CLED_ELEMENT] = {{200,0,0},{200,0,50},{200,0,100},{200,0,150},{200,0,200},
-                    {0,200,0},{0,200,50},{0,200,100},{0,200,150},{0,200,200},
-                    {0,0,200},{50,0,200},{100,0,200},{150,0,200},{200,0,200},
-                    {200,0,0},{200,50,0},{200,100,0},{200,150,0},{200,200,0}, {200,200,200}};;
+uint8_t rgbBuffer[CLED_NUM][CLED_ELEMENT] = 
+            {{0, 250, 0}, {100, 250,0}, {250, 250, 0}, {250, 0, 0}, {0, 0, 250}, {0, 50, 250}, {0, 250, 250},
+        {0, 250, 250}, {0, 50, 250}, {0, 0, 250},  {250, 0, 0},{250, 250, 0},{100, 250,0}, {0, 250, 0},
+        {200,0,200}, {200,0,0},{200,50,0},{200,100,0},{200,150,0},{200,200,0}};
+
 uint8_t tmprgbBuffer[CLED_NUM][CLED_ELEMENT];
 
 uint8_t cmdBuffer[I2C_RECEIVE_DATA_BUFFER_SIZE];
@@ -1461,7 +1462,6 @@ void TinyInitCfg(void)
     tinyConfig.rgb_effect_on = 1; // default on
     tinyConfig.rgb_effect_speed = TINY_RGB_EFFECT_COUNT;
     tinyConfig.rgb_limit = 255;
-    memset(rgbBuffer, 0xff, CLED_ARRAY_SIZE);
 }
 
 void TinyInitEffect(void)
