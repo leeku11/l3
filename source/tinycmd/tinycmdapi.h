@@ -4,7 +4,7 @@
 #include "tinycmd.h"
 #include "tinycmdpkt.h"
 
-uint8_t tinycmd_config(uint8_t rgb_num, uint8_t rgb_limit, uint8_t rsp);
+uint8_t tinycmd_config(uint8_t rgb_num, uint16_t rgb_limit, uint8_t rsp);
 uint8_t tinycmd_ver(uint8_t rsp);
 uint8_t tinycmd_reset(uint8_t type, uint8_t rsp);
 uint8_t tinycmd_three_lock(uint8_t num, uint8_t caps, uint8_t scroll, uint8_t rsp);

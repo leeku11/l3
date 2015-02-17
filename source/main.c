@@ -317,7 +317,7 @@ void kbdActivation(void)
         memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
         kbdConf.rgb_effect_index = 3;
         kbdConf.rgb_chain = 14;
-        kbdConf.rgb_limit = 250;
+        kbdConf.rgb_limit = 600;
         memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
         memcpy(kbdConf.rgb_effect_param, kbdRgbEffectParam, sizeof(kbdRgbEffectParam));
         

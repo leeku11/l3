@@ -457,21 +457,33 @@ void testTinyCmd(uint8_t keyidx)
             tinycmd_rgb_set_effect(0, TRUE); // RGB_EFFECT_HEARTBEAT_LOOP
             break;
         case K_F8:
+            
+            tinycmd_rgb_all(1, 255, 255, 255, TRUE);
+            tinycmd_rgb_set_preset(RGB_EFFECT_BASIC, &kbdConf.rgb_effect_param[RGB_EFFECT_BASIC], TRUE); // RGB_EFFECT_BOOTHID
+            tinycmd_config(kbdConf.rgb_chain + 1, 100, TRUE);
             break;
         case K_F9:
+            
+            tinycmd_config(15, 40, TRUE);
             break;
         case K_F10:
-            tinycmd_led_set_effect(0, TRUE);
-            tinycmd_rgb_effect_speed(100, TRUE); // fast
+            
+            tinycmd_config(15, 150, TRUE);
+            //tinycmd_led_set_effect(0, TRUE);
+            //tinycmd_rgb_effect_speed(100, TRUE); // fast
             break;
         case K_F11:
-            tinycmd_led_set_effect(1, TRUE);
-            tinycmd_rgb_effect_speed(400, TRUE); // normal
+            
+            tinycmd_config(15, 250, TRUE);
+            //tinycmd_led_set_effect(1, TRUE);
+            //tinycmd_rgb_effect_speed(400, TRUE); // normal
 
             break;
         case K_F12:
-            tinycmd_led_set_effect(2, TRUE);
-            tinycmd_rgb_effect_speed(600, TRUE); //slow
+            
+            tinycmd_config(15, 500, TRUE);
+            //tinycmd_led_set_effect(2, TRUE);
+            //tinycmd_rgb_effect_speed(600, TRUE); //slow
             break;
     }
 #endif // SUPPORT_TINY_CMD

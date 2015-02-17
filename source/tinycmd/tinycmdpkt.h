@@ -28,7 +28,7 @@ typedef struct
   uint8_t cmd_code;
   uint8_t pkt_len;
   uint8_t rgb_num;
-  uint8_t rgb_limit;
+  uint16_t rgb_limit;
 } tinycmd_config_req_type;
 
 typedef struct

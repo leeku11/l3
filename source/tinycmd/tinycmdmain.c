@@ -63,7 +63,7 @@ static uint8_t sendCommand(tinycmd_pkt_req_type *p_req, uint8_t len, uint8_t rsp
     return ret;
 }
 
-uint8_t tinycmd_config(uint8_t rgb_num, uint8_t rgb_limit, uint8_t rsp)
+uint8_t tinycmd_config(uint8_t rgb_num, uint16_t rgb_limit, uint8_t rsp)
 {
     tinycmd_config_req_type *p_cfg_req = (tinycmd_config_req_type *)localBuffer;
     uint8_t ret = 0;
