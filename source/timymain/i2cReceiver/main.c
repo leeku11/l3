@@ -49,7 +49,7 @@
 
 
 #define TINY_LED_EFFECT_COUNT           131
-#define TINY_RGB_EFFECT_COUNT           251
+#define TINY_RGB_EFFECT_COUNT           400
 
 #define DEBUG_LED_ON(p, o, r, g, b)    // rgb_pos_on(p, o, r, g, b)
 
@@ -407,7 +407,6 @@ uint8_t rgb_effect_fade_inout_buf(tiny_rgb_effect_type *p_effect)
     max = 0;
     if(p_effect->dir == 0) // ASCENDING
     {
-        rgbstep++;
         for(; i < tinyConfig.rgb_num; i++)
         {
             for(j = 0; j < 3; j++)
@@ -417,45 +416,30 @@ uint8_t rgb_effect_fade_inout_buf(tiny_rgb_effect_type *p_effect)
                 limit = rgbBuffer[i][j];  
                                 
                 // increase level according to mode
-                if(p_effect->accel_mode == 0)
-                {
-                    tmprgbBuffer[i][j] = (uint8_t)((uint16_t)limit * rgbstep / (uint16_t)255);
-                    max++;
-                }
-                else if(p_effect->accel_mode == 1)
-                {
-                    if(p_effect->level < 16)
-                    {
-                        tmprgbBuffer[i][j] = p_effect->level * p_effect->level + 1;
-                        max++;
-                    }
-                    else
-                    {
-                        tmprgbBuffer[i][j] = 255;
-                    }
-                }
-                else if(p_effect->accel_mode == 2)
-                {
-                    if(p_effect->level < 60)
-                    {
-                        tmprgbBuffer[i][j] = 4 * p_effect->level + 1;
-                        max++;
-                    }
-                    else
-                    {
-                        tmprgbBuffer[i][j] = 255;
-                    }
-                }
+                tmprgbBuffer[i][j] = (uint8_t)((uint16_t)limit * rgbstep / (uint16_t)255);
 
                 if(tmprgbBuffer[i][j] > limit)
                 {
                     tmprgbBuffer[i][j] = limit;
                 }
+
+                if(p_effect->accel_mode == 0)
+                {
+                    rgbstep = p_effect->level;                                            // liner
+                }
+                else if(p_effect->accel_mode == 1)
+                {
+                    rgbstep = p_effect->level * p_effect->level + 1;    //exponential
+                }
+                else if(p_effect->accel_mode == 2)
+                {
+                    rgbstep = p_effect->level * 4 + 1;                  // x4
+                }
             }
         }
 
         // If no update go to the sustain state
-        if((max == 0) || (rgbstep >= 255))
+        if(rgbstep >= 255)
         {
             rgbstep = 255;
             if(p_effect->hcnt++ > p_effect->high_hold)
@@ -472,17 +456,15 @@ uint8_t rgb_effect_fade_inout_buf(tiny_rgb_effect_type *p_effect)
     }
     else // DESCENDING
     {
-        rgbstep--;
         for(; i < tinyConfig.rgb_num; i++)
         {
             for(j = 0; j < 3; j++)
             {
                 tmprgbBuffer[i][j] = (uint8_t)((uint16_t)rgbBuffer[i][j] * rgbstep / (uint16_t)255);
-                max++;
             }
         }
 
-        if((max == 0) || (rgbstep <= 0))
+        if( rgbstep-- <= 0)
         {
             rgbstep = 0;
             if(p_effect->lcnt++ > p_effect->low_hold)
@@ -515,7 +497,6 @@ uint8_t rgb_effect_fade_inout_loop(tiny_rgb_effect_type *p_effect)
     max = 0;
     if(p_effect->dir == 0) // ASCENDING
     {
-        rgbstep++;
         for(; i < tinyConfig.rgb_num; i++)
         {
             for(j = 0; j < 3; j++)
@@ -524,45 +505,30 @@ uint8_t rgb_effect_fade_inout_loop(tiny_rgb_effect_type *p_effect)
                 limit = rgb[j];  
               
                 // increase level according to mode
-                if(p_effect->accel_mode == 0)
-                {
-                    tmprgbBuffer[i][j] = (uint8_t)((uint16_t)limit * rgbstep / (uint16_t)255);
-                    max++;
-                }
-                else if(p_effect->accel_mode == 1)
-                {
-                    if(p_effect->level < 16)
-                    {
-                        tmprgbBuffer[i][j] = p_effect->level * p_effect->level + 1;
-                        max++;
-                    }
-                    else
-                    {
-                        tmprgbBuffer[i][j] = 255;
-                    }
-                }
-                else if(p_effect->accel_mode == 2)
-                {
-                    if(p_effect->level < 60)
-                    {
-                        tmprgbBuffer[i][j] = 4 * p_effect->level + 1;
-                        max++;
-                    }
-                    else
-                    {
-                        tmprgbBuffer[i][j] = 255;
-                    }
-                }
+                tmprgbBuffer[i][j] = (uint8_t)((uint16_t)limit * rgbstep / (uint16_t)255);
 
                 if(tmprgbBuffer[i][j] > limit)
                 {
                     tmprgbBuffer[i][j] = limit;
                 }
+
+                if(p_effect->accel_mode == 0)
+                {
+                    rgbstep = p_effect->level;                                            // liner
+                }
+                else if(p_effect->accel_mode == 1)
+                {
+                    rgbstep = p_effect->level * p_effect->level + 1;    //exponential
+                }
+                else if(p_effect->accel_mode == 2)
+                {
+                    rgbstep = p_effect->level * 4 + 1;                  // x4
+                }
             }
         }
 
         // If no update go to the sustain state
-        if((max == 0) || (rgbstep >= 255))
+        if(rgbstep >= 255)
         {
             rgbstep = 255;
             if(p_effect->hcnt++ > p_effect->high_hold)
@@ -579,17 +545,15 @@ uint8_t rgb_effect_fade_inout_loop(tiny_rgb_effect_type *p_effect)
     }
     else // DESCENDING
     {
-        rgbstep--;
         for(; i < tinyConfig.rgb_num; i++)
         {
             for(j = 0; j < 3; j++)
             {
                 tmprgbBuffer[i][j] = (uint8_t)((uint16_t)rgb[j] * rgbstep / (uint16_t)255);
-                max++;
             }
         }
 
-        if((max == 0) || (rgbstep <= 0))
+        if(rgbstep-- <= 0)
         {
             rgbstep = 0;
             if(p_effect->lcnt++ > p_effect->low_hold)
@@ -796,9 +760,7 @@ uint8_t handlecmd_rgb_set_preset(tinycmd_pkt_req_type *p_req)
 {
     uint8_t index;
     tinycmd_rgb_set_preset_req_type *p_set_preset_req = (tinycmd_rgb_set_preset_req_type *)p_req;
-    tinyRgbmodeIndex = 
-
-    index = p_set_preset_req->index;
+    tinyRgbmodeIndex = index = p_set_preset_req->index;
     if(index >= RGBMODE_INDEX_MAX)
     {
         index = 0;
@@ -1387,8 +1349,9 @@ int main(void)
 
     TinyInitCfg();
     TinyInitEffect();
-    wdt_enable(WDTO_2S);
 
+    wdt_enable(WDTO_2S);
+    
     sei();
 
     for(;;)

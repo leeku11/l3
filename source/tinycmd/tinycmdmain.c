@@ -47,8 +47,8 @@ static uint8_t sendCommand(tinycmd_pkt_req_type *p_req, uint8_t len, uint8_t rsp
         if(rsp)
         {
             p_req->cmd_code |= TINY_CMD_RSP_MASK;
-            //if(i2cMasterSendNI(TARGET_ADDR, len, (uint8_t *)p_req) == I2C_OK)
-            i2cMasterSend(TARGET_ADDR, len, (uint8_t *)p_req);
+            if(i2cMasterSendNI(TARGET_ADDR, len, (uint8_t *)p_req) == I2C_OK)
+            //i2cMasterSend(TARGET_ADDR, len, (uint8_t *)p_req);
             {
                 ret = waitResponse(cmd & TINY_CMD_CMD_MASK);
             }

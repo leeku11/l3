@@ -470,20 +470,20 @@ void testTinyCmd(uint8_t keyidx)
             
             tinycmd_config(15, 150, TRUE);
             //tinycmd_led_set_effect(0, TRUE);
-            //tinycmd_rgb_effect_speed(100, TRUE); // fast
+            tinycmd_rgb_effect_speed(100, TRUE); // fast
             break;
         case K_F11:
             
             tinycmd_config(15, 250, TRUE);
             //tinycmd_led_set_effect(1, TRUE);
-            //tinycmd_rgb_effect_speed(400, TRUE); // normal
+            tinycmd_rgb_effect_speed(400, TRUE); // normal
 
             break;
         case K_F12:
             
             tinycmd_config(15, 500, TRUE);
             //tinycmd_led_set_effect(2, TRUE);
-            //tinycmd_rgb_effect_speed(600, TRUE); //slow
+            tinycmd_rgb_effect_speed(600, TRUE); //slow
             break;
     }
 #endif // SUPPORT_TINY_CMD
