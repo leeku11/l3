@@ -144,7 +144,7 @@ uint8_t tinycmd_dirty(uint8_t down)
     {
         p_dirty_req->cmd_code = TINY_CMD_DIRTY_F;
     }
-    sendCommand(p_dirty_req, sizeof(tinycmd_dirty_req_type), FALSE);
+    sendCommand((tinycmd_pkt_req_type *)p_dirty_req, sizeof(tinycmd_dirty_req_type), FALSE);
     return 1;
 }
 

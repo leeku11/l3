@@ -1,25 +1,25 @@
 #ifndef HWADDRESS_H
 #define HWADDRESS_H
 
-#define EEPADDR_BOOTLOADER_ACT      (void *)0
-#define EEPVAL_BOOTLOADER_BIT       0xCA
-
-#define KBD_ACTIVATION              (void *)1
-#define KBD_ACTIVATION_BIT          0x02
+#define KBD_ACTIVATION              ((void *)1)
+#define KBD_ACTIVATION_BIT          (0x04)
 
 
+#define EEPADDR_BOOTLOADER_ACT      ((void *)0)
+#define EEPVAL_BOOTLOADER_BIT       (0xCA)
 
-#define EEPADDR_MACRO_SET           (uint8_t *)0x100    // 256-511 (1Byte x 52)
-#define EEPVAL_MACRO_BIT            0xCA                // 0xCA :macro is recorded 
 
-#define EEPADDR_KBD_CONF            (void *)0x200    // 512-767
+#define EEPADDR_MACRO_SET           ((uint8_t *)0x100)    // 256-511 (1Byte x 52)
+#define EEPVAL_MACRO_BIT            (0xCA)                // 0xCA :macro is recorded 
 
-#define EEPADDR_KEYMAP_LAYER0       (void *)0x300    // 768 -895
-#define EEPADDR_KEYMAP_LAYER1       (void *)0x380    // 896 -1023
-#define EEPADDR_KEYMAP_LAYER2       (void *)0x400    // 1024 - 1151
-#define EEPADDR_KEYMAP_LAYER3       (void *)0x480    // 1152 - 1279
+#define EEPADDR_KBD_CONF            ((void *)0x200)    // 512-767
 
-#define EEPSIZE_KEYMAP              0x80
+#define EEPADDR_KEYMAP_LAYER0       ((void *)0x300)    // 768 -895
+#define EEPADDR_KEYMAP_LAYER1       ((void *)0x380)   // 896 -1023
+#define EEPADDR_KEYMAP_LAYER2       ((void *)0x400)    // 1024 - 1151
+#define EEPADDR_KEYMAP_LAYER3       ((void *)0x480)    // 1152 - 1279
+
+#define EEPSIZE_KEYMAP              (0x80)
 
 
 #define EEP_KEYMAP_ADDR(layer)  (EEPADDR_KEYMAP_LAYER0 + (EEPSIZE_KEYMAP * layer))

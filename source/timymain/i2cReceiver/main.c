@@ -105,7 +105,6 @@ static uint8_t tinyPwmDir[TINY_LED_BLOCK_MAX] = {0, 0};
 static uint16_t tinyPwmCounter[TINY_LED_BLOCK_MAX] = {0, 0};
 
 static uint16_t tinyPushedLevelStay[TINY_LED_BLOCK_MAX] = {0, 0};
-static uint8_t tinyPushedLevel[TINY_LED_BLOCK_MAX] = {0, 0};
 static uint16_t tinyPushedLevelDuty[TINY_LED_BLOCK_MAX] = {0, 0};
 
 uint8_t tinyRgbmodeIndex = 0; // effect preset index
@@ -1361,7 +1360,7 @@ int main(void)
 
         if(rcvlen != 0)
         {
-            pTmp = i2c_wrbuf;
+            pTmp = (uint8_t *)&i2c_wrbuf[0];
             // copy the received data to a local buffer
             for(i=0; i<rcvlen; i++)
             {

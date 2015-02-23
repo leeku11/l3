@@ -46,6 +46,8 @@ uint16_t cntLAlt = 0;
 uint16_t cntLGui = 0;
 
 int8_t isFNpushed = 0;
+uint8_t fn_col;
+uint8_t fn_row;
 
 static uint8_t gDirty;
 
@@ -211,15 +213,14 @@ uint32_t scanRow(uint8_t row)
 
 uint8_t getLayer(uint8_t FNcolrow)
 {
-    uint8_t col;
-    uint8_t row;
-    uint32_t tmp;
-    row = (FNcolrow >> 5) & 0x07;
-    col = FNcolrow & 0x1f;
-	
-    tmp = scanRow(row);
 
-    if((tmp >> col) & 0x00000001)
+    uint32_t tmp;
+    fn_row = (FNcolrow >> 5) & 0x07;
+    fn_col = FNcolrow & 0x1f;
+	
+    tmp = scanRow(fn_row);
+
+    if((tmp >> fn_col) & 0x00000001)
     {
       isFNpushed = DEBOUNCE_MAX*2;
       return KEY_LAYER_FN;          // FN layer
@@ -498,6 +499,7 @@ uint8_t scankey(void)
 	uint8_t keyidx;
 	uint8_t matrixState = 0;
 	uint8_t retVal = 0;
+    uint8_t t_layer;
 
     matrixState = scanmatrix();
     if(matrixState != gDirty)
@@ -521,7 +523,7 @@ uint8_t scankey(void)
 
     clearReportBuffer();
    
-	uint8_t t_layer = getLayer(matrixFN[kbdConf.keymapLayerIndex]);
+	t_layer = getLayer(matrixFN[kbdConf.keymapLayerIndex]);
 
 	// debounce cleared => compare last matrix and current matrix
 	for(row = 0; row < MATRIX_MAX_ROW; row++)
@@ -551,7 +553,7 @@ uint8_t scankey(void)
                 keyidx = eeprom_read_byte(EEP_KEYMAP_ADDR(t_layer)+(row*MATRIX_MAX_COL)+col);
             
 
-            if (keyidx == K_NONE)
+            if ((keyidx == K_NONE) || ((fn_col == col) && (fn_row == row)))
                 continue;
 
             if(curBit && !(keylock & 0x02))
@@ -559,8 +561,6 @@ uint8_t scankey(void)
             
             if (!prevBit && curBit)   //pushed
             {
-//                testTinyCmd(keyidx);
-//                led_pushed_level_cal();          /* LED_EFFECT_PUSHED_LEVEL calculate */        
                 if (processPushedFNkeys(keyidx))
                     continue;
             }else if (prevBit && !curBit)  //released

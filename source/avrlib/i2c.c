@@ -132,7 +132,7 @@ inline void i2cSendStop(void)
 inline void i2cWaitForComplete(void)
 {
 	// wait for i2c interface to complete operation
-	volatile uint16_t byteTimeout = I2C_1BYTE_TIMEOUT;
+	volatile uint32_t byteTimeout = I2C_1BYTE_TIMEOUT;
 	while( !(inb(TWCR) & BV(TWINT)) && byteTimeout-- );
 }
 

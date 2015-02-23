@@ -281,6 +281,7 @@ void updateConf(void)
 
 void kbdActivation(void)
 {
+    uint8_t i;
     
 #if 1
     ///////////////////SHOULD BE REMOVED ////////////////
@@ -317,11 +318,19 @@ void kbdActivation(void)
         memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
         kbdConf.rgb_effect_index = 3;
         kbdConf.rgb_chain = 14;
-        kbdConf.rgb_limit = 600;
+        kbdConf.rgb_limit = 500;
         memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
         memcpy(kbdConf.rgb_effect_param, kbdRgbEffectParam, sizeof(kbdRgbEffectParam));
         
         updateConf();       // should be removed
+
+        for(i = 0; i < 120; i++)
+        {
+            eeprom_write_byte(EEPADDR_KEYMAP_LAYER0+i, pgm_read_byte(0x6300+i));
+            eeprom_write_byte(EEPADDR_KEYMAP_LAYER1+i, pgm_read_byte(0x6400+i));
+            eeprom_write_byte(EEPADDR_KEYMAP_LAYER2+i, pgm_read_byte(0x6500+i));
+            eeprom_write_byte(EEPADDR_KEYMAP_LAYER3+i, pgm_read_byte(0x6600+i));
+        }
         
         eeprom_write_byte(KBD_ACTIVATION, KBD_ACTIVATION_BIT);
     }

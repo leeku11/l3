@@ -315,7 +315,7 @@ void led_3lockupdate(uint8_t LEDstate)
 {
     if (tinyExist)
     {
-        tinycmd_three_lock((LEDstate & LED_NUM), (LEDstate & LED_CAPS), (LEDstate & LED_SCROLL), TRUE);
+        tinycmd_three_lock((LEDstate & LED_NUM), (LEDstate & LED_CAPS), (LEDstate & LED_SCROLL), FALSE);
     }
     else
     {

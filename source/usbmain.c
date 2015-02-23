@@ -417,7 +417,7 @@ void rxHIDCmd(void)
                 // RGB Buffer
                 tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
                 // RGB Effect
-                tinycmd_rgb_set_preset(0, &kbdConf.rgb_effect_param, TRUE);
+                tinycmd_rgb_set_preset(0, (rgb_effect_param_type *)&kbdConf.rgb_effect_param, TRUE);
                 tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, TRUE);
 
                 // LED Effect
