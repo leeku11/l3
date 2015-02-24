@@ -279,45 +279,66 @@ void updateConf(void)
     eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
 }
 
+
+#if 1
+
+///////////////////SHOULD BE REMOVED ////////////////
+
+rgb_effect_param_type kbdRgbEffectParam[RGB_EFFECT_MAX] = 
+{
+    { RGB_EFFECT_BOOTHID, 0, 0, 0 },    // RGB_EFFECT_BOOTHID
+    { RGB_EFFECT_FADE_BUF, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_FADE_BUF
+    { RGB_EFFECT_FADE_LOOP, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_FADE_LOOP
+    { RGB_EFFECT_HEARTBEAT_BUF, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_BUF
+    { RGB_EFFECT_HEARTBEAT_LOOP, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_LOOP
+    { RGB_EFFECT_BASIC, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_LOOP
+};
+
+static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING, LED_EFFECT_FADING_PUSH_ON},
+                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSHED_LEVEL, LED_EFFECT_PUSH_ON},
+                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSH_OFF, LED_EFFECT_BASECAPS}};
+
+#ifdef L3_ALPhas
+static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =         
+        {{0, 250, 250}, {0, 250, 250},
+         {0, 250, 0},   {100, 250,0},  {250, 250, 0}, {250, 0, 0}, {0, 0, 250}, {0, 50, 250},  {0, 250, 250}, {0, 250, 100},
+         {0, 250, 100}, {0, 250, 250}, {0, 50, 250},  {0, 0, 250}, {250, 0, 0}, {250, 250, 0}, {100, 250,0},  {0, 250, 0}};
+
+#define RGB_CHAIN_NUM   18
+#define DEFAULT_LAYER   2
+
+#else
+static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =         
+        {{0, 250, 0},  {100, 250,0},  {250, 250, 0}, {250, 0, 0},   {0, 0, 250},   {0, 50, 250}, {0, 250, 250},
+        {0, 250, 250}, {0, 50, 250},  {0, 0, 250},   {250, 0, 0},   {250, 250, 0}, {100, 250,0}, {0, 250, 0},
+        {0, 250, 100}, {0, 250, 100}, {0, 250, 100}, {0, 250, 100}, {0, 250, 100}, {0, 250, 100}};
+
+#define RGB_CHAIN_NUM   14         
+#define DEFAULT_LAYER   0
+#endif    
+
+
 void kbdActivation(void)
 {
     uint8_t i;
     
-#if 1
-    ///////////////////SHOULD BE REMOVED ////////////////
-    
-    static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING, LED_EFFECT_FADING_PUSH_ON},
-                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSHED_LEVEL, LED_EFFECT_PUSH_ON},
-                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSH_OFF, LED_EFFECT_BASECAPS}};
 
-    
-    static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =         
-        {{0, 250, 0}, {100, 250,0}, {250, 250, 0}, {250, 0, 0}, {0, 0, 250}, {0, 50, 250}, {0, 250, 250},
-        {0, 250, 250}, {0, 50, 250}, {0, 0, 250},  {250, 0, 0},{250, 250, 0},{100, 250,0}, {0, 250, 0},
-        {200,0,200}, {200,0,0},{200,50,0},{200,100,0},{200,150,0},{200,200,0}};
-    
+
     // TODO : LOAD to E2P
-    rgb_effect_param_type kbdRgbEffectParam[RGB_EFFECT_MAX] = 
-    {
-        { RGB_EFFECT_BOOTHID, 0, 0, 0 },    // RGB_EFFECT_BOOTHID
-        { RGB_EFFECT_FADE_BUF, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_FADE_BUF
-        { RGB_EFFECT_FADE_LOOP, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_FADE_LOOP
-        { RGB_EFFECT_HEARTBEAT_BUF, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_BUF
-        { RGB_EFFECT_HEARTBEAT_LOOP, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_LOOP
-        { RGB_EFFECT_BASIC, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_LOOP
-    };
 
     
     if(eeprom_read_byte(KBD_ACTIVATION) != KBD_ACTIVATION_BIT)
     {
         kbdConf.ps2usb_mode = 1;
-        kbdConf.keymapLayerIndex = 0;
+        kbdConf.keymapLayerIndex = DEFAULT_LAYER;
         kbdConf.swapCtrlCaps = 0;
         kbdConf.swapAltGui = 0;
         kbdConf.led_preset_index = 1;
         memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
         kbdConf.rgb_effect_index = 3;
-        kbdConf.rgb_chain = 14;
+        
+
+        kbdConf.rgb_chain = RGB_CHAIN_NUM;
         kbdConf.rgb_limit = 500;
         memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
         memcpy(kbdConf.rgb_effect_param, kbdRgbEffectParam, sizeof(kbdRgbEffectParam));
@@ -336,14 +357,14 @@ void kbdActivation(void)
     }
     
     ///////////////////SHOULD BE REMOVED ////////////////
-#endif
 }
 
+#endif
 
 void kbd_init(void)
 {
 
-    kbdActivation();
+ //   kbdActivation();
         
     portInit();
     initI2C();

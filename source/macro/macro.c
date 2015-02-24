@@ -441,11 +441,7 @@ void playMacroPS2(uint8_t macrokey)
 //            led_off(LED_PIN_ESC);
         }
         
-#ifdef KBDMOD_M3
         keyidx = pgm_read_byte(address++);
-#else            
-        keyidx = pgm_read_byte_far(address++);
-#endif
 
         if(keyidx == K_NONE)
             return;

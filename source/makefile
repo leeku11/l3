@@ -32,7 +32,8 @@ JUMPSTART = 0x7C00
 #  Your "TRG" file is your C source file that is at the top level of your code.
 #  In other words, this is the file which contains your main() function.
 
-	TRG = L3
+#	TRG = L3_ALPhas
+   TRG = L3_Finger
 
 #put your C sourcefiles here 
 #  Here you must list any C source files which are used by your TRG file.
@@ -67,11 +68,11 @@ JUMPSTART = 0x7C00
 	INC	= -Iusbdrv -Imatrix -Iled -Imacro -Itinycmd
 
 #assembler flags
-	ASFLAGS = -Wa, -gstabs -DF_CPU=$(F_CPU) -DKBDMOD_M3
+	ASFLAGS = -Wa, -gstabs -DF_CPU=$(F_CPU)
 #TRG out
 	OUT = $(TRG)
 #compiler flags
-	CPFLAGS	= -g -Os -Wall -Wstrict-prototypes -I$(AVRLIB) -I$(AVRLIB_CONF) $(INC) -DKBDMOD_M3 -DF_CPU=$(F_CPU)UL -Wa,-ahlms=$(<:.c=.lst)
+	CPFLAGS	= -g -Os -Wall -Wstrict-prototypes -I$(AVRLIB) -I$(AVRLIB_CONF) $(INC) -DF_CPU=$(F_CPU)UL -D$(TRG) -Wa,-ahlms=$(<:.c=.lst)
 
 #linker flags
 	LDFLAGS = -Wl,-Map=$(TRG).map,--cref,--section-start=.appinboot=$(JUMPSTART)
@@ -118,13 +119,12 @@ macro/macro.o	: macro/macro.c		macro/macro.h
 led/led.o	: led/led.c		led/led.h
 usbmain.o 	: usbmain.c		usbmain.h 	usbconfig.h		matrix/matrix.h		usbdrv/usbdrv.h
 ps2main.o	: ps2main.c		ps2main.h	keysta.h	matrix/keymap.h	matrix/matrix.h	
-$(AVRLIB)/timer128.o	: $(AVRLIB)/timer128.c	$(AVRLIB)/timer128.h
 usbdrv/usbdrv.o	:	usbdrv/usbdrv.c		usbdrv/usbdrv.h	usbdrv/oddebug.h
 usbdrv/oddebug.o :	usbdrv/oddebug.c 	usbdrv/oddebug.h
 usbdrv/usbdrvasm.o : usbdrv/usbdrvasm.asm usbdrv/usbdrvasm.S usbdrv/usbportability.h	usbdrv/usbdrv.h  usbconfig.h
 
 all:
-	avr-size -C --mcu=atmega32 l3.elf
+	avr-size -C --mcu=atmega32 $(TRG).elf
 	rm -rf $(TRG)
 	mkdir $(TRG)
 	mv *.lst $(TRG)
