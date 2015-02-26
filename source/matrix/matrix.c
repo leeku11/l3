@@ -414,6 +414,7 @@ uint8_t swap_key(uint8_t keyidx)
 
 
 
+#if 0//def SUPPORT_TINY_CMD
 
 void testTinyCmd(uint8_t keyidx)
 {
@@ -425,8 +426,6 @@ void testTinyCmd(uint8_t keyidx)
     RGB_EFFECT_MAX
 
 */
-
-#if 1//def SUPPORT_TINY_CMD
     switch (keyidx)
     {
         case K_F1:
@@ -487,9 +486,10 @@ void testTinyCmd(uint8_t keyidx)
             tinycmd_rgb_effect_speed(600, TRUE); //slow
             break;
     }
+}
 #endif // SUPPORT_TINY_CMD
 
-}
+
 // return : key modified
 uint8_t scankey(void)
 {

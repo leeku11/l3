@@ -301,10 +301,10 @@ static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFF
 #ifdef L3_ALPhas
 static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =         
         {{0, 250, 250}, {0, 250, 250},
-         {0, 250, 0},   {100, 250,0},  {250, 250, 0}, {250, 0, 0}, {0, 0, 250}, {0, 50, 250},  {0, 250, 250}, {0, 250, 100},
-         {0, 250, 100}, {0, 250, 250}, {0, 50, 250},  {0, 0, 250}, {250, 0, 0}, {250, 250, 0}, {100, 250,0},  {0, 250, 0}};
+         {0, 250, 0},   {100, 250,0},  {250, 250, 0}, {250, 0, 0}, {0, 0, 250}, {0, 50, 250},  {0, 250, 250}, {0, 250, 100}, {0, 250, 100},
+         {0, 250, 100}, {0, 250, 250}, {0, 50, 250},  {0, 0, 250}, {250, 0, 0}, {250, 250, 0}, {100, 250,0},  {0, 250, 0}, {0, 250, 0}};
 
-#define RGB_CHAIN_NUM   18
+#define RGB_CHAIN_NUM   21
 #define DEFAULT_LAYER   2
 
 #else
@@ -364,7 +364,7 @@ void kbdActivation(void)
 void kbd_init(void)
 {
 
- //   kbdActivation();
+    kbdActivation();
         
     portInit();
     initI2C();

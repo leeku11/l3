@@ -698,7 +698,7 @@ uint8_t cmpReportBuffer(void)
 }
 
 
-extern void testTinyCmd(uint8_t keyidx);
+//extern void testTinyCmd(uint8_t keyidx);
 
 
 uint8_t buildHIDreports(uint8_t keyidx)
@@ -734,7 +734,7 @@ uint8_t buildHIDreports(uint8_t keyidx)
             keyboardReport[reportIndex] = keyidx; // set next available entry
             reportIndex++;
 
-            testTinyCmd(keyidx);
+//            testTinyCmd(keyidx);
         }
         
     }    

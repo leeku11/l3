@@ -218,7 +218,6 @@ pip-log.txt
 #############
 #output files
 #############
-L3/
 *.lst
 *.o
 *.bin
@@ -227,6 +226,5 @@ L3/
 *.elf
 *.hex
 *.map
-*.zip
 *.lst
 *.lst

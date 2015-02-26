@@ -88,9 +88,10 @@ typedef enum
 
 // local data buffer
 uint8_t rgbBuffer[CLED_NUM][CLED_ELEMENT] = 
-            {{0, 0, 0}, {0, 250, 0}, {100, 250,0}, {250, 250, 0}, {250, 0, 0}, {0, 0, 250}, {0, 50, 250}, {0, 250, 250},
-        {0, 250, 250}, {0, 50, 250}, {0, 0, 250},  {250, 0, 0},{250, 250, 0},{100, 250,0}, {0, 250, 0},
-        {200,0,200}, {200,0,0},{200,50,0},{200,100,0},{200,150,0}};
+            {{0, 0, 0}, 
+            {0, 250, 0},   {100, 250,0}, {250, 250, 0}, {250, 0, 0}, {0, 0, 250},   {0, 50, 250}, {0, 250, 250},
+            {0, 250, 250}, {0, 50, 250}, {0, 0, 250},   {250, 0, 0}, {250, 250, 0}, {100, 250,0}, {0, 250, 0},
+            {200,0,200}, {200,0,0},{200,50,0},{200,100,0},{200,150,0}, {200,150,0}};
 
 uint8_t tmprgbBuffer[CLED_NUM][CLED_ELEMENT];
 
@@ -262,7 +263,7 @@ uint8_t rgb_effect_snake(tiny_rgb_effect_type *p_effect)
     memset(&tmprgbBuffer[1][0], 0x00, CLED_ARRAY_SIZE);
     if(state == 0)
     {
-        for(i = 0; i < pos; i++)            // turn on from 0 to pos
+        for(i = 0; i <= pos; i++)            // turn on from 0 to pos
         {
             tmprgbBuffer[i][0] = rgbBuffer[i][0];
             tmprgbBuffer[i][1] = rgbBuffer[i][1];
@@ -275,7 +276,7 @@ uint8_t rgb_effect_snake(tiny_rgb_effect_type *p_effect)
         }
     }else
     {
-        for(i = pos; i < tinyConfig.rgb_num; i++)     // turn on from pos to end
+        for(i = pos; i <= tinyConfig.rgb_num; i++)     // turn on from pos to end
         {
             tmprgbBuffer[i][0] = rgbBuffer[i][0];
             tmprgbBuffer[i][1] = rgbBuffer[i][1];
