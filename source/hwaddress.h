@@ -2,7 +2,7 @@
 #define HWADDRESS_H
 
 #define KBD_ACTIVATION              ((void *)1)
-#define KBD_ACTIVATION_BIT          (0x03)
+#define KBD_ACTIVATION_BIT          (0x04)
 
 
 #define EEPADDR_BOOTLOADER_ACT      ((void *)0)

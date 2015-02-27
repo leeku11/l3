@@ -56,48 +56,44 @@ extern uint16_t scankeycntms;
 
 void led_off(LED_BLOCK block)
 {
-#ifdef LED_CONTROL_MASTER
     uint8_t i;
     switch(block)
     {
         case LED_PIN_NUMLOCK:
         case LED_PIN_CAPSLOCK:
         case LED_PIN_SCROLLOCK:
-//            *(ledport[block]) |= BV(ledpin[block]);
+            *(ledport[block]) |= BV(ledpin[block]);
             break;
         case LED_PIN_BASE:
-            tinycmd_led_level(PWM_CHANNEL_0, PWM_DUTY_MIN);
+//            tinycmd_led_level(PWM_CHANNEL_0, PWM_DUTY_MIN);
             break;
         case LED_PIN_WASD:
-            tinycmd_led_level(PWM_CHANNEL_1, PWM_DUTY_MIN);
+//            tinycmd_led_level(PWM_CHANNEL_1, PWM_DUTY_MIN);
             break;                    
         default:
             return;
     }
-#endif // LED_CONTROL_MASTER
 }
 
 void led_on(LED_BLOCK block)
 {
-#ifdef LED_CONTROL_MASTER
     uint8_t i;
     switch(block)
     {
         case LED_PIN_NUMLOCK:
         case LED_PIN_CAPSLOCK:
-        case LED_PIN_SCROLLOCK:
-//            *(ledport[block]) |= BV(ledpin[block]);
+        case LED_PIN_SCROLLOCK: 
+            *(ledport[block]) &= ~BV(ledpin[block]);
             break;
         case LED_PIN_BASE:
-            tinycmd_led_level(PWM_CHANNEL_0, PWM_DUTY_MAX);
+//            tinycmd_led_level(PWM_CHANNEL_0, PWM_DUTY_MAX);
             break;
         case LED_PIN_WASD:
-            tinycmd_led_level(PWM_CHANNEL_1, PWM_DUTY_MAX);
+//            tinycmd_led_level(PWM_CHANNEL_1, PWM_DUTY_MAX);
             break;
         default:
             return;
     }
-#endif // LED_CONTROL_MASTER    
 }
 
 

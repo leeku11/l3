@@ -390,7 +390,10 @@ void kbd_init(void)
 
     keymap_init();
     tinyExist = establishSlaveComm();
-
+    if (tinyExist != 1)
+    {
+        DDRD |= 0xE0;           // DDRD [7:5] -> NCR
+    }
     tiny_init();
     
     updateConf();

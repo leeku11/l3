@@ -1343,7 +1343,6 @@ int main(void)
     uint8_t rcvlen;
     uint16_t count = 0;
     uint16_t effect_count = 0;
-
     TinyInitHW();
     TinyInitTimer();
 
