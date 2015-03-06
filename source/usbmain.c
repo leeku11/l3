@@ -45,7 +45,7 @@ HIDcommand_t hidCmd;
 HIDData_t hidData;
 uint8_t gbootCmdoffset;
 uint8_t version[] = "L150205";          // must be length of 7 bytes    HID report size
-
+uint8_t configUpdated = 0;
 
 MODIFIERS modifierBitmap[] = {
     MOD_NONE ,
@@ -413,16 +413,21 @@ void rxHIDCmd(void)
 #endif            
         case CMD_CONFIG:
             {
+                configUpdated = 20;
+#if 0
                 eeprom_update_block(&hidData.data[0], EEPADDR_KBD_CONF, sizeof(kbdConf));
                 // RGB Buffer
                 tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
                 // RGB Effect
-                tinycmd_rgb_set_preset(0, (rgb_effect_param_type *)&kbdConf.rgb_effect_param, TRUE);
+                tinycmd_rgb_set_preset(kbdConf.rgb_effect_index, (rgb_effect_param_type *)&kbdConf.rgb_effect_param[kbdConf.rgb_effect_index], TRUE);
                 tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, TRUE);
 
                 // LED Effect
                 tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
                 tinycmd_led_config_preset((uint8_t*)kbdConf.led_preset, TRUE);
+
+                eeprom_read_block(currentLayer, EEP_KEYMAP_ADDR(kbdConf.keymapLayerIndex), sizeof(currentLayer));
+#endif                
             }
             break;
         case CMD_KEYMAP :
@@ -787,6 +792,26 @@ uint8_t usbmain(void) {
         wdt_reset();
         usbPoll();
 
+        if (configUpdated)
+        {
+            if(--configUpdated == 0)
+            {
+                eeprom_update_block(&hidData.data[0], EEPADDR_KBD_CONF, sizeof(kbdConf));
+                eeprom_read_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
+                eeprom_read_block(currentLayer, EEP_KEYMAP_ADDR(kbdConf.keymapLayerIndex), sizeof(currentLayer));
+
+                // RGB Buffer
+                tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
+                // RGB Effect
+                tinycmd_rgb_set_preset(kbdConf.rgb_effect_index, (rgb_effect_param_type *)&kbdConf.rgb_effect_param[kbdConf.rgb_effect_index], TRUE);
+                tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, TRUE);
+
+                // LED Effect
+                tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
+                tinycmd_led_config_preset((uint8_t*)kbdConf.led_preset, TRUE);
+                configUpdated = 0;
+            }
+        }
         updateNeeded = scankey();   // changes?
         if (updateNeeded == 0)      //debounce
         {

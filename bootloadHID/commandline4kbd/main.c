@@ -396,6 +396,15 @@ enum
     RGB_EFFECT_MAX
 };
 
+#define FADE_HIGH_HOLD             5
+#define FADE_LOW_HOLD              0
+#define FADE_IN_ACCEL              0  // normal ascending
+
+#define HEARTBEAT_HIGH_HOLD        1
+#define HEARTBEAT_LOW_HOLD         5
+#define HEARTBEAT_IN_ACCEL         1  // 1: weighted ascending. 2: quadratic ascending 
+
+
 
 typedef struct {
     unsigned char index;
@@ -413,11 +422,11 @@ typedef struct kbd_conf
     unsigned char swapAltGui;                     // 1: Swap Alt <-> GUI(WIN) 
     unsigned char led_preset_index;               // LED effect  preset index
     unsigned char led_preset[3][5];               // Block configuration for LED effect  preset
-    unsigned char rgb_preset_index;               // RGB effect preset
+    unsigned char rgb_effect_index;               // RGB effect preset
     unsigned char rgb_chain;                      // RGB5050 numbers (H/W dependent)
     unsigned char rgb_preset[MAX_RGB_CHAIN][3];   // Chain color
     rgb_effect_param_type rgb_effect_param[RGB_EFFECT_MAX]; // RGB effect parameter
-    unsigned char  rgb_limit;
+    unsigned short  rgb_limit;
 }kbd_configuration_t;
 
 
@@ -460,35 +469,65 @@ typedef enum
 }LED_MODE;
 
 
+rgb_effect_param_type kbdRgbEffectParam[RGB_EFFECT_MAX] = 
+{
+    { RGB_EFFECT_BOOTHID, 0, 0, 0 },    // RGB_EFFECT_BOOTHID
+    { RGB_EFFECT_FADE_BUF, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_FADE_BUF
+    { RGB_EFFECT_FADE_LOOP, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_FADE_LOOP
+    { RGB_EFFECT_HEARTBEAT_BUF, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_BUF
+    { RGB_EFFECT_HEARTBEAT_LOOP, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_LOOP
+    { RGB_EFFECT_BASIC, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_LOOP
+};
+
+static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING, LED_EFFECT_FADING_PUSH_ON},
+                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSHED_LEVEL, LED_EFFECT_PUSH_ON},
+                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSH_OFF, LED_EFFECT_BASECAPS}};
+
+#if 0  //L3_ALPhas
+static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =         
+        {{0, 250, 250}, {0, 250, 250},
+         {0, 250, 0},   {100, 250,0},  {250, 250, 0}, {250, 0, 0}, {0, 0, 250}, {0, 50, 250},  {0, 250, 250}, {0, 250, 100}, {0, 250, 100},
+         {0, 250, 100}, {0, 250, 250}, {0, 50, 250},  {0, 0, 250}, {250, 0, 0}, {250, 250, 0}, {100, 250,0},  {0, 250, 0}, {0, 250, 0}};
+
+#define RGB_CHAIN_NUM   21
+#define DEFAULT_LAYER   2
+
+#else
+static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =         
+        {{0, 250, 0},  {100, 250,0},  {250, 250, 0}, {250, 0, 0},   {0, 0, 250},   {0, 50, 250}, {0, 250, 250},
+        {0, 250, 250}, {0, 50, 250},  {0, 0, 250},   {250, 0, 0},   {250, 250, 0}, {100, 250,0}, {0, 250, 0},
+        {0, 250, 100}, {0, 250, 100}, {0, 250, 100}, {0, 250, 100}, {0, 250, 100}, {0, 250, 100}};
+
+#define RGB_CHAIN_NUM   14         
+#define DEFAULT_LAYER   1
+#endif    
+
+
+
 int setConfig(void)
 {
-    static unsigned char tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING, LED_EFFECT_FADING},
-                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING_PUSH_ON, LED_EFFECT_FADING_PUSH_ON},
-                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSH_OFF, LED_EFFECT_PUSH_OFF}};
-
-
-    static unsigned char tmprgp_preset[MAX_RGB_CHAIN][3] = {{200,0,0},{200,0,50},{200,0,100},{200,0,150},{200,0,200},
-                    {0,200,0},{0,200,50},{0,200,100},{0,200,150},{0,200,200},
-                    {0,0,200},{50,0,200},{100,0,200},{150,0,200},{200,0,200},
-                    {200,0,0},{200,50,0},{200,100,0},{200,150,0},{200,200,0}};
-
-
-    kbdConf.ps2usb_mode = 1;
-    kbdConf.keymapLayerIndex = 0;
-    kbdConf.swapCtrlCaps = 0;
-    kbdConf.swapAltGui = 0;
-    kbdConf.led_preset_index = 2;
-    memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
-    kbdConf.rgb_preset_index = 1;
-    kbdConf.rgb_chain = MAX_RGB_CHAIN;
-    memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
-
 
     memcpy(cmdData.data, &kbdConf, sizeof(kbdConf)); 
+    cmdData.cmd = CMD_CONFIG;
 
     if(sendCmd(&cmdData))
         return 1;
 }
+
+
+int setRGB(unsigned char index, unsigned char g, unsigned char r, unsigned char b)
+{
+    int i;
+    kbdConf.rgb_effect_index = index % 6;
+    for (i = 0; i < MAX_RGB_CHAIN; i++)
+    {
+        kbdConf.rgb_preset[i][0] = g;
+        kbdConf.rgb_preset[i][1] = r;
+        kbdConf.rgb_preset[i][2] = b;
+    }
+}
+
+
 unsigned char buffer[512];
 
 int main(int argc, char **argv)
@@ -539,10 +578,36 @@ return 0;
     // if no file was given, endAddress is less than startAddress and no data is uploaded
 #endif
 
-#if 0
+#if 1
+    kbdConf.ps2usb_mode = 1;
+    kbdConf.keymapLayerIndex = DEFAULT_LAYER;
+    kbdConf.swapCtrlCaps = 0;
+    kbdConf.swapAltGui = 0;
+    kbdConf.led_preset_index = 1;
+    memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
+    kbdConf.rgb_effect_index = 1;
+    
+    kbdConf.rgb_chain = MAX_RGB_CHAIN;
+    kbdConf.rgb_limit = 500;
+    memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
+    memcpy(kbdConf.rgb_effect_param, kbdRgbEffectParam, sizeof(kbdRgbEffectParam));
+    
+
+    if(argc == 5)
+    {
+        unsigned char index = strtoi(argv[1], 10); 
+        unsigned char r = strtoi(argv[2], 10);    // R
+        unsigned char g = strtoi(argv[3], 10);    // G
+        unsigned char b = strtoi(argv[4], 10);    // B
+        setRGB(index, g, r, b);
+    }
+
     setConfig();
     return 1;
 #endif
+
+
+
 
 #if 0 //def HIDDEBUG
     HIDCMD_debug_t dbgCmd;
@@ -564,7 +629,7 @@ if (strtoi(argv[1], 10) == CMD_DEBUG)
     return 1;
 #endif
 
-#if 0
+#if 0       // change config
     cmdData.cmd = strtoi(argv[1], 10);
     cmdData.index = strtoi(argv[2], 10);
     cmdData.length = strtoi(argv[3], 10);
@@ -580,6 +645,7 @@ return 0;
         return 1;
 #endif  
 
+#if 0       // KEYMAP write
     FILE *fp = fopen("tmpKeymap.bin", "rb");
     int fsize;
     fseek(fp, 0, SEEK_END);         // 파일포인터를 파일의 끝으로 이동
@@ -610,6 +676,7 @@ return 0;
         }
     }
     fclose(fp);
+#endif    
     return 0;
 }
 
