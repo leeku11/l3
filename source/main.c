@@ -264,10 +264,12 @@ uint8_t tiny_init(void)
         tinycmd_rgb_set_preset(kbdConf.rgb_effect_index, &kbdConf.rgb_effect_param[kbdConf.rgb_effect_index], TRUE); // RGB_EFFECT_BOOTHID
         // now kbdConf.rgb_effect_index should be 0.
         tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, TRUE);
+        tinycmd_rgb_effect_speed(kbdConf.rgb_speed, TRUE);      // fast
 
         // Init LED Effect
         tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
         tinycmd_led_config_preset((uint8_t*)kbdConf.led_preset, TRUE);
+
 
         ret = 1;
     }
@@ -340,6 +342,7 @@ void kbdActivation(void)
 
         kbdConf.rgb_chain = RGB_CHAIN_NUM;
         kbdConf.rgb_limit = 500;
+        kbdConf.rgb_speed = 500;
         memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
         memcpy(kbdConf.rgb_effect_param, kbdRgbEffectParam, sizeof(kbdRgbEffectParam));
         
@@ -353,7 +356,7 @@ void kbdActivation(void)
             eeprom_write_byte(EEPADDR_KEYMAP_LAYER3+i, pgm_read_byte(0x6600+i));
         }
         
-        eeprom_write_byte(KBD_ACTIVATION, KBD_ACTIVATION_BIT);
+        eeprom_update_byte(KBD_ACTIVATION, KBD_ACTIVATION_BIT);
     }
     
     ///////////////////SHOULD BE REMOVED ////////////////

@@ -426,7 +426,8 @@ typedef struct kbd_conf
     unsigned char rgb_chain;                      // RGB5050 numbers (H/W dependent)
     unsigned char rgb_preset[MAX_RGB_CHAIN][3];   // Chain color
     rgb_effect_param_type rgb_effect_param[RGB_EFFECT_MAX]; // RGB effect parameter
-    unsigned short  rgb_limit;
+    unsigned short rgb_limit;
+    unsigned short rgb_speed;
 }kbd_configuration_t;
 
 
@@ -515,10 +516,9 @@ int setConfig(void)
 }
 
 
-int setRGB(unsigned char index, unsigned char g, unsigned char r, unsigned char b)
+int setRGB(unsigned char g, unsigned char r, unsigned char b)
 {
     int i;
-    kbdConf.rgb_effect_index = index % 6;
     for (i = 0; i < MAX_RGB_CHAIN; i++)
     {
         kbdConf.rgb_preset[i][0] = g;
@@ -589,17 +589,23 @@ return 0;
     
     kbdConf.rgb_chain = MAX_RGB_CHAIN;
     kbdConf.rgb_limit = 500;
+    kbdConf.rgb_speed = 500;
     memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
     memcpy(kbdConf.rgb_effect_param, kbdRgbEffectParam, sizeof(kbdRgbEffectParam));
     
 
-    if(argc == 5)
+    unsigned char index = strtoi(argv[1], 10); 
+    kbdConf.rgb_effect_index = index % 6;
+
+    unsigned short speed = strtoi(argv[2], 10); 
+    kbdConf.rgb_speed = speed;
+
+    if(argc == 6)
     {
-        unsigned char index = strtoi(argv[1], 10); 
-        unsigned char r = strtoi(argv[2], 10);    // R
-        unsigned char g = strtoi(argv[3], 10);    // G
-        unsigned char b = strtoi(argv[4], 10);    // B
-        setRGB(index, g, r, b);
+        unsigned char r = strtoi(argv[3], 10);    // R
+        unsigned char g = strtoi(argv[4], 10);    // G
+        unsigned char b = strtoi(argv[5], 10);    // B
+        setRGB( g, r, b);
     }
 
     setConfig();

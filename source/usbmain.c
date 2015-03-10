@@ -805,6 +805,7 @@ uint8_t usbmain(void) {
                 // RGB Effect
                 tinycmd_rgb_set_preset(kbdConf.rgb_effect_index, (rgb_effect_param_type *)&kbdConf.rgb_effect_param[kbdConf.rgb_effect_index], TRUE);
                 tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, TRUE);
+                tinycmd_rgb_effect_speed(kbdConf.rgb_speed, TRUE);
 
                 // LED Effect
                 tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);

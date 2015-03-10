@@ -10,7 +10,7 @@
 #define KEYLOCK_COUNTER_START 0x8000
 
 
-#define DEBOUNCE_MAX        4           // 10 is 5ms at 12MHz XTAL
+#define DEBOUNCE_MAX        6       ////4 /*4*/ 6           // 10 is 5ms at 12MHz XTAL
 
 
 #define MATRIX_COL_PORT     PORTC
