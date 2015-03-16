@@ -327,7 +327,7 @@ int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
         goto errorOccurred;
         }
 
-    printf("Send Succeed !\n");
+    printf("\nSend Succeed !\n");
 
 errorOccurred:
     if(dev != NULL)
@@ -428,6 +428,7 @@ typedef struct kbd_conf
     rgb_effect_param_type rgb_effect_param[RGB_EFFECT_MAX]; // RGB effect parameter
     unsigned short rgb_limit;
     unsigned short rgb_speed;
+    unsigned char matrix_debounce;
 }kbd_configuration_t;
 
 
@@ -503,7 +504,15 @@ static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =
 #define DEFAULT_LAYER   1
 #endif    
 
+int readConfg(void)
+{
+    cmdData.cmd = CMD_CONFIG;
 
+    if(receiveCmd(&cmdData))
+        return 1;
+    
+    memcpy(&kbdConf,cmdData.data, sizeof(kbdConf)); 
+}
 
 int setConfig(void)
 {
@@ -579,6 +588,9 @@ return 0;
 #endif
 
 #if 1
+
+#if 1
+
     kbdConf.ps2usb_mode = 1;
     kbdConf.keymapLayerIndex = DEFAULT_LAYER;
     kbdConf.swapCtrlCaps = 0;
@@ -590,10 +602,14 @@ return 0;
     kbdConf.rgb_chain = MAX_RGB_CHAIN;
     kbdConf.rgb_limit = 500;
     kbdConf.rgb_speed = 500;
+    kbdConf.matrix_debounce = 4;
     memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
     memcpy(kbdConf.rgb_effect_param, kbdRgbEffectParam, sizeof(kbdRgbEffectParam));
-    
 
+#else
+    // read current config
+    readConfg();
+#endif
     unsigned char index = strtoi(argv[1], 10); 
     kbdConf.rgb_effect_index = index % 6;
 

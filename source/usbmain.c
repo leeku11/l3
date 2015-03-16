@@ -413,7 +413,7 @@ void rxHIDCmd(void)
 #endif            
         case CMD_CONFIG:
             {
-                configUpdated = 20;
+                configUpdated = 15;
 #if 0
                 eeprom_update_block(&hidData.data[0], EEPADDR_KBD_CONF, sizeof(kbdConf));
                 // RGB Buffer
@@ -764,10 +764,12 @@ void dumpreportBuffer(void)
 #endif
 
 uint8_t usbmain(void) {
+    uint8_t i;
     uint8_t updateNeeded = 0;
     uint8_t idleCounter = 0;
-    uint32_t interfaceCount = 0;
+    uint16_t interfaceCount = 0;
 	interfaceReady = 0;
+    configUpdated = 0
 
     DEBUG_PRINT(("USB\n"));
 
@@ -775,7 +777,12 @@ uint8_t usbmain(void) {
     cli();
     usbInit();
     usbDeviceDisconnect();  /* enforce re-enumeration, do this while interrupts are disabled! */
-    _delay_ms(20);
+    i = 0;
+    while(--i){             /* fake USB disconnect for > 250 ms */
+        wdt_reset();
+        _delay_ms(1);
+    }
+
     usbDeviceConnect();
     sei();
     
@@ -784,9 +791,9 @@ uint8_t usbmain(void) {
     while (1) {
         // main event loop
 
-        if(interfaceReady == 0 && interfaceCount++ > 12000){
-		   //Reset_AVR();
-			//break;
+        if(interfaceReady == 0 && interfaceCount++ > 8000){
+		   Reset_AVR();
+		   break;
 		}
 
         wdt_reset();
@@ -797,15 +804,16 @@ uint8_t usbmain(void) {
             if(--configUpdated == 0)
             {
                 eeprom_update_block(&hidData.data[0], EEPADDR_KBD_CONF, sizeof(kbdConf));
-                eeprom_read_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
+                memcpy(&kbdConf, &hidData.data[0], sizeof(kbdConf));
                 eeprom_read_block(currentLayer, EEP_KEYMAP_ADDR(kbdConf.keymapLayerIndex), sizeof(currentLayer));
 
                 // RGB Buffer
+                //tinycmd_rgb_buffer(kbdConf.rgb_chain+1, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
                 tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
-                // RGB Effect
+                tinycmd_rgb_effect_speed(kbdConf.rgb_speed, TRUE);
                 tinycmd_rgb_set_preset(kbdConf.rgb_effect_index, (rgb_effect_param_type *)&kbdConf.rgb_effect_param[kbdConf.rgb_effect_index], TRUE);
                 tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, TRUE);
-                tinycmd_rgb_effect_speed(kbdConf.rgb_speed, TRUE);
+                // RGB Effect
 
                 // LED Effect
                 tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);

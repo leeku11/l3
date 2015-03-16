@@ -2,7 +2,7 @@
 #define HWADDRESS_H
 
 #define KBD_ACTIVATION              ((void *)1)
-#define KBD_ACTIVATION_BIT          (0x05)
+#define KBD_ACTIVATION_BIT          (0x55)
 
 
 #define EEPADDR_BOOTLOADER_ACT      ((void *)0)
@@ -69,6 +69,7 @@ typedef struct kbd_conf
     rgb_effect_param_type rgb_effect_param[RGB_EFFECT_MAX]; // RGB effect parameter
     uint16_t rgb_limit;
     uint16_t rgb_speed;
+    uint16_t matrix_debounce;
 }kbd_configuration_t;
 
 #define MACRO_ADDR_START      0x4400     // 0x4400 ~ 0x6FFF  (7KBytes - 256B x 44)

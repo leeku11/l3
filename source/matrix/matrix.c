@@ -223,7 +223,7 @@ uint8_t getLayer(uint8_t FNcolrow)
 
     if((tmp >> fn_col) & 0x00000001)
     {
-      isFNpushed = DEBOUNCE_MAX*2;
+      isFNpushed = kbdConf.matrix_debounce*2;
       return KEY_LAYER_FN;          // FN layer
     }
     else
@@ -580,14 +580,14 @@ uint8_t scankey(void)
             {
                 if(curBit)
                 {
-                    if(debounceMATRIX[row][col]++ >= DEBOUNCE_MAX)
+                    if(debounceMATRIX[row][col]++ >= kbdConf.matrix_debounce)
                     {
                         retVal = buildHIDreports(keyidx);
-                        debounceMATRIX[row][col] = DEBOUNCE_MAX*2;
+                        debounceMATRIX[row][col] = kbdConf.matrix_debounce*2;
                     }
                 }else
                 {
-                    if(debounceMATRIX[row][col]-- >= DEBOUNCE_MAX)
+                    if(debounceMATRIX[row][col]-- >= kbdConf.matrix_debounce)
                     {
                         retVal = buildHIDreports(keyidx);
                     }else
@@ -608,7 +608,7 @@ uint8_t scankey(void)
                 
                 if(debounceMATRIX[row][col] >= 0)
                 {                
-                   if(debounceMATRIX[row][col]++ >= DEBOUNCE_MAX)
+                   if(debounceMATRIX[row][col]++ >= kbdConf.matrix_debounce)
                    {
                         if(curBit)
                         {

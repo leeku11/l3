@@ -649,7 +649,7 @@ void recordMacro(uint8_t macrokey)
 
          if(debounceMATRIX[row][col] >= 0)
          {                
-            if(debounceMATRIX[row][col]++ >= DEBOUNCE_MAX)
+            if(debounceMATRIX[row][col]++ >= kbdConf.matrix_debounce)
             {
                if(curBit)
                {

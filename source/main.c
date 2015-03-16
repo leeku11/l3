@@ -111,11 +111,11 @@ int portInit(void)
 //  Matrix
     PORTA   = 0xFF; //  row
     PORTB   = 0xFF; //  row
-    PORTC   = 0xFC; // LED5,6 off, COL[0-5] pull-up
+    PORTC   = 0xFF; // LED5,6 off, COL[0-5] pull-up
 
     DDRA	= 0x00; // col
     DDRB    = 0x00; // LED_VESEL, LED_PIN_PRT, LED_PIN_PAD, LED_PIN_WASD OUT        (11110000)
-    DDRC	= 0x03; // row 2, 3, 4, 5, 6, 7, 8, 9
+    DDRC	= 0x00; // row 2, 3, 4, 5, 6, 7, 8, 9
 
     PORTD   = 0xF1; // DPpull-up(Low), Zener(pull-up), LED_SCR, LED_CAPS, LED_NUM (0ff), D-(0), D+(0)
     DDRD    = 0x03; // DPpull-up(OUT), Zener(OUT), LED_SCR, LED_CAPS, LED_NUM (OUT), D-(INPUT), D+(INPUT)
@@ -306,7 +306,7 @@ static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =
          {0, 250, 0},   {100, 250,0},  {250, 250, 0}, {250, 0, 0}, {0, 0, 250}, {0, 50, 250},  {0, 250, 250}, {0, 250, 100}, {0, 250, 100},
          {0, 250, 100}, {0, 250, 250}, {0, 50, 250},  {0, 0, 250}, {250, 0, 0}, {250, 250, 0}, {100, 250,0},  {0, 250, 0}, {0, 250, 0}};
 
-#define RGB_CHAIN_NUM   21
+#define RGB_CHAIN_NUM   20
 #define DEFAULT_LAYER   2
 
 #else
@@ -343,6 +343,7 @@ void kbdActivation(void)
         kbdConf.rgb_chain = RGB_CHAIN_NUM;
         kbdConf.rgb_limit = 500;
         kbdConf.rgb_speed = 500;
+        kbdConf.matrix_debounce = 8;
         memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
         memcpy(kbdConf.rgb_effect_param, kbdRgbEffectParam, sizeof(kbdRgbEffectParam));
         
