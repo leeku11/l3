@@ -35,7 +35,6 @@
 
 all:	$(TRG).elf $(TRG).cof $(TRG).bin $(TRG).hex $(TRG).eep $(TRG).ok
 
-
 ###### BLOCK 5) compile: instructions to create assembler and/or object files from C source ######
 
 %.o : %.c 

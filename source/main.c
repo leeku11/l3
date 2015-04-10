@@ -303,8 +303,10 @@ static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFF
 #ifdef L3_ALPhas
 static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =         
         {{0, 250, 250}, {0, 250, 250},
-         {0, 250, 0},   {100, 250,0},  {250, 250, 0}, {250, 0, 0}, {0, 0, 250}, {0, 50, 250},  {0, 250, 250}, {0, 250, 100}, {0, 250, 100},
-         {0, 250, 100}, {0, 250, 250}, {0, 50, 250},  {0, 0, 250}, {250, 0, 0}, {250, 250, 0}, {100, 250,0},  {0, 250, 0}, {0, 250, 0}};
+         {0, 250, 100}, {0, 250, 250}, {0, 50, 250},  {0, 0, 250}, {250, 0, 0}, {250, 250, 0}, {100, 250,0},  {0, 250, 0}, {0, 250, 0},
+         {0, 250, 0},   {100, 250,0},  {250, 250, 0}, {250, 0, 0}, {0, 0, 250}, {0, 50, 250},  {0, 250, 250}, {0, 250, 100}, {0, 250, 100}
+        };
+
 
 #define RGB_CHAIN_NUM   20
 #define DEFAULT_LAYER   2
@@ -343,12 +345,13 @@ void kbdActivation(void)
         kbdConf.rgb_chain = RGB_CHAIN_NUM;
         kbdConf.rgb_limit = 500;
         kbdConf.rgb_speed = 500;
-        kbdConf.matrix_debounce = 8;
+        kbdConf.matrix_debounce = 4;
         memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
         memcpy(kbdConf.rgb_effect_param, kbdRgbEffectParam, sizeof(kbdRgbEffectParam));
         
         updateConf();       // should be removed
 
+#if 1
         for(i = 0; i < 120; i++)
         {
             eeprom_write_byte(EEPADDR_KEYMAP_LAYER0+i, pgm_read_byte(0x6300+i));
@@ -356,7 +359,7 @@ void kbdActivation(void)
             eeprom_write_byte(EEPADDR_KEYMAP_LAYER2+i, pgm_read_byte(0x6500+i));
             eeprom_write_byte(EEPADDR_KEYMAP_LAYER3+i, pgm_read_byte(0x6600+i));
         }
-        
+#endif        
         eeprom_update_byte(KBD_ACTIVATION, KBD_ACTIVATION_BIT);
     }
     

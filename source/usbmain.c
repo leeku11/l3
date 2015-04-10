@@ -387,7 +387,7 @@ uint8_t txHIDCmd(void)
             hidData.parm0 = hidCmd.keymap.index;
             hidData.parm1 = sizeof(currentLayer);
 
-            eeprom_read_block(hidData.data, (void *)(0x300 + (0x80 * hidCmd.keymap.index)), sizeof(currentLayer));
+            eeprom_read_block(hidData.data, (void *)(EEPADDR_KEYMAP_LAYER0 + (0x80 * hidCmd.keymap.index)), sizeof(currentLayer));
             break;
         }
         case CMD_MACRO :

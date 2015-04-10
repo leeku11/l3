@@ -207,7 +207,7 @@ uint32_t scanRow(uint8_t row)
     vPinD = (~MATRIX_ROW_PIN2 & 0xf0) >> 4;    // MSB 4bit
     
     rowValue = (uint32_t)(vPinD) << 16 | (uint32_t)vPinB << 8 | (uint32_t)vPinA;
-    if(tinyExist == 0)
+//    if(tinyExist == 0)
         rowValue = rowValue & 0x0001FFFF;
     return rowValue;
 }

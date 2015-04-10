@@ -28,7 +28,7 @@ ARCH_COMPILE=
 ARCH_LINK=		
 
 OBJ=		main.o usbcalls.o
-PROGRAM=	setRGB$(EXE_SUFFIX)
+PROGRAM=	loadKeymap$(EXE_SUFFIX)
 
 all: $(PROGRAM)
 

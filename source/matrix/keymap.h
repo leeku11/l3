@@ -232,29 +232,34 @@ enum {
    K_BASS_DN,
    K_TRE_UP,
    K_TRE_DN,
-
-   K_MEDIA_SEL,      // 0xc0
+   K_MEDIA_SEL,      
    K_MAIL,
    K_CALC,
    K_MYCOM,
-   K_WWW_SEARCH,
-   K_WWW_HOME,
-   K_WWW_BACK,
-   K_WWW_FORWARD,
-   K_WWW_STOP,
-   K_WWW_REFRESH,
-   K_WWW_FAVORITE,
-   K_EJECT,
-   K_SCREENSAVE,
-   K_REC,
-	K_REWIND,
-	K_MINIMIZE,
 
-   K_M01,            // 0xd0 //K_F13,
+
+    
+    K_WWW_SEARCH,    // 0xc0
+    K_WWW_HOME,
+    K_WWW_BACK,
+    K_WWW_FORWARD,
+    K_WWW_STOP,
+    K_WWW_REFRESH,
+    K_WWW_FAVORITE,
+    K_EJECT,
+    K_SCREENSAVE,
+    K_REC,
+    K_REWIND,
+    K_MINIMIZE,
+
+   K_M01,            //K_F13,
    K_M02,            //K_F14,
    K_M03,            //K_F15,
    K_M04,            //K_F16,
-   K_M05,            //K_F17,
+
+
+    
+   K_M05,            // 0xd0//K_F17,
    K_M06,            //K_F18,
    K_M07,            //K_F19,
    K_M08,            //K_F20,
@@ -266,12 +271,13 @@ enum {
    K_M14,            //K_INTL2,
    K_M15,            //K_INTL3,
    K_M16,            //K_INTL4,
-
-   K_M17,            // 0xe0 //K_INTL5,
+   K_M17,            //K_INTL5,
    K_M18,            //K_INTL6,
    K_M19,            //K_INTL7,
    K_M20,        
-   K_M21,        
+
+
+   K_M21,           // 0xe0 
    K_M22,        
    K_M23,       
    K_M24,   
@@ -283,12 +289,13 @@ enum {
    K_M30,            //218
    K_M31,            //219
    K_M32,            //220
-
-   K_M33,            // 0xf0//221
+   K_M33,            //221
    K_M34,            //222
    K_M35,            //223
    K_M36,            //224
-   K_M37,            //225
+
+    
+   K_M37,            // 0xf0//225
    K_M38,            //226
    K_M39,            //227
    K_M40,            //228

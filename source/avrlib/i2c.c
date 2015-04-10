@@ -30,7 +30,7 @@
 //#define I2C_DEBUG
 
 
-#define I2C_1BYTE_TIMEOUT       CYCLES_PER_US * 1000 * 10   // 1ms timeout for 1Byte transfer
+#define I2C_1BYTE_TIMEOUT       CYCLES_PER_US * 1000 * 1   // 1ms timeout for 1Byte transfer
 // I2C state and address variables
 static volatile eI2cStateType I2cState;
 static volatile uint32_t I2cTimeout = I2C_1BYTE_TIMEOUT;   // default time out for 1Bytes transfer

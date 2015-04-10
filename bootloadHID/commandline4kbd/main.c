@@ -213,7 +213,7 @@ int         err = 0, len, mask, pageSize, deviceSize, i,j, offset;
     buffer[1] = 1;      // Command
     
     if((err = usbSetReport(dev, USB_HID_REPORT_TYPE_FEATURE, buffer, 8)) != 0){
-        fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
+        //fprintf(stderr, "Error uploading data block: %s\n", usbErrorMessage(err));
         goto errorOccurred;
         }
     printf("cmd : [%d][%d][%d][%d][%d][%d][%d][%d] :length %d Sent \n", buffer[0],buffer[1],buffer[2],buffer[3],buffer[4],buffer[5],buffer[6],buffer[7], len);
@@ -587,9 +587,9 @@ return 0;
     // if no file was given, endAddress is less than startAddress and no data is uploaded
 #endif
 
-#if 1
+#if 0       // setting config
 
-#if 1
+#if 0
 
     kbdConf.ps2usb_mode = 1;
     kbdConf.keymapLayerIndex = DEFAULT_LAYER;
@@ -610,8 +610,9 @@ return 0;
     // read current config
     readConfg();
 #endif
+#if 0   // rgbSet
     unsigned char index = strtoi(argv[1], 10); 
-    kbdConf.rgb_effect_index = index % 6;
+    kbdConf.rgb_effect_index= index % 6;
 
     unsigned short speed = strtoi(argv[2], 10); 
     kbdConf.rgb_speed = speed;
@@ -623,6 +624,15 @@ return 0;
         unsigned char b = strtoi(argv[5], 10);    // B
         setRGB( g, r, b);
     }
+#endif
+
+#if 1
+    tmpled_preset[1][3] =  strtoi(argv[1], 10)% 8; 
+    tmpled_preset[1][4] =  strtoi(argv[2], 10)% 8; 
+    memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
+
+#endif
+
 
     setConfig();
     return 1;
@@ -668,7 +678,7 @@ return 0;
 #endif  
 
 #if 0       // KEYMAP write
-    FILE *fp = fopen("tmpKeymap.bin", "rb");
+    FILE *fp = fopen(argv[1], "rb");
     int fsize;
     fseek(fp, 0, SEEK_END);         // 파일포인터를 파일의 끝으로 이동
     fsize = ftell(fp);              // 현재 파일포인터를 읽으면 파일크기가 됨
@@ -698,7 +708,45 @@ return 0;
         }
     }
     fclose(fp);
+#endif 
+
+
+#if 1       // KEYMAP read
+        FILE *fp = fopen(argv[1], "wb");
+        int fsize;
+        fseek(fp, 0, SEEK_END);         // 파일포인터를 파일의 끝으로 이동
+        fsize = ftell(fp);              // 현재 파일포인터를 읽으면 파일크기가 됨
+           
+        fseek(fp, 0, SEEK_SET);         // 파일포인터를 파일의 끝으로 이동
+    
+        printf("fsize = %d \n", fsize);
+        char *pbuf;
+        int writeLen;
+        pbuf = buffer;
+        
+//        readLen = fread(pbuf, 1, fsize, fp);
+        
+//        printf("read len = %d \n", readLen);
+        cmdData.cmd = CMD_KEYMAP;
+            
+    
+        for (i = 0; i < 4; i++)
+        {
+            cmdData.index = i;
+            if(receiveCmd(&cmdData))
+            {
+                fclose(fp);
+                return 1;
+    
+            }
+            memcpy(pbuf, cmdData.data, 120);
+            writeLen = fwrite(pbuf, 1, 120, fp);
+        }
+
+        fclose(fp);
 #endif    
+
+
     return 0;
 }
 
