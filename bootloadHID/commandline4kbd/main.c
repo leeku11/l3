@@ -504,20 +504,20 @@ static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =
 #define DEFAULT_LAYER   1
 #endif    
 
-int readConfg(void)
+int readConfg(void *pbuf)
 {
     cmdData.cmd = CMD_CONFIG;
 
     if(receiveCmd(&cmdData))
         return 1;
     
-    memcpy(&kbdConf,cmdData.data, sizeof(kbdConf)); 
+    memcpy(pbuf,cmdData.data, sizeof(kbdConf)); 
 }
 
-int setConfig(void)
+int setConfig(void *pbuf)
 {
 
-    memcpy(cmdData.data, &kbdConf, sizeof(kbdConf)); 
+    memcpy(cmdData.data, pbuf, sizeof(kbdConf)); 
     cmdData.cmd = CMD_CONFIG;
 
     if(sendCmd(&cmdData))
@@ -587,6 +587,62 @@ return 0;
     // if no file was given, endAddress is less than startAddress and no data is uploaded
 #endif
 
+#if 1       // read config
+
+
+    // read current config
+
+    FILE *fp = fopen(argv[1], "wb");
+    int fsize;
+    fseek(fp, 0, SEEK_END);         // 파일포인터를 파일의 끝으로 이동
+    fsize = ftell(fp);              // 현재 파일포인터를 읽으면 파일크기가 됨
+       
+    fseek(fp, 0, SEEK_SET);         // 파일포인터를 파일의 끝으로 이동
+
+    printf("fsize = %d \n", fsize);
+    char *pbuf;
+    int writeLen;
+    pbuf = buffer;
+    
+    readConfg(pbuf);
+
+    writeLen = fwrite(pbuf, 1, 120, fp);
+
+    fclose(fp);
+
+    return 1;
+#endif
+
+#if 0       //write config
+
+    // read current config
+
+    FILE *fp = fopen(argv[1], "rb");
+    int fsize;
+    fseek(fp, 0, SEEK_END);         // 파일포인터를 파일의 끝으로 이동
+    fsize = ftell(fp);              // 현재 파일포인터를 읽으면 파일크기가 됨
+       
+    fseek(fp, 0, SEEK_SET);         // 파일포인터를 파일의 끝으로 이동
+
+    printf("fsize = %d \n", fsize);
+    char *pbuf;
+    int writeLen;
+    pbuf = buffer;
+    
+    len = fread(pbuf, 1, fsize, fp);
+    printf("read len = %d \n", len);
+      
+    setConfig(pbuf);
+        
+
+    fclose(fp);
+
+    return 1;
+
+#endif
+
+
+
 #if 0       // setting config
 
 #if 0
@@ -608,7 +664,7 @@ return 0;
 
 #else
     // read current config
-    readConfg();
+    readConfg(&kbdConf);
 #endif
 #if 0   // rgbSet
     unsigned char index = strtoi(argv[1], 10); 
@@ -627,6 +683,7 @@ return 0;
 #endif
 
 #if 1
+    kbdConf.led_preset_index = 1;
     tmpled_preset[1][3] =  strtoi(argv[1], 10)% 8; 
     tmpled_preset[1][4] =  strtoi(argv[2], 10)% 8; 
     memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
@@ -634,7 +691,7 @@ return 0;
 #endif
 
 
-    setConfig();
+    setConfig(&kbdConf);
     return 1;
 #endif
 
@@ -661,21 +718,7 @@ if (strtoi(argv[1], 10) == CMD_DEBUG)
     return 1;
 #endif
 
-#if 0       // change config
-    cmdData.cmd = strtoi(argv[1], 10);
-    cmdData.index = strtoi(argv[2], 10);
-    cmdData.length = strtoi(argv[3], 10);
-    cmdData.data[0] = strtoi(argv[4], 10);
 
-    if(receiveCmd(&cmdData))
-        return 1;
-return 0;
-    pkbdConf = (kbd_configuration_t *)cmdData.data;
-    pkbdConf->led_preset_index = 1;
-      
-    if(sendCmd(&cmdData))
-        return 1;
-#endif  
 
 #if 0       // KEYMAP write
     FILE *fp = fopen(argv[1], "rb");
@@ -711,7 +754,7 @@ return 0;
 #endif 
 
 
-#if 1       // KEYMAP read
+#if 0       // KEYMAP read
         FILE *fp = fopen(argv[1], "wb");
         int fsize;
         fseek(fp, 0, SEEK_END);         // 파일포인터를 파일의 끝으로 이동
