@@ -587,7 +587,7 @@ return 0;
     // if no file was given, endAddress is less than startAddress and no data is uploaded
 #endif
 
-#if 1       // read config
+#if 0       // read config
 
 
     // read current config
@@ -613,7 +613,7 @@ return 0;
     return 1;
 #endif
 
-#if 0       //write config
+#if 1       //write config
 
     // read current config
 
@@ -631,7 +631,19 @@ return 0;
     
     len = fread(pbuf, 1, fsize, fp);
     printf("read len = %d \n", len);
-      
+
+	pkbdConf = (kbd_configuration_t *)pbuf;
+
+	for(i = 0; i< MAX_RGB_CHAIN; i++)		// prevent blinking
+	{
+		if(pkbdConf->rgb_preset[i][0] == 255)
+			pkbdConf->rgb_preset[i][0] = 254;
+		if(pkbdConf->rgb_preset[i][1] == 255)
+			pkbdConf->rgb_preset[i][1] = 254;
+		if(pkbdConf->rgb_preset[i][2] == 255)
+			pkbdConf->rgb_preset[i][2] = 254;
+	}
+	
     setConfig(pbuf);
         
 

@@ -317,7 +317,11 @@ void sendString(uint16_t pString) {
 void sendMatrix(char row, char col)
 {
     Key a;
-    
+
+	a.mode = 0;
+    a.key = K_LBR;
+    sendKey(a);
+	
     a.mode = 0;
     a.key = K_A + row;
     sendKey(a);
@@ -328,7 +332,8 @@ void sendMatrix(char row, char col)
     a.key = K_A + col;
     sendKey(a);
 
-    a.key = K_SPACE;
+	a.mode = 0;
+    a.key = K_RBR;
     sendKey(a);
 
     clearKey();
