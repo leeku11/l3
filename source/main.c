@@ -351,7 +351,7 @@ void kbdActivation(void)
         
         updateConf();       // should be removed
 
-#if 1
+#if 0
         for(i = 0; i < 120; i++)
         {
             eeprom_write_byte(EEPADDR_KEYMAP_LAYER0+i, pgm_read_byte(0x6300+i));
