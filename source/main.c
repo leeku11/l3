@@ -216,7 +216,7 @@ uint8_t tiny_init(void)
 
 void updateConf(void)
 {
-    eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, 128);
+    eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
 }
 
 
@@ -312,7 +312,7 @@ void kbd_init(void)
     timer0Init();
     timer0SetPrescaler(TIMER_CLK_DIV8);
 
-    eeprom_read_block(&kbdConf, EEPADDR_KBD_CONF, 128);
+    eeprom_read_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
     if(kbdConf.swapAltGui != 0)
         kbdConf.swapAltGui = 1;    
     if(kbdConf.swapCtrlCaps != 0)

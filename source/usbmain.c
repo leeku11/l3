@@ -355,8 +355,8 @@ void rxHIDCmd(void)
 #endif            
         case CMD_CONFIG:
             {
-                memcpy(&kbdConf, hidData.data, 128);
-                eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, 128);
+                memcpy(&kbdConf, hidData.data, sizeof(kbdConf));
+                eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
                 configUpdated = 15;
             }
             break;
