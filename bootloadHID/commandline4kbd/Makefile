@@ -28,7 +28,7 @@ ARCH_COMPILE=
 ARCH_LINK=		
 
 OBJ=		main.o usbcalls.o
-PROGRAM=	l3conf$(EXE_SUFFIX)
+PROGRAM=	l3cmd$(EXE_SUFFIX)
 
 all: $(PROGRAM)
 

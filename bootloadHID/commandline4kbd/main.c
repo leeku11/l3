@@ -506,26 +506,76 @@ static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =
 #define DEFAULT_LAYER   1
 #endif    
 
-int readConfg(void *pbuf)
+int readConfg(char *pbuf)
 {
-    cmdData.cmd = CMD_CONFIG;
+   int status;
 
-    if(receiveCmd(&cmdData))
-        return 1;
-    
-    memcpy(pbuf,cmdData.data, sizeof(kbdConf)); 
+   cmdData.cmd = CMD_CONFIG;
+
+   status = receiveCmd(&cmdData);
+   if(status != 0)
+   {
+      return status;
+   }
+   memcpy(pbuf,cmdData.data, sizeof(kbdConf));
+
+   return status;
 }
 
-int setConfig(void *pbuf)
+int writeConfig(char *pbuf)
 {
+   int status;
 
-    memcpy(cmdData.data, pbuf, sizeof(kbdConf)); 
-    cmdData.cmd = CMD_CONFIG;
+   memcpy(cmdData.data, pbuf, sizeof(kbdConf)); 
 
-    if(sendCmd(&cmdData))
-        return 1;
+   cmdData.cmd = CMD_CONFIG;
+   status = sendCmd(&cmdData);
+
+   return status;
 }
 
+
+int readKeymap(char *pbuf)
+{
+   int i;
+   int status;
+   
+   cmdData.cmd = CMD_KEYMAP;
+
+   for (i = 0; i < 4; i++)
+   {
+       cmdData.index = i;
+
+       status = receiveCmd(&cmdData);
+
+       memcpy(pbuf, cmdData.data, 120);
+       pbuf += 120;
+       if(status != 0)
+         break;
+   }
+   return status;
+}
+
+int writeKeymap(char *pbuf)
+{
+   int i;
+   int status;
+   
+   cmdData.cmd = CMD_KEYMAP;
+
+   for (i = 0; i < 4; i++)
+   {
+       cmdData.index = i;
+       memcpy(cmdData.data,pbuf, 120);
+       pbuf += 120;
+       
+       status = sendCmd(&cmdData);
+       if(status != 0)
+         break;
+
+   }
+   return status;
+}
 
 int setRGB(unsigned char g, unsigned char r, unsigned char b)
 {
@@ -539,7 +589,142 @@ int setRGB(unsigned char g, unsigned char r, unsigned char b)
 }
 
 
+
+#define ERR_NONE             0
+#define ERR_INVALID_ARG    -100
+#define ERR_INVALID_FILE   -101  
+
+
+int write2File(char *filename, void* pbuf, int length)
+{
+   FILE *fp;
+   int writeLen;
+
+   fp = fopen(filename, "wb");
+   if(fp == NULL)
+   {
+      return ERR_INVALID_FILE;
+   }
+
+   writeLen = fwrite(pbuf, 1, length, fp);
+  
+   fclose(fp);
+
+   if(length != writeLen)
+   {
+      return ERR_INVALID_FILE;
+   }
+   return ERR_NONE;
+}
+
+int readFromFile(char *filename, void* pbuf, int length)
+{
+   FILE *fp;
+   int readLen;
+   int fsize;
+   fp = fopen(filename, "rb");
+   if(fp == NULL)
+   {
+      return ERR_INVALID_FILE;
+   }
+   fseek(fp, 0, SEEK_END);
+   fsize = ftell(fp);
+   fseek(fp, 0, SEEK_SET);
+   
+   printf("fsize = %d \n", fsize);
+   if(fsize != length)
+   {
+      return ERR_INVALID_FILE;
+   }
+   readLen = fread(pbuf, 1, fsize, fp);
+   fclose(fp);
+
+   if(readLen != length)
+   {
+      return ERR_INVALID_FILE;
+   }
+    return ERR_NONE;
+}
+
+
 unsigned char buffer[512];
+
+unsigned char reportMatrix[] = {1, 1, 2, 2, 0, 0, 0, 0}; 
+unsigned char reportKeyCode[] = {1, 1, 2, 1, 0, 0, 0, 0}; 
+unsigned char jumpBootloader[] = {1, 1, 3, 0, 0, 0, 0, 0}; 
+
+int main(int argc, char **argv)
+{
+
+   char *pbuf;
+   int status;
+   pbuf = buffer;
+     
+   if(strcasecmp((char *)argv[1], "cmd") == 0)
+   {
+      if(strcasecmp((char *)argv[2], "boot") == 0)
+      {
+         status = sendDBGCmd(jumpBootloader);
+      }else if(strcasecmp((char *)argv[2], "matrix") == 0)
+      {
+         status = sendDBGCmd(reportMatrix);
+      }else if(strcasecmp((char *)argv[2], "keycode") == 0)
+      {
+         status = sendDBGCmd(reportKeyCode);
+      }else
+      {
+         status = ERR_INVALID_ARG;
+      }
+
+   }else if(strcasecmp((char *)argv[1], "readcfg") == 0)
+   {
+      if (argv[2] == NULL)
+            return ERR_INVALID_ARG;
+      status = readConfg(pbuf);
+      if(status == ERR_NONE)
+      {
+         status = write2File(argv[2], pbuf,128);
+      }
+   }else if(strcasecmp((char *)argv[1], "writecfg") == 0)
+   {
+      if (argv[2] == NULL)
+            return ERR_INVALID_ARG;
+      
+      status = readFromFile(argv[2], pbuf,128);
+      if(status == ERR_NONE)
+      {
+         status = writeConfig(pbuf);
+      }
+   }else if(strcasecmp((char *)argv[1], "readkey") == 0)
+   {
+      if (argv[2] == NULL)
+            return ERR_INVALID_ARG;
+      status = readKeymap(pbuf);
+      if(status == ERR_NONE)
+      {
+         status = write2File(argv[2], pbuf,480);
+      }
+   }else if(strcasecmp((char *)argv[1], "writekey") == 0)
+   {
+      if (argv[2] == NULL)
+            return ERR_INVALID_ARG;
+      
+      status = readFromFile(argv[2], pbuf,480);
+      if(status == ERR_NONE)
+      {
+         status = writeKeymap(pbuf);
+      }
+
+   }else
+   {
+      printf("USAGE : l3cmd [cmd] [filename]\n");
+
+   }
+   printf("status = %d\n", status);
+}
+
+
+#if 0
 
 int main(int argc, char **argv)
 {
@@ -845,7 +1030,7 @@ if (strtoi(argv[1], 10) == CMD_DEBUG)
 
     return 0;
 }
-
+#endif
 /* ------------------------------------------------------------------------- */
 
 
