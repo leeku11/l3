@@ -366,7 +366,7 @@ int processTX(void)
     	_delay_ms(300);
     case STA_WAIT_RESET:
         clear();
-        led_check(0);
+//        led_check(0);
         led_mode_init();
         tx_state(0xAA, STA_NORMAL);
         break;

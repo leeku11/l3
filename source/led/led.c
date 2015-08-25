@@ -28,7 +28,6 @@
 static uint8_t *const ledport[] = {LED_NUM_PORT, LED_CAP_PORT,LED_SCR_PORT};
     
 static uint8_t const ledpin[] = {LED_NUM_PIN, LED_CAP_PIN, LED_SCR_PIN};
-uint8_t ledmodeIndex;
 
 
 #ifdef LED_CONTROL_MASTER    
@@ -86,10 +85,8 @@ void led_on(LED_BLOCK block)
             *(ledport[block]) &= ~BV(ledpin[block]);
             break;
         case LED_PIN_BASE:
-//            tinycmd_led_level(PWM_CHANNEL_0, PWM_DUTY_MAX);
             break;
         case LED_PIN_WASD:
-//            tinycmd_led_level(PWM_CHANNEL_1, PWM_DUTY_MAX);
             break;
         default:
             return;
@@ -99,36 +96,10 @@ void led_on(LED_BLOCK block)
 
 void led_wave_on(LED_BLOCK block)
 {
-#ifdef LED_CONTROL_MASTER
-    switch(block)
-    {
-        case LED_PIN_BASE:
-            tinycmd_led_level(PWM_CHANNEL_0, PWM_DUTY_MAX-1);
-            break;
-        case LED_PIN_WASD:
-            tinycmd_led_level(PWM_CHANNEL_1, PWM_DUTY_MAX-1);
-            break;
-        default:
-            break;
-    }
-#endif // LED_CONTROL_MASTER
 }
 
 void led_wave_off(LED_BLOCK block)
 {
-#ifdef LED_CONTROL_MASTER
-    switch(block)
-    {
-        case LED_PIN_BASE:
-            tinycmd_led_level(PWM_CHANNEL_0, PWM_DUTY_MIN);
-            break;
-        case LED_PIN_WASD:
-            tinycmd_led_level(PWM_CHANNEL_0, PWM_DUTY_MIN);
-            break;
-        default:
-            break;
-    }
-#endif // LED_CONTROL_MASTER
 }
 
 
@@ -136,19 +107,6 @@ void led_wave_off(LED_BLOCK block)
 
 void led_wave_set(LED_BLOCK block, uint16_t duty)
 {
-#ifdef LED_CONTROL_MASTER
-    switch(block)
-    {
-        case LED_PIN_BASE:
-            tinycmd_led_level(PWM_CHANNEL_0, duty);
-            break;
-        case LED_PIN_WASD:
-            tinycmd_led_level(PWM_CHANNEL_1, duty);
-            break;
-       default:
-            break;
-    }
-#endif // LED_CONTROL_MASTER
 }
 
 
@@ -166,134 +124,10 @@ void led_blink(int matrixState)
             tinycmd_dirty(matrixState & SCAN_DIRTY);
         }
     }
-#ifdef LED_CONTROL_MASTER
-    else
-    {
-        LED_BLOCK ledblock;
-    
-        for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
-        {
-            
-            if(matrixState & SCAN_DIRTY)      // 1 or more key is pushed
-            {
-                switch(ledmode[ledmodeIndex][ledblock])
-                {
-    
-                    case LED_EFFECT_FADING_PUSH_ON:
-                    case LED_EFFECT_PUSH_ON:
-                        led_on(ledblock);
-                        break;
-                    case LED_EFFECT_PUSH_OFF:
-                        led_wave_off(ledblock);
-                        led_wave_set(ledblock, 0);
-                        led_off(ledblock);
-                        break;
-                    default :
-                        break;
-                }             
-            }else{          // none of keys is pushed
-                switch(ledmode[ledmodeIndex][ledblock])
-                     {
-                         case LED_EFFECT_FADING_PUSH_ON:
-                         case LED_EFFECT_PUSH_ON:
-                            led_off(ledblock);
-                            break;
-                         case LED_EFFECT_PUSH_OFF:
-                            led_on(ledblock);
-                            break;
-                         default :
-                             break;
-                     }
-            }
-        }
-    }
-#endif // LED_CONTROL_MASTER
 }
 
 void led_fader(void)
 {
-#ifdef LED_CONTROL_MASTER    
-    uint8_t ledblock;
-    for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
-    {
-        if((scankeycntms > 1000)
-            && (ledmode[ledmodeIndex][ledblock] == LED_EFFECT_FADING)
-                || ((ledmode[ledmodeIndex][ledblock] == LED_EFFECT_FADING_PUSH_ON)))
-        {
-            if(pwmDir[ledblock]==0)
-            {
-                led_wave_set(ledblock, ((uint16_t)(pwmCounter[ledblock]/brigspeed[ledblock])));        // brighter
-                if(pwmCounter[ledblock]>=255*brigspeed[ledblock])
-                    pwmDir[ledblock] = 1;
-                    
-            }
-            else if(pwmDir[ledblock]==2)
-            {
-                led_wave_set(ledblock, ((uint16_t)(255-pwmCounter[ledblock]/speed[ledblock])));    // darker
-                if(pwmCounter[ledblock]>=255*speed[ledblock])
-                    pwmDir[ledblock] = 3;
-
-            }
-            else if(pwmDir[ledblock]==1)
-            {
-                if(pwmCounter[ledblock]>=255*speed[ledblock])
-                   {
-                       pwmCounter[ledblock] = 0;
-                       pwmDir[ledblock] = 2;
-                   }
-            }else if(pwmDir[ledblock]==3)
-            {
-                if(pwmCounter[ledblock]>=255*brigspeed[ledblock])
-                   {
-                       pwmCounter[ledblock] = 0;
-                       pwmDir[ledblock] = 0;
-                   }
-            }
-
-
-            led_wave_on(ledblock);
-
-            // pwmDir 0~3 : idle
-       
-            pwmCounter[ledblock]++;
-
-        }
-        else if (ledmode[ledmodeIndex][ledblock] == LED_EFFECT_PUSHED_LEVEL)
-        {
-    		// 일정시간 유지
-
-    		if(pushedLevelStay[ledblock] > 0){
-    			pushedLevelStay[ledblock]--;
-    		}else{
-    			// 시간이 흐르면 레벨을 감소 시킨다.
-    			if(pushedLevelDuty[ledblock] > 0){
-    				pwmCounter[ledblock]++;
-    				if(pwmCounter[ledblock] >= speed[ledblock]){
-    					pwmCounter[ledblock] = 0;			
-    					pushedLevelDuty[ledblock]--;
-    					pushedLevel[ledblock] = PUSHED_LEVEL_MAX - (255-pushedLevelDuty[ledblock]) / (255/PUSHED_LEVEL_MAX);
-    					/*if(pushedLevel_prev != pushedLevel){
-    						DEBUG_PRINT(("---------------------------------decrease pushedLevel : %d, life : %d\n", pushedLevel, pushedLevelDuty));
-    						pushedLevel_prev = pushedLevel;
-    					}*/
-    				}
-    			}else{
-    				pushedLevel[ledblock] = 0;
-    				pwmCounter[ledblock] = 0;
-    			}
-    		}
-    		led_wave_set(ledblock, pushedLevelDuty[ledblock]);
-
-    	}
-    	else
-        {
-            led_wave_set(ledblock, 0);
-            led_wave_off(ledblock);
-            pwmCounter[ledblock]=0;
-            pwmDir[ledblock]=0;
-        }
-    }
-#endif // LED_CONTROL_MASTER
 }
 
 void led_check(uint8_t forward)
@@ -306,7 +140,7 @@ void led_check(uint8_t forward)
     _delay_ms(100);
 }
 
-
+uint8_t tmpToggle;
 void led_3lockupdate(uint8_t LEDstate)
 {
     if (tinyExist)
@@ -346,90 +180,37 @@ void led_3lockupdate(uint8_t LEDstate)
 void led_mode_init(void)
 {
     LED_BLOCK ledblock;
-#if 0
-    int16_t i;
-    uint8_t *buf;
-    
-    ledmodeIndex = eeprom_read_byte(EEPADDR_LEDMODE_INDEX); 
-    if (ledmodeIndex >= LEDMODE_INDEX_MAX)
-        ledmodeIndex = 0;
-    buf = ledmode;
-    for (i = 0; i < LEDMODE_ARRAY_SIZE; i++)
-    {
-        *buf++ = pgm_read_byte(LEDMODE_ADDRESS+i);
-//        *buf++ = eeprom_read_byte(EEPADDR_LED_MODE+i);
-    }
-#else
-    ledmodeIndex = 0;
-#endif
-
-    for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
-    {
-#ifdef LED_CONTROL_MASTER
-        pwmDir[ledblock ] = 0;
-        pwmCounter[ledblock] = 0;
-        led_mode_change(ledblock, ledmode[ledmodeIndex][ledblock]);
-#endif // LED_CONTROL_MASTER
-    }
     
     led_3lockupdate(gLEDstate);
 
-#if 0//def LED_CONTROL_SLAVE
-    tinycmd_led_config_preset((uint8_t *)&kbdConf.led_preset[0][0]);
-    tinycmd_led_set_effect(kbdConf.led_preset_index);
-
-#endif // LED_CONTROL_SLAVE
 }
-#ifdef LED_CONTROL_MASTER
 
-void led_mode_change (LED_BLOCK ledblock, int mode)
+uint8_t led_sleep_preset[3][5] ={LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF
+                                , LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF
+                                , LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF};
+void led_sleep(void)
 {
-    switch (mode)
-    {
-        case LED_EFFECT_FADING :
-        case LED_EFFECT_FADING_PUSH_ON :
-            break;
-        case LED_EFFECT_PUSH_OFF :
-        case LED_EFFECT_ALWAYS :
-            led_on(ledblock);
-            break;
-        case LED_EFFECT_PUSH_ON :
-        case LED_EFFECT_OFF :
-        case LED_EFFECT_PUSHED_LEVEL :
-        case LED_EFFECT_BASECAPS :
-            led_off(ledblock);
-            led_wave_set(ledblock,0);
-            led_wave_on(ledblock);
-            break;
-        default :
-            ledmode[ledmodeIndex][ledblock] = LED_EFFECT_FADING;
-            break;
-     }
-}
-#endif
+    led_3lockupdate(0);
+    
+    tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
+    tinycmd_led_config_preset((uint8_t*)led_sleep_preset, TRUE);
 
-#if 0
-void led_mode_save(void)
+        // RGB Effect
+    tinycmd_rgb_all(0, 0, 0, 0, TRUE);
+}
+void led_restore(void)
 {
-    eeprom_write_byte(EEPADDR_LEDMODE_INDEX, ledmodeIndex);
+    
+    led_3lockupdate(gLEDstate);
+
+    tinycmd_config(kbdConf.rgb_chain + 1, kbdConf.rgb_limit, TRUE);
+    tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
+    tinycmd_rgb_effect_speed(kbdConf.rgb_speed, TRUE);
+    tinycmd_rgb_set_preset(kbdConf.rgb_effect_index, (rgb_effect_param_type *)&kbdConf.rgb_effect_param[kbdConf.rgb_effect_index], TRUE);
+    tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, TRUE);
+    // RGB Effect
+    // LED Effect
+    tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
+    tinycmd_led_config_preset((uint8_t*)kbdConf.led_preset, TRUE);
+    
 }
-#endif
-
-#ifdef LED_CONTROL_MASTER
-
-void led_pushed_level_cal(void)
-{
-    LED_BLOCK ledblock;
-    // update pushed level
-
-    for (ledblock = LED_PIN_BASE; ledblock <= LED_PIN_WASD; ledblock++)
-    { 
-        if(pushedLevel[ledblock] < PUSHED_LEVEL_MAX)
-        {
-            pushedLevelStay[ledblock] = 511;
-            pushedLevel[ledblock]++;
-            pushedLevelDuty[ledblock] = (255 * pushedLevel[ledblock]) / PUSHED_LEVEL_MAX;
-        }
-    }
-}
-#endif

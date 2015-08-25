@@ -47,6 +47,10 @@ uint8_t gbootCmdoffset;
 uint8_t version[] = "L150205";          // must be length of 7 bytes    HID report size
 uint8_t configUpdated = 0;
 
+uint16_t sleepTimeOut;
+extern uint8_t kbdsleepmode;
+
+
 MODIFIERS modifierBitmap[] = {
     MOD_NONE ,
     MOD_CONTROL_LEFT ,
@@ -119,56 +123,6 @@ PROGMEM uchar keyboard_hid_report[] = {
  * http://www.microsoft.com/whdc/device/input/wheel.mspx
  */
 PROGMEM uchar mouse_hid_report[] = {
-#if 0
-    /* mouse */
-    0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
-    0x09, 0x02,                    // USAGE (Mouse)
-    0xa1, 0x01,                    // COLLECTION (Application)
-    0x85, REPORT_ID_MOUSE,         //   REPORT_ID (1)
-    0x09, 0x01,                    //   USAGE (Pointer)
-    0xa1, 0x00,                    //   COLLECTION (Physical)
-                                   // ----------------------------  Buttons
-    0x05, 0x09,                    //     USAGE_PAGE (Button)
-    0x19, 0x01,                    //     USAGE_MINIMUM (Button 1)
-    0x29, 0x05,                    //     USAGE_MAXIMUM (Button 5)
-    0x15, 0x00,                    //     LOGICAL_MINIMUM (0)
-    0x25, 0x01,                    //     LOGICAL_MAXIMUM (1)
-    0x75, 0x01,                    //     REPORT_SIZE (1)
-    0x95, 0x05,                    //     REPORT_COUNT (5)
-    0x81, 0x02,                    //     INPUT (Data,Var,Abs)
-    0x75, 0x03,                    //     REPORT_SIZE (3)
-    0x95, 0x01,                    //     REPORT_COUNT (1)
-    0x81, 0x03,                    //     INPUT (Cnst,Var,Abs)
-                                   // ----------------------------  X,Y position
-    0x05, 0x01,                    //     USAGE_PAGE (Generic Desktop)
-    0x09, 0x30,                    //     USAGE (X)
-    0x09, 0x31,                    //     USAGE (Y)
-    0x15, 0x81,                    //     LOGICAL_MINIMUM (-127)
-    0x25, 0x7f,                    //     LOGICAL_MAXIMUM (127)
-    0x75, 0x08,                    //     REPORT_SIZE (8)
-    0x95, 0x02,                    //     REPORT_COUNT (2)
-    0x81, 0x06,                    //     INPUT (Data,Var,Rel)
-                                   // ----------------------------  Vertical wheel
-    0x09, 0x38,                    //     USAGE (Wheel)
-    0x15, 0x81,                    //     LOGICAL_MINIMUM (-127)
-    0x25, 0x7f,                    //     LOGICAL_MAXIMUM (127)
-    0x35, 0x00,                    //     PHYSICAL_MINIMUM (0)        - reset physical
-    0x45, 0x00,                    //     PHYSICAL_MAXIMUM (0)
-    0x75, 0x08,                    //     REPORT_SIZE (8)
-    0x95, 0x01,                    //     REPORT_COUNT (1)
-    0x81, 0x06,                    //     INPUT (Data,Var,Rel)
-                                   // ----------------------------  Horizontal wheel
-    0x05, 0x0c,                    //     USAGE_PAGE (Consumer Devices)
-    0x0a, 0x38, 0x02,              //     USAGE (AC Pan)
-    0x15, 0x81,                    //     LOGICAL_MINIMUM (-127)
-    0x25, 0x7f,                    //     LOGICAL_MAXIMUM (127)
-    0x75, 0x08,                    //     REPORT_SIZE (8)
-    0x95, 0x01,                    //     REPORT_COUNT (1)
-    0x81, 0x06,                    //     INPUT (Data,Var,Rel)
-    0xc0,                          //   END_COLLECTION
-    0xc0,                          // END_COLLECTION
-
-#else
     /* Boot HID */
     0x06, 0x00, 0xff,              // USAGE_PAGE (Generic Desktop)
     0x09, 0x01,                    // USAGE (Vendor Usage 1)
@@ -188,7 +142,6 @@ PROGMEM uchar mouse_hid_report[] = {
     0xb2, 0x02, 0x01,              //   FEATURE (Data,Var,Abs,Buf)
 
     0xc0,                           // END_COLLECTION
-#endif
 
     /* system control */
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
@@ -314,14 +267,6 @@ USB_PUBLIC usbMsgLen_t usbFunctionDescriptor(struct usbRequest *rq)
 {
     usbMsgLen_t len = 0;
 
-/*
-    debug("usbFunctionDescriptor: ");
-    debug_hex(rq->bmRequestType); debug(" ");
-    debug_hex(rq->bRequest); debug(" ");
-    debug_hex16(rq->wValue.word); debug(" ");
-    debug_hex16(rq->wIndex.word); debug(" ");
-    debug_hex16(rq->wLength.word); debug("\n");
-*/
     switch (rq->wValue.bytes[1]) {
 #if USB_CFG_DESCR_PROPS_CONFIGURATION
         case USBDESCR_CONFIG:
@@ -355,11 +300,9 @@ USB_PUBLIC usbMsgLen_t usbFunctionDescriptor(struct usbRequest *rq)
             }
             break;
     }
-    //debug("desc len: "); debug_hex(len); debug("\n");
     return len;
 }
-
-    
+   
 
 uint8_t txHIDCmd(void)
 {
@@ -393,7 +336,6 @@ uint8_t txHIDCmd(void)
         case CMD_MACRO :
         {
 
-
         }
         break;
     }
@@ -413,29 +355,15 @@ void rxHIDCmd(void)
 #endif            
         case CMD_CONFIG:
             {
+                memcpy(&kbdConf, hidData.data, 128);
+                eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, 128);
                 configUpdated = 15;
-#if 0
-                eeprom_update_block(&hidData.data[0], EEPADDR_KBD_CONF, sizeof(kbdConf));
-                // RGB Buffer
-                tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
-                // RGB Effect
-                tinycmd_rgb_set_preset(kbdConf.rgb_effect_index, (rgb_effect_param_type *)&kbdConf.rgb_effect_param[kbdConf.rgb_effect_index], TRUE);
-                tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, TRUE);
-
-                // LED Effect
-                tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
-                tinycmd_led_config_preset((uint8_t*)kbdConf.led_preset, TRUE);
-
-                eeprom_read_block(currentLayer, EEP_KEYMAP_ADDR(kbdConf.keymapLayerIndex), sizeof(currentLayer));
-#endif                
             }
             break;
         case CMD_KEYMAP :
             {
                eeprom_update_block(hidData.data, EEPADDR_KEYMAP_LAYER0 + (0x80 * hidCmd.keymap.index), sizeof(currentLayer));
                keymap_init();
-                // TO DO reload key map
-                
             }
             break;
 
@@ -445,7 +373,6 @@ void rxHIDCmd(void)
 
             }
             break;
-
     }
 }
 
@@ -456,12 +383,12 @@ void rxHIDCmd(void)
  * \return number of bytes to use, or 0xff if usbFunctionWrite() should be
  * called
  */
+
 uint8_t usbFunctionSetup(uint8_t data[8]) {
     usbRequest_t *rq = (void *)data;
-
     
 	interfaceReady = 1;
-
+    
     usbMsgPtr = (usbMsgPtr_t)keyboardReport;
     if ((rq->bmRequestType & USBRQ_TYPE_MASK) == USBRQ_TYPE_CLASS) {
         // class request type
@@ -484,8 +411,6 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
                 return sizeof(hidData);
             }
         }
-
-
 
         else if (rq->bRequest == USBRQ_HID_SET_REPORT) {
             if (rq->wValue.word == HID_REPORT_KEBOARD && rq->wIndex.word == 0) {
@@ -521,7 +446,6 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
             }
             DEBUG_PRINT(("idleRate = %2x\n", idleRate));
         } 
-
 
         else if (rq->bRequest == USBRQ_HID_GET_PROTOCOL) {
             if (rq->wValue.bytes[1] < 1) {
@@ -571,7 +495,7 @@ uint8_t usbFuncDebugCmdHandler(void)
 }
 
 volatile uint8_t gLEDstate;     ///< current state of the LEDs
-
+extern uint32_t scankeycntms;
 /**
  * The write function is called when LEDs should be set. Normally, we get only
  * one byte that contains info about the LED states.
@@ -587,10 +511,22 @@ uint8_t usbFunctionWrite(uchar *data, uchar len)
     if ((expectReport) && (len == 1)) {
         
         LEDstate = (data[0] & LED_NUM) | (data[0] & LED_CAPS) | (data[0] & LED_SCROLL);
+
+        if(kbdsleepmode == 1)
+        {
+           led_restore();
+           kbdsleepmode = 0;
+           sleepTimeOut = 5000;
+           scankeycntms = 0;
+        }
+
+
         if(gLEDstate != LEDstate)
         {
             gLEDstate = LEDstate;            // Get the state of all 5 LEDs
             led_3lockupdate(LEDstate);
+
+           
         }
         expectReport = 0;
         result = 1;     // last block received
@@ -747,32 +683,32 @@ uint8_t buildHIDreports(uint8_t keyidx)
     return retval;
 }
 
-#ifdef DEBUG
-uint8_t toggle1 = 0;
 
-void dumpreportBuffer(void)
+
+uint8_t checkSleep(void)
 {
-    uint8_t i;
-
-    DEBUG_PRINT(("RBuf "));
-    for (i = 0; i < sizeof(keyboardReport); i++)
+    if(usbSofCount == 0)
     {
-        DEBUG_PRINT(("%02x", keyboardReport[i]));
+        if((--sleepTimeOut == 0))
+        {
+            kbdsleepmode = 1;
+            sleepTimeOut = 5000;
+            led_sleep();
+        }
+    }else 
+    {
+        sleepTimeOut = 5000;
+//        led_restore();
+        usbSofCount = 0;
     }
-    DEBUG_PRINT(("\n"));
 }
-#endif
-
 uint8_t usbmain(void) {
     uint8_t i;
     uint8_t updateNeeded = 0;
     uint8_t idleCounter = 0;
     uint16_t interfaceCount = 0;
 	interfaceReady = 0;
-    configUpdated = 0
-
-    DEBUG_PRINT(("USB\n"));
-
+    configUpdated = 0;
 
     cli();
     usbInit();
@@ -791,7 +727,10 @@ uint8_t usbmain(void) {
     while (1) {
         // main event loop
 
-        if(interfaceReady == 0 && interfaceCount++ > 8000){
+
+        checkSleep();
+
+        if(interfaceReady == 0 && interfaceCount++ > 8000 && !kbdsleepmode){
 		   Reset_AVR();
 		   break;
 		}
@@ -803,30 +742,16 @@ uint8_t usbmain(void) {
         {
             if(--configUpdated == 0)
             {
-                eeprom_update_block(&hidData.data[0], EEPADDR_KBD_CONF, sizeof(kbdConf));
-                memcpy(&kbdConf, &hidData.data[0], sizeof(kbdConf));
-                eeprom_read_block(currentLayer, EEP_KEYMAP_ADDR(kbdConf.keymapLayerIndex), sizeof(currentLayer));
-
-                // RGB Buffer
-                //tinycmd_rgb_buffer(kbdConf.rgb_chain+1, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
-                tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
-                tinycmd_rgb_effect_speed(kbdConf.rgb_speed, TRUE);
-                tinycmd_rgb_set_preset(kbdConf.rgb_effect_index, (rgb_effect_param_type *)&kbdConf.rgb_effect_param[kbdConf.rgb_effect_index], TRUE);
-                tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, TRUE);
-                // RGB Effect
-
-                // LED Effect
-                tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
-                tinycmd_led_config_preset((uint8_t*)kbdConf.led_preset, TRUE);
+                led_restore();
                 configUpdated = 0;
             }
         }
         updateNeeded = scankey();   // changes?
         if (updateNeeded == 0)      //debounce
         {
-            
             continue;
         }
+        
         if (idleRate == 0)                  // report only when the change occured
         {
             if (cmpReportBuffer() == 0)     // exactly same status?
@@ -858,6 +783,12 @@ uint8_t usbmain(void) {
       
         if((updateNeeded & 0x01)  && usbInterruptIsReady())
         {
+            if (kbdsleepmode == 1)
+            {
+                led_restore();
+                kbdsleepmode = 0;
+                sleepTimeOut = 1000;
+            }
             usbSetInterrupt(keyboardReport, sizeof(keyboardReport));
             saveReportBuffer();
         }

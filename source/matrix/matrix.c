@@ -131,7 +131,12 @@ uint8_t processPushedFNkeys(uint8_t keyidx)
     if(keyidx >= K_LED0 && keyidx <= K_LED3)
     {
         kbdConf.led_preset_index = keyidx - K_LED0;
-        led_mode_init();
+
+        eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
+        // LED Effect
+        tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
+        tinycmd_led_config_preset((uint8_t*)kbdConf.led_preset, TRUE);
+       
         retVal = 1;
     }else if(keyidx >= K_LFX && keyidx <= K_LARR)
     {
@@ -207,8 +212,10 @@ uint32_t scanRow(uint8_t row)
     vPinD = (~MATRIX_ROW_PIN2 & 0xf0) >> 4;    // MSB 4bit
     
     rowValue = (uint32_t)(vPinD) << 16 | (uint32_t)vPinB << 8 | (uint32_t)vPinA;
-//    if(tinyExist == 0)
+    if(tinyExist == 0)
         rowValue = rowValue & 0x0001FFFF;
+    else
+        rowValue = rowValue & 0x000FFFFF;
     return rowValue;
 }
 
@@ -251,8 +258,8 @@ uint8_t scanmatrix(void)
     
     if (scankeycntms == STANDBY_LOOP && kbdsleepmode == 0)   // 5min
     {
+        led_sleep();
         kbdsleepmode = 1;
-        ledmodeIndex = 4;       // hidden OFF index
     }
     
 
@@ -264,14 +271,7 @@ uint8_t scanmatrix(void)
       if(curMATRIX[row])
       {
          matrixState |= SCAN_DIRTY;
-         
          scankeycntms = 0;
-         if (kbdsleepmode == 1)
-         {
-             led_mode_init();
-             led_3lockupdate(gLEDstate);
-             kbdsleepmode = 0;
-         }
       }
  	}
 

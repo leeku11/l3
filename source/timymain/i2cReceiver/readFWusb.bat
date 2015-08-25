@@ -1,0 +1,1 @@
+avrdude -c usbasp -P USB -p attiny85 -U flash:r:main_read.hex:i 

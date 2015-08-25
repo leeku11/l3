@@ -429,6 +429,8 @@ typedef struct kbd_conf
     unsigned short rgb_limit;
     unsigned short rgb_speed;
     unsigned char matrix_debounce;
+    unsigned char sleeptimer;    
+    uint8_t padding[16];
 }kbd_configuration_t;
 
 
@@ -613,7 +615,7 @@ return 0;
     return 1;
 #endif
 
-#if 1       //write config
+#if 0      //write config
 
     // read current config
 
@@ -632,6 +634,10 @@ return 0;
     len = fread(pbuf, 1, fsize, fp);
     printf("read len = %d \n", len);
 
+    if(len <= 0)
+    {
+        return -1;
+    }
 	pkbdConf = (kbd_configuration_t *)pbuf;
 
 	for(i = 0; i< MAX_RGB_CHAIN; i++)		// prevent blinking
@@ -800,6 +806,41 @@ if (strtoi(argv[1], 10) == CMD_DEBUG)
 
         fclose(fp);
 #endif    
+
+
+
+#if 1       // read&write config
+   
+        FILE *fp = fopen("backup.bin", "wb");
+        int fsize;
+
+        int writeLen;
+        fseek(fp, 0, SEEK_END);         // 파일포인터를 파일의 끝으로 이동
+        fsize = ftell(fp);              // 현재 파일포인터를 읽으면 파일크기가 됨
+
+        fseek(fp, 0, SEEK_SET);         // 파일포인터를 파일의 끝으로 이동
+
+        readConfg(buffer);
+
+        writeLen = fwrite(buffer, 1, 120, fp);
+
+        fclose(fp);
+        
+        pkbdConf = (kbd_configuration_t *)buffer;
+
+        if(strcasecmp((char *)argv[1], "rgblimit") == 0)
+        {
+            pkbdConf->rgb_limit = atoi(argv[2]);
+            printf("rgb_limit = %d \n",  pkbdConf->rgb_limit );
+        }else
+        {
+            printf("not supported command ! \n");
+        }
+        setConfig(buffer);
+    
+        return 1;
+    
+#endif
 
 
     return 0;

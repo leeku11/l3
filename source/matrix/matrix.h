@@ -4,7 +4,7 @@
 #define SCAN_CHANGED        (SCAN_PUSHED | SCAN_RELEASED)
 
 
-#define STANDBY_LOOP    130000  // scan matix entry is 2.2msec @ 12Mh x-tal : 5min
+#define STANDBY_LOOP    13000  // scan matix entry is 2.2msec @ 12Mh x-tal : 5min
 #define SWAP_TIMER  0x400
 #define KEYLOCK_TIMER  0x600
 #define KEYLOCK_COUNTER_START 0x8000

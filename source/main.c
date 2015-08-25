@@ -1,7 +1,3 @@
-/* Copyright Jamie Honan, 2001.  Distributed under the GPL.
-   This program comes with ABSOLUTELY NO WARRANTY.
-   See the file COPYING for license details.
-   */
 #define KEYBD_EXTERN
 #include "global.h"
 #include "timer.h"
@@ -37,94 +33,47 @@ unsigned char localBuffer[0x4B];
 unsigned char localBufferLength;
 #endif // SUPPORT_I2C
 
+#define CHECK_U (~PINA & 0x80)  // row2-col7 => U
+#define CHECK_P (~PINB & 0x04)  // row2-col10 => P
+
 extern uint8_t usbmain(void);
 extern uint8_t ps2main(void);
 
+//global configuration strored in E2P
 kbd_configuration_t kbdConf;
-
-
-#ifdef DEBUG
-void enable_printf(void)
-{
-	stdout = &mystdout;
-    DDRD |= 0x01;
-
-	UBRRH = (UBRR>>8);
-	UBRRL = UBRR;
-    
-	UCSRA = 0x00;									   // asynchronous normal mode
-	UCSRB = 0x08;									   // Tx enable, 8 data
-	UCSRC = 0x86;									   // no parity, 1 stop, 8 data
-}
-#else
-void enable_printf(void)
-{
-}
-#endif
-
-
-
 
 int portInit(void)
 {
-//  initialize matrix ports - cols, rows
-//    PA       0:7      col      (6, 7 reserved)
-//    PG       0:1      row 0, 1
-//               2         N/A
-//               3         N/A
-//    PC       0:7      row 2:9
-//    PF        0:7      row 10:17
-    
-//    PB
-//    0      INDI0
-//    1      SCK (ISP)
-//    2      INDI1
-//    3      INDI2
-//    4(OC0)       LED_PIN_WASD
-//    5(OC1A)     LED_PIN_PAD
-//    6(OC1B)     LED_PIN_PRT
-//    7(OC1C)     LED_VESEL
-    
-//    PD
-//    0(INT0)      D+
-//    1(INT1)      D-
-//    2               N/A
-//    3               LED_NUM
-//    4               LED_CAPS
-//    5               LED_SCR
-//    6               Zener Diode
-//    7               D+ pull-up register
-    
-//    PE
-//    0(PDI)         MOSI
-//    1(PDO)        MISO
-//    2                N/A
-//    3(OC3A)     LED_PIN_Fx
-//    4(OC3B)     LED_PIN_BASE
-//    5(OC3C)     LED_PIN_ESC
-//    6                N/A
-//    7                N/A
+/*
+PA  [0:7]   col[0:7]
+PB  [0:7]   col[8:15]
+PC  [0]     SCL
+    [1]     SDA
+    [2:6]   row[0:6]
+PD  [0]     USB D+- level shifter(high 3.3v, low 5v)
+    [1]     PS2 pull-up for CLK
+    [2]     CLK[D+]
+    [3]     DATA[D-]
+    [4:7]   col[16:19]
+*/
 
     
-    // signal direction : col -> row
+// signal direction : row -> col
+    PORTA   = 0xFF; // pull up
+    DDRA    = 0x00; // input
+       
+    PORTB   = 0xFF; // pull up
+    DDRB    = 0x00; // input
 
-//  Matrix
-    PORTA   = 0xFF; //  row
-    PORTB   = 0xFF; //  row
-    PORTC   = 0xFF; // LED5,6 off, COL[0-5] pull-up
+    PORTC   = 0xFF; // pull up
+    DDRC	= 0x00; // input
 
-    DDRA	= 0x00; // col
-    DDRB    = 0x00; // LED_VESEL, LED_PIN_PRT, LED_PIN_PAD, LED_PIN_WASD OUT        (11110000)
-    DDRC	= 0x00; // row 2, 3, 4, 5, 6, 7, 8, 9
-
-    PORTD   = 0xF1; // DPpull-up(Low), Zener(pull-up), LED_SCR, LED_CAPS, LED_NUM (0ff), D-(0), D+(0)
-    DDRD    = 0x03; // DPpull-up(OUT), Zener(OUT), LED_SCR, LED_CAPS, LED_NUM (OUT), D-(INPUT), D+(INPUT)
+    PORTD   = 0xF1; // col(pull up) D-(pull up) D+(pull up) PS2PU(low) USBSHIFT(high)
+    DDRD    = 0x03; // 
 
     return 0;
 }
 
-#define CHECK_U (~PINA & 0x80)  // col2-row7 => U
-#define CHECK_P (~PINB & 0x04)  // col2-row10 => P
 
 #ifdef SUPPORT_I2C
 // slave operations
@@ -187,7 +136,7 @@ void initI2C(void)
 int8_t setPS2USB(void)
 {
     uint8_t cur_usbmode = kbdConf.ps2usb_mode;
-    DDRC  |= BV(4);        //  col2
+    DDRC  |= BV(4);        //  row2
     PORTC &= ~BV(4);       //
 
     _delay_us(10);
@@ -207,23 +156,23 @@ int8_t setPS2USB(void)
     /* control zener diode for level shift signal line
         1 : TR on - 3v level
         0 : TR off - 5v level
-        */
+    */
     
     if (cur_usbmode)
     {
         sbi(USB_LEVEL_SHIFT_PORT, USB_LEVEL_SHIFT_PIN);     // pullup
         cbi(USB_LEVEL_SHIFT_DDR, USB_LEVEL_SHIFT_PIN);      // INPUT
 
-        sbi(PS2_CLK_PULLUP_DDR, PS2_CLK_PULLUP_PIN);      // OUT
-        cbi(PS2_CLK_PULLUP_PORT, PS2_CLK_PULLUP_PIN);     // drive 0
+        sbi(PS2_CLK_PULLUP_DDR, PS2_CLK_PULLUP_PIN);        // OUT
+        cbi(PS2_CLK_PULLUP_PORT, PS2_CLK_PULLUP_PIN);       // drive 0
     }
     else
     {
         sbi(USB_LEVEL_SHIFT_DDR, USB_LEVEL_SHIFT_PIN);      // OUTPUT
         cbi(USB_LEVEL_SHIFT_PORT, USB_LEVEL_SHIFT_PIN);     // drive 0
         
-        sbi(PS2_CLK_PULLUP_PORT, PS2_CLK_PULLUP_PIN);     // pullup
-        cbi(PS2_CLK_PULLUP_DDR, PS2_CLK_PULLUP_PIN);      // INPUT
+        sbi(PS2_CLK_PULLUP_PORT, PS2_CLK_PULLUP_PIN);       // pullup
+        cbi(PS2_CLK_PULLUP_DDR, PS2_CLK_PULLUP_PIN);        // INPUT
     }
     
     kbdConf.ps2usb_mode = cur_usbmode;    
@@ -233,7 +182,6 @@ int8_t setPS2USB(void)
 uint8_t establishSlaveComm(void)
 {
     uint8_t ret = 0;
-
 #ifdef SUPPORT_TINY_CMD
     uint16_t retry = 0;
 
@@ -260,30 +208,19 @@ uint8_t tiny_init(void)
     if(tinyExist)
     {
         // Init RGB Effect
-        tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
-        tinycmd_rgb_set_preset(kbdConf.rgb_effect_index, &kbdConf.rgb_effect_param[kbdConf.rgb_effect_index], TRUE); // RGB_EFFECT_BOOTHID
-        // now kbdConf.rgb_effect_index should be 0.
-        tinycmd_rgb_set_effect(kbdConf.rgb_effect_index, TRUE);
-        tinycmd_rgb_effect_speed(kbdConf.rgb_speed, TRUE);      // fast
-
-        // Init LED Effect
-        tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
-        tinycmd_led_config_preset((uint8_t*)kbdConf.led_preset, TRUE);
-
-
-        ret = 1;
+       led_restore();
+       ret = 1;
     }
     return ret;
 }
 
 void updateConf(void)
 {
-    eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
+    eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, 128);
 }
 
 
 #if 1
-
 ///////////////////SHOULD BE REMOVED ////////////////
 
 rgb_effect_param_type kbdRgbEffectParam[RGB_EFFECT_MAX] = 
@@ -296,9 +233,9 @@ rgb_effect_param_type kbdRgbEffectParam[RGB_EFFECT_MAX] =
     { RGB_EFFECT_BASIC, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_LOOP
 };
 
-static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_FADING, LED_EFFECT_FADING_PUSH_ON},
-                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSHED_LEVEL, LED_EFFECT_PUSH_ON},
-                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_PUSH_OFF, LED_EFFECT_BASECAPS}};
+static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS},
+                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS},
+                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS}};
 
 #ifdef L3_ALPhas
 static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =         
@@ -313,11 +250,15 @@ static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =
 
 #else
 static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =         
-        {{0, 250, 0},  {100, 250,0},  {250, 250, 0}, {250, 0, 0},   {0, 0, 250},   {0, 50, 250}, {0, 250, 250},
-        {0, 250, 250}, {0, 50, 250},  {0, 0, 250},   {250, 0, 0},   {250, 250, 0}, {100, 250,0}, {0, 250, 0},
-        {0, 250, 100}, {0, 250, 100}, {0, 250, 100}, {0, 250, 100}, {0, 250, 100}, {0, 250, 100}};
+    {{250, 250, 0}, 
+     {0, 250, 0},   {100, 250,0},  {250, 250, 0}, {250, 0, 0}, {0, 0, 250}, {0, 50, 250},  {0, 250, 250}, 
+     {250, 250, 0},
+     {0, 250, 250}, {0, 50, 250},  {0, 0, 250}, {250, 0, 0}, {250, 250, 0}, {100, 250,0},  {0, 250, 0}, 
+     {0, 250, 0}, {0, 250, 100}, {0, 250, 100},{0, 250, 100}
+    };
 
-#define RGB_CHAIN_NUM   14         
+
+#define RGB_CHAIN_NUM   20         
 #define DEFAULT_LAYER   0
 #endif    
 
@@ -325,12 +266,6 @@ static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =
 void kbdActivation(void)
 {
     uint8_t i;
-    
-
-
-    // TODO : LOAD to E2P
-
-    
     if(eeprom_read_byte(KBD_ACTIVATION) != KBD_ACTIVATION_BIT)
     {
         kbdConf.ps2usb_mode = 1;
@@ -340,10 +275,9 @@ void kbdActivation(void)
         kbdConf.led_preset_index = 1;
         memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
         kbdConf.rgb_effect_index = 3;
-        
 
         kbdConf.rgb_chain = RGB_CHAIN_NUM;
-        kbdConf.rgb_limit = 500;
+        kbdConf.rgb_limit = 260;
         kbdConf.rgb_speed = 500;
         kbdConf.matrix_debounce = 4;
         memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
@@ -370,32 +304,25 @@ void kbdActivation(void)
 
 void kbd_init(void)
 {
-
     kbdActivation();
         
     portInit();
     initI2C();
-    enable_printf();
-    eeprom_read_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
-
-    if(kbdConf.swapAltGui != 1)
-        kbdConf.swapAltGui = 0;    
-    if(kbdConf.swapCtrlCaps != 1)
-        kbdConf.swapCtrlCaps = 0; 
-    if(kbdConf.keymapLayerIndex >= MAX_LAYER)
-        kbdConf.keymapLayerIndex = 1;
-    
-    setPS2USB();
-
-    //   led_off(LED_PIN_Fx);
-    //   timerInit();
-    //   timer1PWMInit(8);
-    //   timer2PWMInit(8);
 
     timer0Init();
     timer0SetPrescaler(TIMER_CLK_DIV8);
 
+    eeprom_read_block(&kbdConf, EEPADDR_KBD_CONF, 128);
+    if(kbdConf.swapAltGui != 0)
+        kbdConf.swapAltGui = 1;    
+    if(kbdConf.swapCtrlCaps != 0)
+        kbdConf.swapCtrlCaps = 1; 
+    if(kbdConf.keymapLayerIndex >= MAX_LAYER)
+        kbdConf.keymapLayerIndex = 1;
+
+    setPS2USB();
     keymap_init();
+
     tinyExist = establishSlaveComm();
     if (tinyExist != 1)
     {
@@ -405,8 +332,6 @@ void kbd_init(void)
     
     updateConf();
 }
-
-
 
 int main(void)
 {
