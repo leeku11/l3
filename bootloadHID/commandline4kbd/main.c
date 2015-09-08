@@ -647,11 +647,83 @@ int readFromFile(char *filename, void* pbuf, int length)
 }
 
 
+typedef enum KBD_CONF_TYPE{
+   KBD_CONF_RGB_EFFET_INDEX = 0,
+   KBD_CONF_RGB_LIMIT,
+   KBD_CONF_RGB_SPEED,
+   KBD_CONF_LED_PRESET,
+   KBD_CONF_SLEEP_TIMER
+}KBD_CONF_TYPE_E;
+
+
 unsigned char buffer[512];
 
 unsigned char reportMatrix[] = {1, 1, 2, 2, 0, 0, 0, 0}; 
 unsigned char reportKeyCode[] = {1, 1, 2, 1, 0, 0, 0, 0}; 
 unsigned char jumpBootloader[] = {1, 1, 3, 0, 0, 0, 0, 0}; 
+
+int setConfg(char *param, char *value)
+{
+   int status;
+   int a;
+   
+   a = atoi(value);
+
+   status = readConfg(buffer);
+   if (status != ERR_NONE)
+      return status;
+
+   pkbdConf = (kbd_configuration_t *)buffer;
+
+  if(strcasecmp(param, "rgbeffect") == 0)
+   {
+      pkbdConf->rgb_effect_index = a;
+   }else if(strcasecmp(param, "rgblimit") == 0)
+   {
+      pkbdConf->rgb_limit = a;
+   }else if(strcasecmp(param, "rgbspeed") == 0)
+   {
+      pkbdConf->rgb_speed = a;
+   }else if(strcasecmp(param, "ledpreset") == 0)
+   {
+      pkbdConf->led_preset_index = a;
+   }else if(strcasecmp(param, "sleep") == 0)
+   {
+      pkbdConf->sleeptimer = a;
+   }else
+   {
+      status = ERR_INVALID_ARG;
+   }
+   if(status == ERR_NONE)
+   {
+      status = writeConfig(buffer);
+   }
+
+   return status;
+
+}
+
+int printcfg(char *pBuf, int valid)
+{
+   pkbdConf = (kbd_configuration_t *)pBuf;
+
+   printf("ps2usb_mode : %d \n", pkbdConf->ps2usb_mode);
+   printf("keymapLayerIndex : %d \n", pkbdConf->keymapLayerIndex);
+   printf("swapCtrlCaps : %d \n", pkbdConf->swapCtrlCaps);
+   printf("swapAltGui : %d \n", pkbdConf->swapAltGui);
+   printf("led_preset_index : %d \n", pkbdConf->led_preset_index);
+   printf("rgb_effect_index : %d \n", pkbdConf->rgb_effect_index);
+   printf("rgb_chain : %d \n", pkbdConf->rgb_chain);
+   printf("rgb_limit : %d \n", pkbdConf->rgb_limit);
+   printf("rgb_speed : %d \n", pkbdConf->rgb_speed);
+   printf("matrix_debounce : %d \n", pkbdConf->matrix_debounce);
+   printf("sleeptimer : %d \n", pkbdConf->sleeptimer);
+
+   printf("sizeof kdbConf = %d\n", sizeof(kbdConf));
+   return ERR_NONE;
+}
+
+
 
 int main(int argc, char **argv)
 {
@@ -676,6 +748,22 @@ int main(int argc, char **argv)
          status = ERR_INVALID_ARG;
       }
 
+   }else if(strcasecmp((char *)argv[1], "printcfg") == 0)
+   {
+      if (argv[2] != NULL)
+      {
+         status = readFromFile(argv[2], pbuf,128);
+      }else
+      {
+         status = readConfg(pbuf);
+      }
+      if(status == ERR_NONE)
+      {
+         status = printcfg(pbuf, 1);
+      }else
+      {
+         return ERR_INVALID_ARG;
+      }
    }else if(strcasecmp((char *)argv[1], "readcfg") == 0)
    {
       if (argv[2] == NULL)
@@ -715,6 +803,13 @@ int main(int argc, char **argv)
          status = writeKeymap(pbuf);
       }
 
+   }else if(strcasecmp((char *)argv[1], "set") == 0)
+   {
+      if (argv[2] == NULL)
+              return ERR_INVALID_ARG;
+        
+        status = setConfg(argv[2], argv[3]);
+
    }else
    {
       printf("USAGE : l3cmd [cmd] [filename]\n");
@@ -722,315 +817,4 @@ int main(int argc, char **argv)
    }
    printf("status = %d\n", status);
 }
-
-
-#if 0
-
-int main(int argc, char **argv)
-{
-char    *file = NULL;
-char    a = 0, i = 0;
-volatile int     sleep = 0xFFFF;
-
-int len;
-#if 0
-    if(argc < 2){
-        printUsage(argv[0]);
-        return 1;
-    }
-    if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
-        printUsage(argv[0]);
-        return 1;
-    }
-    if(strcmp(argv[1], "-r") == 0){
-        leaveBootLoader = 1;
-        if(argc >= 3){
-            file = argv[2];
-        }
-    }else{
-        file = argv[1];
-    }
-//    startAddress = sizeof(dataBuffer);
-//    endAddress = 0;
-    if(file != NULL){   // an upload file was given, load the data
-        memset(dataBuffer, -1, sizeof(dataBuffer));
-        if(parseIntelHex(file, dataBuffer))
-            return 1;
-        if(startAddress[0] == endAddress[0]){
-            fprintf(stderr, "No data in input file, exiting.\n");
-            return 0;
-        }
-    }
-#if 0
-{
-
-FILE    *output;
-output  = fopen("uploaddata.bin", "w");
-fwrite(dataBuffer, 1, sizeof(dataBuffer),output);
-fclose(output);
-return 0;
-}
-#endif
-    // if no file was given, endAddress is less than startAddress and no data is uploaded
-#endif
-
-#if 0       // read config
-
-
-    // read current config
-
-    FILE *fp = fopen(argv[1], "wb");
-    int fsize;
-    fseek(fp, 0, SEEK_END);         // 파일포인터를 파일의 끝으로 이동
-    fsize = ftell(fp);              // 현재 파일포인터를 읽으면 파일크기가 됨
-       
-    fseek(fp, 0, SEEK_SET);         // 파일포인터를 파일의 끝으로 이동
-
-    printf("fsize = %d \n", fsize);
-    char *pbuf;
-    int writeLen;
-    pbuf = buffer;
-    
-    readConfg(pbuf);
-
-    writeLen = fwrite(pbuf, 1, 120, fp);
-
-    fclose(fp);
-
-    return 1;
-#endif
-
-#if 0      //write config
-
-    // read current config
-
-    FILE *fp = fopen(argv[1], "rb");
-    int fsize;
-    fseek(fp, 0, SEEK_END);         // 파일포인터를 파일의 끝으로 이동
-    fsize = ftell(fp);              // 현재 파일포인터를 읽으면 파일크기가 됨
-       
-    fseek(fp, 0, SEEK_SET);         // 파일포인터를 파일의 끝으로 이동
-
-    printf("fsize = %d \n", fsize);
-    char *pbuf;
-    int writeLen;
-    pbuf = buffer;
-    
-    len = fread(pbuf, 1, fsize, fp);
-    printf("read len = %d \n", len);
-
-    if(len <= 0)
-    {
-        return -1;
-    }
-	pkbdConf = (kbd_configuration_t *)pbuf;
-
-	for(i = 0; i< MAX_RGB_CHAIN; i++)		// prevent blinking
-	{
-		if(pkbdConf->rgb_preset[i][0] == 255)
-			pkbdConf->rgb_preset[i][0] = 254;
-		if(pkbdConf->rgb_preset[i][1] == 255)
-			pkbdConf->rgb_preset[i][1] = 254;
-		if(pkbdConf->rgb_preset[i][2] == 255)
-			pkbdConf->rgb_preset[i][2] = 254;
-	}
-	
-    setConfig(pbuf);
-        
-
-    fclose(fp);
-
-    return 1;
-
-#endif
-
-
-
-#if 0       // setting config
-
-#if 0
-
-    kbdConf.ps2usb_mode = 1;
-    kbdConf.keymapLayerIndex = DEFAULT_LAYER;
-    kbdConf.swapCtrlCaps = 0;
-    kbdConf.swapAltGui = 0;
-    kbdConf.led_preset_index = 1;
-    memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
-    kbdConf.rgb_effect_index = 1;
-    
-    kbdConf.rgb_chain = MAX_RGB_CHAIN;
-    kbdConf.rgb_limit = 500;
-    kbdConf.rgb_speed = 500;
-    kbdConf.matrix_debounce = 4;
-    memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
-    memcpy(kbdConf.rgb_effect_param, kbdRgbEffectParam, sizeof(kbdRgbEffectParam));
-
-#else
-    // read current config
-    readConfg(&kbdConf);
-#endif
-#if 0   // rgbSet
-    unsigned char index = strtoi(argv[1], 10); 
-    kbdConf.rgb_effect_index= index % 6;
-
-    unsigned short speed = strtoi(argv[2], 10); 
-    kbdConf.rgb_speed = speed;
-
-    if(argc == 6)
-    {
-        unsigned char r = strtoi(argv[3], 10);    // R
-        unsigned char g = strtoi(argv[4], 10);    // G
-        unsigned char b = strtoi(argv[5], 10);    // B
-        setRGB( g, r, b);
-    }
-#endif
-
-#if 1
-    kbdConf.led_preset_index = 1;
-    tmpled_preset[1][3] =  strtoi(argv[1], 10)% 8; 
-    tmpled_preset[1][4] =  strtoi(argv[2], 10)% 8; 
-    memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
-
-#endif
-
-
-    setConfig(&kbdConf);
-    return 1;
-#endif
-
-
-
-
-#if 0 //def HIDDEBUG
-    HIDCMD_debug_t dbgCmd;
-    unsigned char buffer[8];
-
-
-if (strtoi(argv[1], 10) == CMD_DEBUG)
-    buffer[0] = 1;      // Report ID
-    buffer[1] = strtoi(argv[1], 10);    // Command
-    buffer[2] = strtoi(argv[2], 10);    // SubCmd
-    buffer[3] = strtoi(argv[3], 10);    // arg3
-    buffer[4] = strtoi(argv[4], 10);    // arg4
-    buffer[5] = strtoi(argv[5], 10);    // arg5
-    buffer[6] = strtoi(argv[6], 10);    // arg6
-    buffer[7] = strtoi(argv[7], 10);    // arg7
-    
-
-    sendDBGCmd(buffer);
-    return 1;
-#endif
-
-
-
-#if 0       // KEYMAP write
-    FILE *fp = fopen(argv[1], "rb");
-    int fsize;
-    fseek(fp, 0, SEEK_END);         // 파일포인터를 파일의 끝으로 이동
-    fsize = ftell(fp);              // 현재 파일포인터를 읽으면 파일크기가 됨
-       
-    fseek(fp, 0, SEEK_SET);         // 파일포인터를 파일의 끝으로 이동
-
-    printf("fsize = %d \n", fsize);
-    char *pbuf;
-    int readLen;
-    pbuf = buffer;
-    
-    readLen = fread(pbuf, 1, fsize, fp);
-    
-    printf("read len = %d \n", readLen);
-    cmdData.cmd = CMD_KEYMAP;
-        
-
-    for (i = 0; i < 4; i++)
-    {
-        cmdData.index = i;
-        memcpy(cmdData.data, &buffer[120*i], 120);
-        if(sendCmd(&cmdData))
-        {
-            fclose(fp);
-            return 1;
-
-        }
-    }
-    fclose(fp);
-#endif 
-
-
-#if 0       // KEYMAP read
-        FILE *fp = fopen(argv[1], "wb");
-        int fsize;
-        fseek(fp, 0, SEEK_END);         // 파일포인터를 파일의 끝으로 이동
-        fsize = ftell(fp);              // 현재 파일포인터를 읽으면 파일크기가 됨
-           
-        fseek(fp, 0, SEEK_SET);         // 파일포인터를 파일의 끝으로 이동
-    
-        printf("fsize = %d \n", fsize);
-        char *pbuf;
-        int writeLen;
-        pbuf = buffer;
-        
-//        readLen = fread(pbuf, 1, fsize, fp);
-        
-//        printf("read len = %d \n", readLen);
-        cmdData.cmd = CMD_KEYMAP;
-            
-    
-        for (i = 0; i < 4; i++)
-        {
-            cmdData.index = i;
-            if(receiveCmd(&cmdData))
-            {
-                fclose(fp);
-                return 1;
-    
-            }
-            memcpy(pbuf, cmdData.data, 120);
-            writeLen = fwrite(pbuf, 1, 120, fp);
-        }
-
-        fclose(fp);
-#endif    
-
-
-
-#if 1       // read&write config
-   
-        FILE *fp = fopen("backup.bin", "wb");
-        int fsize;
-
-        int writeLen;
-        fseek(fp, 0, SEEK_END);         // 파일포인터를 파일의 끝으로 이동
-        fsize = ftell(fp);              // 현재 파일포인터를 읽으면 파일크기가 됨
-
-        fseek(fp, 0, SEEK_SET);         // 파일포인터를 파일의 끝으로 이동
-
-        readConfg(buffer);
-
-        writeLen = fwrite(buffer, 1, 120, fp);
-
-        fclose(fp);
-        
-        pkbdConf = (kbd_configuration_t *)buffer;
-
-        if(strcasecmp((char *)argv[1], "rgblimit") == 0)
-        {
-            pkbdConf->rgb_limit = atoi(argv[2]);
-            printf("rgb_limit = %d \n",  pkbdConf->rgb_limit );
-        }else
-        {
-            printf("not supported command ! \n");
-        }
-        setConfig(buffer);
-    
-        return 1;
-    
-#endif
-
-
-    return 0;
-}
-#endif
-/* ------------------------------------------------------------------------- */
-
 

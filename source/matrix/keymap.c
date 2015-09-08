@@ -31,6 +31,7 @@ const uint8_t PROGMEM keycode_set2[MAX_KEY] =	{
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00
 };
+#if 0
 
 // key information for each keys
 uint8_t KFLA[MAX_KEY];
@@ -46,8 +47,8 @@ const uint8_t PROGMEM keycode_set2_makeonly[4] =
 const uint8_t PROGMEM keycode_set2_make_break[4] =
 { 	K_POWER, K_SLEEP, K_WAKE,
 	K_NONE };
-
-const uint8_t PROGMEM keycode_set2_extend[46] =
+#endif
+const uint8_t keycode_set2_extend[46] =
 {	K_LGUI, K_RCTRL, K_RGUI, K_RALT, K_APPS, K_PRNSCR,
 	K_INSERT, K_HOME, K_PGUP, K_DEL, K_END, K_PGDN, 
 	K_UP, K_LEFT, K_RIGHT, K_DOWN, K_KP_SLASH, K_KP_ENTER,
@@ -55,10 +56,11 @@ const uint8_t PROGMEM keycode_set2_extend[46] =
 	K_WWW_BACK, K_WWW_FORWARD, K_WWW_STOP, K_WWW_REFRESH, K_WWW_FAVORITE, K_NEXT_TRK,
 	K_PREV_TRK, K_STOP, K_PLAY, K_MUTE, K_VOL_UP, K_VOL_DOWN,
 	K_MEDIA_SEL, K_CALC, K_MYCOM, K_SCREENSAVE, K_REC, K_REWIND,
-	K_MINIMIZE, K_EJECT, K_NONE, K_NONE };
+	K_MINIMIZE, K_EJECT, K_NONE};
 
+#if 0
 const uint8_t PROGMEM keycode_set2_proc_shift[16] = 
 {
 	K_INSERT, K_DEL, K_HOME, K_END, K_PGUP, K_PGDN, K_LGUI, K_RGUI, K_APPS,
  	K_LEFT, K_RIGHT, K_UP, K_DOWN, K_KP_SLASH, K_NONE, K_NONE };
-
+#endif

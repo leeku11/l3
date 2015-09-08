@@ -136,5 +136,5 @@ all:
 	mv *.map $(TRG)
 	cp *.bat $(TRG)
 	cp bootloadHID_l3.exe $(TRG)
-	cp sendHIDCmd.exe $(TRG)
+	cp l3cmd.exe $(TRG)
    

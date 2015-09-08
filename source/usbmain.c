@@ -356,7 +356,6 @@ void rxHIDCmd(void)
         case CMD_CONFIG:
             {
                 memcpy(&kbdConf, hidData.data, sizeof(kbdConf));
-                eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
                 configUpdated = 15;
             }
             break;
@@ -512,12 +511,12 @@ uint8_t usbFunctionWrite(uchar *data, uchar len)
         
         LEDstate = (data[0] & LED_NUM) | (data[0] & LED_CAPS) | (data[0] & LED_SCROLL);
 
-        if(kbdsleepmode == 1)
+        if(kbdsleepmode == LED_POWERDOWN)
         {
            led_restore();
-           kbdsleepmode = 0;
+           kbdsleepmode = LED_ACTIVE;
            sleepTimeOut = 5000;
-           scankeycntms = 0;
+           scankeycntms = SCAN_COUNT_IN_MIN * kbdConf.sleepTimerMin;
         }
 
 
@@ -687,27 +686,34 @@ uint8_t buildHIDreports(uint8_t keyidx)
 
 uint8_t checkSleep(void)
 {
+// Power down
     if(usbSofCount == 0)
     {
         if((--sleepTimeOut == 0))
         {
-            kbdsleepmode = 1;
-            sleepTimeOut = 5000;
+            kbdsleepmode = LED_POWERDOWN;
+            sleepTimeOut = 1000;
             led_sleep();
         }
     }else 
     {
-        sleepTimeOut = 5000;
-//        led_restore();
+        sleepTimeOut = 1000;
         usbSofCount = 0;
     }
+// Timer Sleep   
+    if ((--scankeycntms == 0) && (kbdsleepmode == LED_ACTIVE))   // 5min
+    {
+        led_sleep();
+        kbdsleepmode = LED_SLEEP;
+    }
+
 }
 uint8_t usbmain(void) {
     uint8_t i;
     uint8_t updateNeeded = 0;
     uint8_t idleCounter = 0;
     uint16_t interfaceCount = 0;
-	interfaceReady = 0;
+	 interfaceReady = 0;
     configUpdated = 0;
 
     cli();
@@ -727,10 +733,9 @@ uint8_t usbmain(void) {
     while (1) {
         // main event loop
 
-
         checkSleep();
 
-        if(interfaceReady == 0 && interfaceCount++ > 8000 && !kbdsleepmode){
+        if(interfaceReady == 0 && interfaceCount++ > 8000 && (kbdsleepmode != LED_POWERDOWN)){
 		   Reset_AVR();
 		   break;
 		}
@@ -742,6 +747,8 @@ uint8_t usbmain(void) {
         {
             if(--configUpdated == 0)
             {
+                eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
+                keymap_init();
                 led_restore();
                 configUpdated = 0;
             }
@@ -783,14 +790,17 @@ uint8_t usbmain(void) {
       
         if((updateNeeded & 0x01)  && usbInterruptIsReady())
         {
-            if (kbdsleepmode == 1)
-            {
-                led_restore();
-                kbdsleepmode = 0;
-                sleepTimeOut = 1000;
-            }
+        
             usbSetInterrupt(keyboardReport, sizeof(keyboardReport));
             saveReportBuffer();
+            if (kbdsleepmode == LED_SLEEP)
+            {
+                led_restore();
+               kbdsleepmode = LED_ACTIVE;
+            }else
+            {
+               scankeycntms = (uint32_t)SCAN_COUNT_IN_MIN * (uint32_t)kbdConf.sleepTimerMin;
+            }
         }
 
         if((updateNeeded & 0x04)  && usbInterruptIsReady3())

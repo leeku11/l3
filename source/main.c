@@ -25,7 +25,7 @@
 #include "i2c.h"        // include i2c support
 #include "tinycmdapi.h"
 
-#define TINY_DETECT_RETRY        10
+#define TINY_DETECT_RETRY        50
 
 // local data buffer
 uint8_t tinyExist = 1;
@@ -38,6 +38,7 @@ unsigned char localBufferLength;
 
 extern uint8_t usbmain(void);
 extern uint8_t ps2main(void);
+extern uint32_t scankeycntms;
 
 //global configuration strored in E2P
 kbd_configuration_t kbdConf;
@@ -190,7 +191,9 @@ uint8_t establishSlaveComm(void)
     while(ret == 0 && (retry++ < TINY_DETECT_RETRY))
     {
         // proving
+        _delay_ms(50);
         ret = tinycmd_ver(TRUE);
+        _delay_ms(50);
         if(ret)
         { 
             tinycmd_config(kbdConf.rgb_chain + 1, kbdConf.rgb_limit, TRUE);
@@ -205,12 +208,10 @@ uint8_t establishSlaveComm(void)
 uint8_t tiny_init(void)
 {
     uint8_t ret = 0;
-    if(tinyExist)
-    {
-        // Init RGB Effect
+
        led_restore();
        ret = 1;
-    }
+   
     return ret;
 }
 
@@ -280,6 +281,7 @@ void kbdActivation(void)
         kbdConf.rgb_limit = 260;
         kbdConf.rgb_speed = 500;
         kbdConf.matrix_debounce = 4;
+        kbdConf.sleepTimerMin = 30;
         memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
         memcpy(kbdConf.rgb_effect_param, kbdRgbEffectParam, sizeof(kbdRgbEffectParam));
         
@@ -313,23 +315,25 @@ void kbd_init(void)
     timer0SetPrescaler(TIMER_CLK_DIV8);
 
     eeprom_read_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
-    if(kbdConf.swapAltGui != 0)
+    if(kbdConf.swapAltGui & 0x01)
         kbdConf.swapAltGui = 1;    
-    if(kbdConf.swapCtrlCaps != 0)
+    if(kbdConf.swapCtrlCaps & 0x01)
         kbdConf.swapCtrlCaps = 1; 
     if(kbdConf.keymapLayerIndex >= MAX_LAYER)
         kbdConf.keymapLayerIndex = 1;
 
     setPS2USB();
     keymap_init();
+    scankeycntms = (uint32_t)SCAN_COUNT_IN_MIN * (uint32_t)kbdConf.sleepTimerMin;
 
     tinyExist = establishSlaveComm();
     if (tinyExist != 1)
     {
         DDRD |= 0xE0;           // DDRD [7:5] -> NCR
+    }else
+    {
+        tiny_init();
     }
-    tiny_init();
-    
     updateConf();
 }
 

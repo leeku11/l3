@@ -1,3 +1,3 @@
-sendHidCmd.exe 1 3 0 0 0 0 0
+l3cmd.exe cmd boot
 bootloadHID_l3.exe -r l3_finger.hex
 pause;

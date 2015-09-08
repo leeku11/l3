@@ -12,12 +12,12 @@
 #define EEPADDR_MACRO_SET           ((uint8_t *)0x80)    // 256-511 (1Byte x 52)
 #define EEPVAL_MACRO_BIT            (0xCA)                // 0xCA :macro is recorded 
 
-#define EEPADDR_KBD_CONF            ((void *)0x100)    // 512-767
+#define EEPADDR_KBD_CONF            ((void *)0x100)    // 256 - 128
 
-#define EEPADDR_KEYMAP_LAYER0       ((void *)0x200)    // 768 -895
-#define EEPADDR_KEYMAP_LAYER1       ((void *)0x280)   // 896 -1023
-#define EEPADDR_KEYMAP_LAYER2       ((void *)0x300)    // 1024 - 1151
-#define EEPADDR_KEYMAP_LAYER3       ((void *)0x380)    // 1152 - 1279
+#define EEPADDR_KEYMAP_LAYER0       ((void *)0x200)    // 512 - 128
+#define EEPADDR_KEYMAP_LAYER1       ((void *)0x280)    // 640 - 128
+#define EEPADDR_KEYMAP_LAYER2       ((void *)0x300)    // 768 - 128
+#define EEPADDR_KEYMAP_LAYER3       ((void *)0x380)    // 896 - 128
 
 #define EEPSIZE_KEYMAP              (0x80)
 
@@ -70,7 +70,7 @@ typedef struct kbd_conf
     uint16_t rgb_limit;
     uint16_t rgb_speed;
     uint8_t  matrix_debounce;
-    uint8_t sleeptimer;
+    uint8_t  sleepTimerMin;
 }kbd_configuration_t;
 
 #define MACRO_ADDR_START      0x4400     // 0x4400 ~ 0x6FFF  (7KBytes - 256B x 44)

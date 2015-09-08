@@ -26,9 +26,9 @@
 
 uint8_t macrobuffer[256] = {};
 
-const char PROGMEM macrostart[] = "MACRO record mode@";
-const char PROGMEM macroend[] = "@record done@";
-const char PROGMEM mresetstart[] = "MACRO erase";
+const char PROGMEM macrostart[] = "MACRO REC@";
+const char PROGMEM macroend[] = "@DONE@";
+const char PROGMEM mresetstart[] = "RESET";
 const char PROGMEM macroresetdone[]  = "done@";
 extern MODIFIERS modifierBitmap[];
 
@@ -573,14 +573,14 @@ void resetMacro(void)
 {
     uint8_t mIndex;
     
-    sendString((uint16_t) &mresetstart[0]);
+    sendString((uint16_t) &mresetstart);
     for (mIndex = 0; mIndex < MAX_MACRO_INDEX; mIndex++)
     {
       wdt_reset();
       eeprom_write_byte(EEPADDR_MACRO_SET+mIndex, (uint8_t)~(EEPVAL_MACRO_BIT));
       sendString((uint16_t) "-");
     }
-    sendString((uint16_t) &macroresetdone);
+    sendString((uint16_t) macroend);
 }
 
 
@@ -617,7 +617,7 @@ void recordMacro(uint8_t macrokey)
          debounceMATRIX[row][col] = -1;
       }
    }
-   sendString((uint16_t) &macrostart[0]);
+   sendString((uint16_t)macrostart);
 
    while(1)
    {
@@ -667,7 +667,7 @@ void recordMacro(uint8_t macrokey)
                      wdt_reset();
                      eeprom_write_byte(EEPADDR_MACRO_SET+mIndex, EEPVAL_MACRO_BIT);
                      wdt_reset();
-                     sendString((uint16_t) &macroend[0]);
+                     sendString((uint16_t) macroend);
                      return;
                   }
                   else

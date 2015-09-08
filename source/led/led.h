@@ -41,6 +41,11 @@ typedef enum
 
 #define PUSHED_LEVEL_MAX        20
 
+#define LED_ACTIVE         0
+#define LED_POWERDOWN      1
+#define LED_SLEEP          2
+
+
 extern uint8_t tinyExist;
 extern volatile uint8_t gLEDstate;     ///< current state of the LEDs
 extern uint8_t ledmode[LEDMODE_INDEX_MAX][LED_BLOCK_MAX];

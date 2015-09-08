@@ -33,6 +33,17 @@ unsigned char lastState;
 static uint8_t TYPEMATIC_DELAY=2;
 static long TYPEMATIC_REPEAT=10;
 
+uint8_t checkExtended(uint8_t keyidx)
+{
+   uint8_t i;
+
+	for(i=0; i< 46; i++)
+	{
+      if(keyidx == pgm_read_byte((uint16_t)(&keycode_set2_extend[i])))
+         return 1;
+	}
+   return 0;
+}
 
 // Queue operation -> push, pop
 void push(uint8_t item) {
@@ -118,50 +129,47 @@ void putKey(uint8_t keyidx, uint8_t isPushed)
 		loopCnt=0;
 		m_state = STA_NORMAL;
 
-		if(KFLA[keyidx]&KFLA_SPECIAL) {
-			switch(keyidx) {
-				case K_PRNSCR:
-					push(START_MAKE);
-					push(0xE0);
-					push(0x12);
-					push(0xE0);
-					push(0x7C);
-					push(END_MAKE);
-					push(SPLIT); // SPLIT is for make sure all key codes are transmitted before disturbed by RX
-					break;
-				case K_PAUSE:
-					push(NO_REPEAT);
-					push(0xE1);
-					push(0x14);
-					push(0x77);
-					push(0xE1);
-					push(0xF0);
-					push(0x14);
-					push(0xF0);
-					push(0x77);
-					push(SPLIT);
-					break;
-			}
-		}
-		else 
-		{
+		switch(keyidx)
+      {
+   		case K_PRNSCR:
+   			push(START_MAKE);
+   			push(0xE0);
+   			push(0x12);
+   			push(0xE0);
+   			push(0x7C);
+   			push(END_MAKE);
+   			push(SPLIT); // SPLIT is for make sure all key codes are transmitted before disturbed by RX
+   			break;
+   		case K_PAUSE:
+   			push(NO_REPEAT);
+   			push(0xE1);
+   			push(0x14);
+   			push(0x77);
+   			push(0xE1);
+   			push(0xF0);
+   			push(0x14);
+   			push(0xF0);
+   			push(0x77);
+   			push(SPLIT);
+   			break;
+         default:
             push(START_MAKE);
-            if(KFLA[keyidx]&KFLA_EXTEND) 
-            push(0xE0);
+            if(checkExtended(keyidx) == 1)
+				   push(0xE0);
             push(keyVal);
-
             push(END_MAKE);
             push(SPLIT);
-
-		}
-	}
-	else			// break code - key realeased
+            break;
+         
+         }
+      
+	}else			// break code - key realeased
 	{
 		if(lastMAKE_keyidx == keyidx)		// repeat is resetted only if last make key is released
 			lastMAKE_SIZE=0;
 
-		if(KFLA[keyidx]&KFLA_SPECIAL) {
-			switch(keyidx) {
+			switch(keyidx) 
+         {
 				case K_PRNSCR:
 					push(0xE0);
 					push(0xF0);
@@ -171,17 +179,15 @@ void putKey(uint8_t keyidx, uint8_t isPushed)
 					push(0x12);
 					push(SPLIT);
 					break;
-			}
-		}
-		else 
-		{
- 
-			if(KFLA[keyidx]&KFLA_EXTEND)
-				push(0xE0);
-			push(0xF0);
-			push(keyVal);
-			push(SPLIT);
-		}
+       
+            default:
+               if(checkExtended(keyidx) == 1)
+      			   push(0xE0);
+      			push(0xF0);
+      			push(keyVal);
+      			push(SPLIT);
+               break;
+		   }
 	}
 }
 
@@ -378,29 +384,29 @@ int processTX(void)
 
 uint8_t ps2main(void)
 {
-    int keyval=0;
-	 m_state = STA_WAIT_RESET;
-    cli();
+   int keyval=0;
+   m_state = STA_WAIT_RESET;
+   cli();
 
-    DEBUG_PRINT(("PS/2\n"));
- 
 
-	kbd_init_ps2();
-    
-    wdt_enable(WDTO_2S);
-    sei();
+   kbd_init_ps2();
 
-	while(1) {
-        
-        wdt_reset();
-													// check that every key code for single keys are transmitted
-		if ((kbd_flags & FLA_RX_BYTE) && (keyval==SPLIT || isEmpty())) {     // pokud nastaveny flag prijmu bytu, vezmi ho a zanalyzuj
-			// pokud law, the flag setting apart, take it and zanalyzuj
-            processRX();
-		}
-		if (kbd_flags & FLA_TX_OK) {   // pokud flag odesilani ok -> if the flag sent ok
-            keyval = processTX();
-		}
-	}
-    return 0;
+   wdt_enable(WDTO_2S);
+   sei();
+
+   while(1)
+   {
+      wdt_reset();
+      // check that every key code for single keys are transmitted
+      if ((kbd_flags & FLA_RX_BYTE) && (keyval==SPLIT || isEmpty())) 
+      {     // pokud nastaveny flag prijmu bytu, vezmi ho a zanalyzuj
+         // pokud law, the flag setting apart, take it and zanalyzuj
+         processRX();
+      }
+      if (kbd_flags & FLA_TX_OK)
+      {   // pokud flag odesilani ok -> if the flag sent ok
+         keyval = processTX();
+      }
+   }
+   return 0;
 }
