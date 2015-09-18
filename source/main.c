@@ -26,22 +26,45 @@
 #include "tinycmdapi.h"
 
 #define TINY_DETECT_RETRY        50
+#define RGB_CHAIN_NUM   20
+#define DEFAULT_LAYER   0
 
 // local data buffer
 uint8_t tinyExist = 1;
-unsigned char localBuffer[0x4B];
-unsigned char localBufferLength;
+uint8_t localBuffer[0x4B];
+uint8_t localBufferLength;
 #endif // SUPPORT_I2C
-
-#define CHECK_U (~PINA & 0x80)  // row2-col7 => U
-#define CHECK_P (~PINB & 0x04)  // row2-col10 => P
 
 extern uint8_t usbmain(void);
 extern uint8_t ps2main(void);
 extern uint32_t scankeycntms;
 
 //global configuration strored in E2P
-kbd_configuration_t kbdConf;
+kbd_configuration_t kbdConf = 
+{
+    1,                  // ps2usb_mode
+    DEFAULT_LAYER,      // keymapLayerIndex
+    0,                  // swapCtrlCaps
+    0,                  // swapAltGui
+    0,                  // led_preset_index
+    {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS}, //led_preset
+     {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS},
+     {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS}},
+    3,                  // rgb_effect_index
+    RGB_CHAIN_NUM,      // rgb_chain
+    {{0, 250, 250}, {0, 250, 250},{0, 250, 100}, {0, 250, 250}, {0, 50, 250},  {0, 0, 250}, {250, 0, 0}, {250, 250, 0}, {100, 250,0},  {0, 250, 0}, // rgb_preset
+     {0, 250, 0}, {0, 250, 0},   {100, 250,0},  {250, 250, 0}, {250, 0, 0}, {0, 0, 250}, {0, 50, 250},  {0, 250, 250}, {0, 250, 100}, {0, 250, 100}}, 
+    {{ RGB_EFFECT_BOOTHID, 0, 0, 0 },                                                           // RGB_EFFECT_BOOTHID
+     { RGB_EFFECT_FADE_BUF, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },                     // RGB_EFFECT_FADE_BUF
+     { RGB_EFFECT_FADE_LOOP, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },                    // RGB_EFFECT_FADE_LOOP
+     { RGB_EFFECT_HEARTBEAT_BUF, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL }, // RGB_EFFECT_HEARTBEAT_BUF
+     { RGB_EFFECT_HEARTBEAT_LOOP, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },// RGB_EFFECT_HEARTBEAT_LOOP
+     { RGB_EFFECT_BASIC, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL }},        // RGB_EFFECT_HEARTBEAT_LOOP
+    260,                // rgb_limit
+    500,                // rgb_speed
+    4,                  // matrix_debounce
+    30,                 // sleepTimerMin
+};
 
 int portInit(void)
 {
@@ -57,7 +80,6 @@ PD  [0]     USB D+- level shifter(high 3.3v, low 5v)
     [3]     DATA[D-]
     [4:7]   col[16:19]
 */
-
     
 // signal direction : row -> col
     PORTA   = 0xFF; // pull up
@@ -67,7 +89,7 @@ PD  [0]     USB D+- level shifter(high 3.3v, low 5v)
     DDRB    = 0x00; // input
 
     PORTC   = 0xFF; // pull up
-    DDRC	= 0x00; // input
+    DDRC	   = 0x00; // input
 
     PORTD   = 0xF1; // col(pull up) D-(pull up) D+(pull up) PS2PU(low) USBSHIFT(high)
     DDRD    = 0x03; // 
@@ -134,51 +156,6 @@ void initI2C(void)
 }
 #endif // SUPPORT_I2C
 
-int8_t setPS2USB(void)
-{
-    uint8_t cur_usbmode = kbdConf.ps2usb_mode;
-    DDRC  |= BV(4);        //  row2
-    PORTC &= ~BV(4);       //
-
-    _delay_us(10);
-
-    if (CHECK_U)   
-    {
-        cur_usbmode = 1;
-    }else if (CHECK_P)
-    {
-        cur_usbmode = 0;
-    }else
-    {
-        if (cur_usbmode > 1)
-            cur_usbmode = 1;    //default USB
-    }
-
-    /* control zener diode for level shift signal line
-        1 : TR on - 3v level
-        0 : TR off - 5v level
-    */
-    
-    if (cur_usbmode)
-    {
-        sbi(USB_LEVEL_SHIFT_PORT, USB_LEVEL_SHIFT_PIN);     // pullup
-        cbi(USB_LEVEL_SHIFT_DDR, USB_LEVEL_SHIFT_PIN);      // INPUT
-
-        sbi(PS2_CLK_PULLUP_DDR, PS2_CLK_PULLUP_PIN);        // OUT
-        cbi(PS2_CLK_PULLUP_PORT, PS2_CLK_PULLUP_PIN);       // drive 0
-    }
-    else
-    {
-        sbi(USB_LEVEL_SHIFT_DDR, USB_LEVEL_SHIFT_PIN);      // OUTPUT
-        cbi(USB_LEVEL_SHIFT_PORT, USB_LEVEL_SHIFT_PIN);     // drive 0
-        
-        sbi(PS2_CLK_PULLUP_PORT, PS2_CLK_PULLUP_PIN);       // pullup
-        cbi(PS2_CLK_PULLUP_DDR, PS2_CLK_PULLUP_PIN);        // INPUT
-    }
-    
-    kbdConf.ps2usb_mode = cur_usbmode;    
-    return cur_usbmode;
-}        
 
 uint8_t establishSlaveComm(void)
 {
@@ -205,15 +182,47 @@ uint8_t establishSlaveComm(void)
     return ret;    
 }  
 
-uint8_t tiny_init(void)
+int8_t setPS2USB(void)
 {
-    uint8_t ret = 0;
+    DDRC  |= BV(4);        //  row2
+    PORTC &= ~BV(4);       //
 
-       led_restore();
-       ret = 1;
-   
-    return ret;
+    _delay_us(10);
+
+    if (CHECK_U)   
+    {
+        kbdConf.ps2usb_mode = 1;
+    }else if (CHECK_P)
+    {
+        kbdConf.ps2usb_mode = 0;
+    }else
+    {
+        if (kbdConf.ps2usb_mode > 1)
+            kbdConf.ps2usb_mode = 1;    //default USB
+    }
+    /* control zener diode for level shift signal line
+        1 : TR on - 3v level
+        0 : TR off - 5v level
+    */
+    if (kbdConf.ps2usb_mode)
+    {
+        sbi(USB_LEVEL_SHIFT_PORT, USB_LEVEL_SHIFT_PIN);     // pullup
+        cbi(USB_LEVEL_SHIFT_DDR, USB_LEVEL_SHIFT_PIN);      // INPUT
+
+        sbi(PS2_CLK_PULLUP_DDR, PS2_CLK_PULLUP_PIN);        // OUT
+        cbi(PS2_CLK_PULLUP_PORT, PS2_CLK_PULLUP_PIN);       // drive 0
+    }
+    else
+    {
+        sbi(USB_LEVEL_SHIFT_DDR, USB_LEVEL_SHIFT_PIN);      // OUTPUT
+        cbi(USB_LEVEL_SHIFT_PORT, USB_LEVEL_SHIFT_PIN);     // drive 0
+        
+        sbi(PS2_CLK_PULLUP_PORT, PS2_CLK_PULLUP_PIN);       // pullup
+        cbi(PS2_CLK_PULLUP_DDR, PS2_CLK_PULLUP_PIN);        // INPUT
+    }
+    return kbdConf.ps2usb_mode;
 }
+
 
 void updateConf(void)
 {
@@ -223,85 +232,23 @@ void updateConf(void)
 
 #if 1
 ///////////////////SHOULD BE REMOVED ////////////////
-
-rgb_effect_param_type kbdRgbEffectParam[RGB_EFFECT_MAX] = 
-{
-    { RGB_EFFECT_BOOTHID, 0, 0, 0 },    // RGB_EFFECT_BOOTHID
-    { RGB_EFFECT_FADE_BUF, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_FADE_BUF
-    { RGB_EFFECT_FADE_LOOP, FADE_HIGH_HOLD, FADE_LOW_HOLD, FADE_IN_ACCEL },    // RGB_EFFECT_FADE_LOOP
-    { RGB_EFFECT_HEARTBEAT_BUF, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_BUF
-    { RGB_EFFECT_HEARTBEAT_LOOP, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_LOOP
-    { RGB_EFFECT_BASIC, HEARTBEAT_HIGH_HOLD, HEARTBEAT_LOW_HOLD, HEARTBEAT_IN_ACCEL },    // RGB_EFFECT_HEARTBEAT_LOOP
-};
-
-static uint8_t tmpled_preset[3][5] = {{LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS},
-                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS},
-                    {LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_NONE, LED_EFFECT_ALWAYS, LED_EFFECT_ALWAYS}};
-
-#ifdef L3_ALPhas
-static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =         
-        {{0, 250, 250}, {0, 250, 250},
-         {0, 250, 100}, {0, 250, 250}, {0, 50, 250},  {0, 0, 250}, {250, 0, 0}, {250, 250, 0}, {100, 250,0},  {0, 250, 0}, {0, 250, 0},
-         {0, 250, 0},   {100, 250,0},  {250, 250, 0}, {250, 0, 0}, {0, 0, 250}, {0, 50, 250},  {0, 250, 250}, {0, 250, 100}, {0, 250, 100}
-        };
-
-
-#define RGB_CHAIN_NUM   20
-#define DEFAULT_LAYER   2
-
-#else
-static uint8_t tmprgp_preset[MAX_RGB_CHAIN][3] =         
-    {{250, 250, 0}, 
-     {0, 250, 0},   {100, 250,0},  {250, 250, 0}, {250, 0, 0}, {0, 0, 250}, {0, 50, 250},  {0, 250, 250}, 
-     {250, 250, 0},
-     {0, 250, 250}, {0, 50, 250},  {0, 0, 250}, {250, 0, 0}, {250, 250, 0}, {100, 250,0},  {0, 250, 0}, 
-     {0, 250, 0}, {0, 250, 100}, {0, 250, 100},{0, 250, 100}
-    };
-
-
-#define RGB_CHAIN_NUM   20         
-#define DEFAULT_LAYER   0
-#endif    
-
-
 void kbdActivation(void)
 {
-    uint8_t i;
     if(eeprom_read_byte(KBD_ACTIVATION) != KBD_ACTIVATION_BIT)
     {
-        kbdConf.ps2usb_mode = 1;
-        kbdConf.keymapLayerIndex = DEFAULT_LAYER;
-        kbdConf.swapCtrlCaps = 0;
-        kbdConf.swapAltGui = 0;
-        kbdConf.led_preset_index = 1;
-        memcpy(kbdConf.led_preset, tmpled_preset, sizeof(kbdConf.led_preset));
-        kbdConf.rgb_effect_index = 3;
-
-        kbdConf.rgb_chain = RGB_CHAIN_NUM;
-        kbdConf.rgb_limit = 260;
-        kbdConf.rgb_speed = 500;
-        kbdConf.matrix_debounce = 4;
-        kbdConf.sleepTimerMin = 30;
-        memcpy(kbdConf.rgb_preset, tmprgp_preset, sizeof(kbdConf.rgb_preset));
-        memcpy(kbdConf.rgb_effect_param, kbdRgbEffectParam, sizeof(kbdRgbEffectParam));
-        
         updateConf();       // should be removed
-
 #if 0
         for(i = 0; i < 120; i++)
         {
-            eeprom_write_byte(EEPADDR_KEYMAP_LAYER0+i, pgm_read_byte(0x6300+i));
-            eeprom_write_byte(EEPADDR_KEYMAP_LAYER1+i, pgm_read_byte(0x6400+i));
-            eeprom_write_byte(EEPADDR_KEYMAP_LAYER2+i, pgm_read_byte(0x6500+i));
-            eeprom_write_byte(EEPADDR_KEYMAP_LAYER3+i, pgm_read_byte(0x6600+i));
+        eeprom_write_byte(EEPADDR_KEYMAP_LAYER0+i, pgm_read_byte(0x6300+i));
+        eeprom_write_byte(EEPADDR_KEYMAP_LAYER1+i, pgm_read_byte(0x6400+i));
+        eeprom_write_byte(EEPADDR_KEYMAP_LAYER2+i, pgm_read_byte(0x6500+i));
+        eeprom_write_byte(EEPADDR_KEYMAP_LAYER3+i, pgm_read_byte(0x6600+i));
         }
 #endif        
         eeprom_update_byte(KBD_ACTIVATION, KBD_ACTIVATION_BIT);
     }
-    
-    ///////////////////SHOULD BE REMOVED ////////////////
 }
-
 #endif
 
 void kbd_init(void)
@@ -332,7 +279,7 @@ void kbd_init(void)
         DDRD |= 0xE0;           // DDRD [7:5] -> NCR
     }else
     {
-        tiny_init();
+        led_restore();
     }
     updateConf();
 }

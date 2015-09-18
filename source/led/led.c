@@ -54,19 +54,18 @@ static uint16_t pushedLevelDuty[LED_BLOCK_MAX] = {0, 0, 0, 0, 0};
 
 void led_off(LED_BLOCK block)
 {
-    uint8_t i;
     switch(block)
     {
         case LED_PIN_NUMLOCK:
         case LED_PIN_CAPSLOCK:
         case LED_PIN_SCROLLOCK:
             *(ledport[block]) |= BV(ledpin[block]);
-            break;
+        break;
         case LED_PIN_BASE:
-//            tinycmd_led_level(PWM_CHANNEL_0, PWM_DUTY_MIN);
+            //tinycmd_led_level(PWM_CHANNEL_0, PWM_DUTY_MIN);
             break;
         case LED_PIN_WASD:
-//            tinycmd_led_level(PWM_CHANNEL_1, PWM_DUTY_MIN);
+            //tinycmd_led_level(PWM_CHANNEL_1, PWM_DUTY_MIN);
             break;                    
         default:
             return;
@@ -75,7 +74,6 @@ void led_off(LED_BLOCK block)
 
 void led_on(LED_BLOCK block)
 {
-    uint8_t i;
     switch(block)
     {
         case LED_PIN_NUMLOCK:
@@ -181,25 +179,22 @@ void led_mode_init(void)
     led_3lockupdate(gLEDstate);
 }
 
-uint8_t led_sleep_preset[3][5] ={LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF
-                                , LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF
-                                , LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF};
+uint8_t led_sleep_preset[3][5] ={{LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF}, 
+                                 {LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF}, 
+                                 {LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF, LED_EFFECT_OFF}};
 void led_sleep(void)
 {
     led_3lockupdate(0);
-    
-    tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
+    _delay_ms(1);
     tinycmd_led_config_preset((uint8_t*)led_sleep_preset, TRUE);
-
-        // RGB Effect
+    _delay_ms(1);
+    // RGB Effect
     tinycmd_rgb_all(0, 0, 0, 0, TRUE);
 }
+
 void led_restore(void)
 {
-    
     led_3lockupdate(gLEDstate);
-
-    
     _delay_ms(1);
     tinycmd_rgb_buffer(MAX_RGB_CHAIN, 0, (uint8_t *)kbdConf.rgb_preset, TRUE);
     _delay_ms(1);
@@ -211,11 +206,9 @@ void led_restore(void)
     // RGB Effect
     tinycmd_config(kbdConf.rgb_chain + 1, kbdConf.rgb_limit, TRUE);
     _delay_ms(1);
-
     // LED Effect
     tinycmd_led_set_effect(kbdConf.led_preset_index, TRUE);
-        _delay_ms(1);
+    _delay_ms(1);
     tinycmd_led_config_preset((uint8_t*)kbdConf.led_preset, TRUE);
-    
     _delay_ms(1);
 }

@@ -10,8 +10,8 @@
 #include <util/delay.h>     /* for _delay_ms() */
 
 extern uint8_t tinyExist;           // 1 : attiny85 is exist, 0 : not
-extern unsigned char localBuffer[0x4B]; // I2C_WRSIZE
-extern unsigned char localBufferLength;
+extern uint8_t localBuffer[0x4B]; // I2C_WRSIZE
+extern uint8_t localBufferLength;
 
 #define TARGET_ADDR     0xB0
 #define WAIT_RETRY      10

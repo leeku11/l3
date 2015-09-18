@@ -99,7 +99,7 @@ void clear(void) {
 	loopCnt=0;
 
 	for(i=0;i<MATRIX_MAX_COL;i++)
-		MATRIX[i] = 0x00;
+		oldMATRIX[i] = 0x00;
 }
 
 void tx_state(unsigned char x, unsigned char newstate)

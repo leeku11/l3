@@ -723,6 +723,22 @@ int printcfg(char *pBuf, int valid)
    return ERR_NONE;
 }
 
+int validateConfig(char *pbuf)
+{
+    int i, j;
+    pkbdConf = (kbd_configuration_t *)pbuf;
+
+    for (i=0; i < MAX_RGB_CHAIN; i++)
+    {
+        if(pkbdConf->rgb_preset[i][0] == 0xff)
+            pkbdConf->rgb_preset[i][0]--;
+        if(pkbdConf->rgb_preset[i][1] == 0xff)
+            pkbdConf->rgb_preset[i][1]--;
+        if(pkbdConf->rgb_preset[i][2] == 0xff)
+            pkbdConf->rgb_preset[i][2]--;
+    }
+}
+
 
 
 int main(int argc, char **argv)
@@ -781,6 +797,7 @@ int main(int argc, char **argv)
       status = readFromFile(argv[2], pbuf,128);
       if(status == ERR_NONE)
       {
+         status = validateConfig(pbuf);
          status = writeConfig(pbuf);
       }
    }else if(strcasecmp((char *)argv[1], "readkey") == 0)
@@ -816,5 +833,6 @@ int main(int argc, char **argv)
 
    }
    printf("status = %d\n", status);
+   return 0;
 }
 

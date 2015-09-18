@@ -29,7 +29,39 @@ uint8_t macrobuffer[256] = {};
 const char PROGMEM macrostart[] = "MACRO REC@";
 const char PROGMEM macroend[] = "@DONE@";
 const char PROGMEM mresetstart[] = "RESET";
-const char PROGMEM macroresetdone[]  = "done@";
+const char PROGMEM macroresetdone[]  = "@DONE@";
+uint8_t specialKey[28][3] = 
+    {{K_C,K_A,K_P},
+    {K_F,K_1,K_NONE},
+    {K_F,K_2,K_NONE},
+    {K_F,K_3,K_NONE},
+    {K_F,K_4,K_NONE},
+    {K_F,K_5,K_NONE},
+    {K_F,K_6,K_NONE},
+    {K_F,K_7,K_NONE},
+    {K_F,K_8,K_NONE},
+    {K_F,K_9,K_NONE},
+    {K_F,K_1,K_0},
+    {K_F,K_1,K_1},
+    {K_F,K_1,K_2},
+    {K_P,K_R,K_N},
+    {K_S,K_C,K_L},
+    {K_P,K_A,K_U},
+    {K_I,K_N,K_S},
+    {K_H,K_O,K_M},
+    {K_P,K_G,K_U},
+    {K_D,K_E,K_L},
+    {K_E,K_N,K_D},
+    {K_P,K_G,K_D},
+    {K_R,K_I,K_T},
+    {K_L,K_F,K_T},
+    {K_D,K_N,K_NONE},
+    {K_U,K_P,K_NONE},
+    {K_N,K_U,K_M},
+    {K_E,K_S,K_C}
+};
+
+
 extern MODIFIERS modifierBitmap[];
 
 
@@ -44,7 +76,11 @@ void usbSendReport(uint8_t mode, uint8_t key) {
     uint8_t repBuffer[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     repBuffer[0] = mode;
     repBuffer[2] = key;
-    while (!usbInterruptIsReady()); // wait
+    while (!usbInterruptIsReady())
+    {
+        usbPoll();
+        _delay_ms(1);
+    }; // wait
     usbSetInterrupt(repBuffer, sizeof(repBuffer)); // send
 }
 
@@ -238,7 +274,7 @@ void printModifier(uint8_t keytosend, uint8_t open)
 
    wdt_reset();
    
-   prtKey.mode = 0;
+   prtKey.mode = MOD_SHIFT_LEFT;
    switch(keytosend)
    {
       case K_LCTRL:
@@ -264,7 +300,7 @@ void printModifier(uint8_t keytosend, uint8_t open)
       case K_LGUI:
       case K_RGUI:
       {
-         prtKey.key = K_G;
+         prtKey.key = K_W;
          break;
       }
    }
@@ -277,14 +313,38 @@ void printModifier(uint8_t keytosend, uint8_t open)
       prtKey.key = K_RBR;
    }else
    {
-      
       prtKey.mode = MOD_SHIFT_LEFT;
       prtKey.key = K_BKSLASH;
    }
    sendKey(prtKey);
    clearKey();
+}
 
+void printSpecialKey(uint8_t keytosend)
+{
+    Key prtKey;
+    uint8_t index;
+    uint8_t i;
+    index = keytosend - K_CAPS;
+    if(keytosend == K_ESC)
+        index = 27;             // for "ESC" abnormal case.
+        
+    prtKey.mode = 0;
+    prtKey.key = K_LBR;
+    sendKey(prtKey);
 
+    for (i = 0; i < 3; i++)
+    {
+        wdt_reset();
+        prtKey.key = specialKey[index][i];
+        sendKey(prtKey);
+    }
+
+    prtKey.mode = 0;
+    prtKey.key = K_RBR;
+    sendKey(prtKey);
+    wdt_reset();
+    clearKey();
 }
 
 
@@ -392,7 +452,6 @@ void playMacroUSB(uint8_t macrokey)
             
             key.key = keyidx;
             sendKey(key);
-            
             wdt_reset();
             keyidx = pgm_read_byte(address++);
         }
@@ -405,7 +464,7 @@ void playMacroUSB(uint8_t macrokey)
     key.key = 0;
     sendKey(key);
 
-    led_mode_init();
+//    led_mode_init();
 }
 
 
@@ -605,7 +664,6 @@ void recordMacro(uint8_t macrokey)
    key.mode = 0;
       
    wdt_reset();
-
    
    cntKey(K_FN, 0x0000);
 
@@ -628,9 +686,9 @@ void recordMacro(uint8_t macrokey)
       // debounce cleared => compare last matrix and current matrix
       for(row = 0; row < MATRIX_MAX_ROW; row++)
       {
-         prev = MATRIX[row];
+         prev = oldMATRIX[row];
          cur  = curMATRIX[row];
-         MATRIX[row] = curMATRIX[row];
+         oldMATRIX[row] = curMATRIX[row];
          for(col = 0; col < MATRIX_MAX_COL; col++)
          {
             prevBit = (uint8_t)prev & 0x01;
@@ -676,11 +734,17 @@ void recordMacro(uint8_t macrokey)
                      if ((K_Modifiers < keyidx)  && (keyidx < K_Modifiers_end))
                      {
                         printModifier(keyidx, 1);
-                     }else
+                     }else if (((K_CAPS <= keyidx) && (keyidx <= K_NUMLOCK)) || (keyidx == K_ESC))
+                     {
+                        printSpecialKey(keyidx);
+                     }else if (keyidx < K_KP_EQUAL) 
                      {
                         key.key = macrobuffer[index];
                         sendKey(key);
                         clearKey();
+                     }else
+                     {
+                        index --;       // ignore other keys
                      }
 
                      if(index == 0x7F)

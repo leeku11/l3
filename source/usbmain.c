@@ -37,6 +37,7 @@ uint8_t reportMatrix = 0 ;
 report_extra_t extraReport;
 report_extra_t oldextraReport;
 static uint8_t idleRate = 0;        ///< in 4ms units
+static uint16_t cntIdelRate = 0;
 static uint8_t protocolVer = 1; ///< 0 = boot protocol, 1 = report protocol
 uint8_t expectReport = 0;       ///< flag to indicate if we expect an USB-report
 AppPtr_t Bootloader = (void *)BOOTLOADER_ADDRESS; 
@@ -436,6 +437,7 @@ uint8_t usbFunctionSetup(uint8_t data[8]) {
 
         else if (rq->bRequest == USBRQ_HID_SET_IDLE) {
             idleRate = rq->wValue.bytes[1];
+            cntIdelRate = idleRate *2; 
             if(idleRate > 0)    // not windows
             {
                kbdConf.swapAltGui = 1;
@@ -471,16 +473,7 @@ uint8_t usbFuncDebugCmdHandler(void)
 
             break;
         case HID_DEBUG_RGB: 
-            if(hidCmd.debug.arg3 < 20)
-            {
-                tinycmd_rgb_pos(hidCmd.debug.arg3, hidCmd.debug.arg4, hidCmd.debug.arg5, hidCmd.debug.arg6, TRUE);
-            }else if(hidCmd.debug.arg3 == 21)
-            {
-                tinycmd_rgb_range(hidCmd.debug.arg4, hidCmd.debug.arg5, hidCmd.debug.arg6, hidCmd.debug.arg7, 0, TRUE);
-            }else
-            {
-                tinycmd_rgb_all(1, hidCmd.debug.arg3, hidCmd.debug.arg4, hidCmd.debug.arg5, TRUE);
-            }
+
             break;
         case HID_DEBUG_KEYMAPER: 
             reportMatrix = hidCmd.debug.arg3;
@@ -706,14 +699,14 @@ uint8_t checkSleep(void)
         led_sleep();
         kbdsleepmode = LED_SLEEP;
     }
-
+    return kbdsleepmode;
 }
 uint8_t usbmain(void) {
-    uint8_t i;
+    uint8_t i, updated = 0;
     uint8_t updateNeeded = 0;
     uint8_t idleCounter = 0;
-    uint16_t interfaceCount = 0;
-	 interfaceReady = 0;
+    uint16_t interfaceCount = 2500; // 1cycle takes 2ms approximatly 
+    interfaceReady = 0;
     configUpdated = 0;
 
     cli();
@@ -724,22 +717,19 @@ uint8_t usbmain(void) {
         wdt_reset();
         _delay_ms(1);
     }
-
     usbDeviceConnect();
     sei();
-    
+
     wdt_enable(WDTO_2S);
 
-    while (1) {
-        // main event loop
-
+    while (1)       // main event loop
+    {
         checkSleep();
-
-        if(interfaceReady == 0 && interfaceCount++ > 8000 && (kbdsleepmode != LED_POWERDOWN)){
-		   Reset_AVR();
-		   break;
-		}
-
+        if((interfaceReady == 0) && !(--interfaceCount) && (kbdsleepmode != LED_POWERDOWN))
+        {
+            Reset_AVR();
+            break;
+        }
         wdt_reset();
         usbPoll();
 
@@ -747,23 +737,24 @@ uint8_t usbmain(void) {
         {
             if(--configUpdated == 0)
             {
-                eeprom_update_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
+                updateConf();
                 keymap_init();
                 led_restore();
                 configUpdated = 0;
             }
         }
-        updateNeeded = scankey();   // changes?
+        updateNeeded = scankey();   // scan matrix
+        
         if (updateNeeded == 0)      //debounce
         {
             continue;
         }
-        
+
         if (idleRate == 0)                  // report only when the change occured
         {
             if (cmpReportBuffer() == 0)     // exactly same status?
             {
-                updateNeeded &= ~(0x01);   // clear key report
+                updateNeeded &= ~(0x01);    // clear key report
             }
             if (bufcmp((uint8_t *)&oldextraReport, (uint8_t *)&extraReport, sizeof(extraReport)) == 0)
             {
@@ -771,47 +762,39 @@ uint8_t usbmain(void) {
             }
         }
 
-        if (TIFR & (1 << TOV0)) 
+        if((idleRate != 0) && (--cntIdelRate == 1))      // report if idleRate(4ms Unit) expired
         {
-            TIFR = (1 << TOV0); // reset flag
-            if (idleRate != 0) 
-            { // do we need periodic reports?
-                if(idleCounter > 4)
-                { // yes, but not yet
-                    idleCounter -= 5; // 22ms in units of 4ms
-                }else 
-                { // yes, it is time now
-                    updateNeeded |= 0x01;
-                    idleCounter = idleRate;
-                }
-            }
-        }
-        // if an update is needed, send the report
-      
-        if((updateNeeded & 0x01)  && usbInterruptIsReady())
-        {
-        
-            usbSetInterrupt(keyboardReport, sizeof(keyboardReport));
-            saveReportBuffer();
-            if (kbdsleepmode == LED_SLEEP)
-            {
-                led_restore();
-               kbdsleepmode = LED_ACTIVE;
-            }else
-            {
-               scankeycntms = (uint32_t)SCAN_COUNT_IN_MIN * (uint32_t)kbdConf.sleepTimerMin;
-            }
+            updateNeeded |= 1;
+            cntIdelRate = idleRate*2;                    // 1 loop = 2ms  
         }
 
+        // if an update is needed, send the report
+
+        if((updateNeeded & 0x01)  && usbInterruptIsReady())
+        {
+            usbSetInterrupt(keyboardReport, sizeof(keyboardReport));
+            saveReportBuffer();
+            updated = 1;
+        }
         if((updateNeeded & 0x04)  && usbInterruptIsReady3())
         {
             usbSetInterrupt3((uchar *)&extraReport, sizeof(extraReport));
             memcpy(&oldextraReport, &extraReport, sizeof(extraReport));
+            updated = 1;
         }
-
+        if (updated == 1)         // if any update?
+        {
+            if (kbdsleepmode == LED_SLEEP)
+            {
+                led_restore();
+                kbdsleepmode = LED_ACTIVE;
+            }else
+            {
+                scankeycntms = (uint32_t)SCAN_COUNT_IN_MIN * (uint32_t)kbdConf.sleepTimerMin;
+            }
+            updated = 0;
+        }
+         
     }
-
-    wdt_disable();
-	USB_INTR_ENABLE &= ~(1 << USB_INTR_ENABLE_BIT);
     return 0;
 }

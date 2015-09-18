@@ -25,6 +25,8 @@
 
 #define BOOTLOADER_ADDRESS 0x7000
 
+#define CHECK_U (~PINA & 0x80)  // row2-col7 => U
+#define CHECK_P (~PINB & 0x04)  // row2-col10 => P
 
 #define Reset_AVR() wdt_enable(WDTO_250MS); while(1) {}
 typedef void (*AppPtr_t) (void); 

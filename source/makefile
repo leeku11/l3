@@ -33,7 +33,7 @@ JUMPSTART = 0x7C00
 #  In other words, this is the file which contains your main() function.
 
 #	TRG = L3_ALPhas
-  TRG = L3_Finger
+  TRG = L3
 
 #put your C sourcefiles here 
 #  Here you must list any C source files which are used by your TRG file.

@@ -5,6 +5,7 @@
 
 
 #define SCAN_COUNT_IN_MIN    30000  // 1 loops tasks 2.1msec @ 12Mh x-tal : 1min
+
 #define SWAP_TIMER  0x400
 #define KEYLOCK_TIMER  0x600
 #define KEYLOCK_COUNTER_START 0x8000
@@ -46,7 +47,7 @@ typedef enum KEY_LAYER_NUM{
 }KEY_LAYER_NUM_E;
 
 
-extern uint32_t MATRIX[MATRIX_MAX_ROW];
+extern uint32_t oldMATRIX[MATRIX_MAX_ROW];
 extern uint32_t curMATRIX[MATRIX_MAX_ROW];
 extern int8_t debounceMATRIX[MATRIX_MAX_ROW][MATRIX_MAX_COL];
 extern uint8_t  currentLayer[MATRIX_MAX_ROW][MATRIX_MAX_COL];
