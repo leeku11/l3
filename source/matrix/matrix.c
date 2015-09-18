@@ -288,12 +288,14 @@ uint8_t cntKey(uint8_t keyidx, uint8_t clearmask)
         kbdConf.swapCtrlCaps &= 0x7F;
         updateConf();
     }
+#if 0
     if((cntLGui == SWAP_TIMER) && (cntLAlt == SWAP_TIMER) && (kbdConf.swapAltGui & 0x80))
     {
         kbdConf.swapAltGui ^= 1;
         kbdConf.swapAltGui &= 0x7F;
         updateConf();
     }
+#endif
     if(keyidx >= K_M01 && keyidx <= K_M48)
     {
          if(clearmask == 0x0000)
