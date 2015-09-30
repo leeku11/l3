@@ -211,12 +211,14 @@ uint8_t getLayer(uint8_t FNcolrow)
 
       tmp = scanRow(fn_row);
 
-      if(((tmp >> fn_col) & 0x00000001) || isFNpushed)
+      if((tmp >> fn_col) & 0x00000001) 
       {
          isFNpushed = kbdConf.matrix_debounce;
+      }
+      if (isFNpushed != 0)
+      {
          layerIndex = KEY_LAYER_FN;                // FN layer
       }
-
    }
    return layerIndex;
 }

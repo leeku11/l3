@@ -690,6 +690,9 @@ int setConfg(char *param, char *value)
    }else if(strcasecmp(param, "sleep") == 0)
    {
       pkbdConf->sleeptimer = a;
+   }else if(strcasecmp(param, "debounce") == 0)
+   {
+      pkbdConf->matrix_debounce = a;
    }else
    {
       status = ERR_INVALID_ARG;
