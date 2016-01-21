@@ -23,6 +23,7 @@
 #include "ps2main.h"
 #include "tinycmdapi.h"
 
+
 uint32_t scankeycntms;
 	
 // 17*8 bit matrix
@@ -31,7 +32,7 @@ uint32_t curMATRIX[MATRIX_MAX_ROW];
 int8_t debounceMATRIX[MATRIX_MAX_ROW][MATRIX_MAX_COL];
 uint8_t svlayer;
 uint8_t currentLayer[MATRIX_MAX_ROW][MATRIX_MAX_COL];
-uint8_t matrixFN[MAX_LAYER];           // (col << 4 | row)
+uint8_t matrixFN[MAX_LAYER][MAX_FN_PER_LAYER];           // (col << 4 | row)
 uint8_t kbdsleepmode = 0;              // 1 POWERDOWN, 2 LED SLEEP
 uint16_t macrokeypushedcnt;
 uint16_t ledkeypushedcnt;
@@ -52,33 +53,36 @@ uint8_t fn_row;
 static uint8_t gDirty;
 
 
-
 static uint8_t findFNkey(void)
 {
-   uint8_t col, row;
-   uint8_t keyidx;
-   uint8_t i;
-   for(i = 0; i < MAX_LAYER; i++)
-   {
-      eeprom_read_block(currentLayer, EEP_KEYMAP_ADDR(i), sizeof(currentLayer));
-      matrixFN[i] = 0xff;
-      for(row=0;row<MATRIX_MAX_ROW;row++)
-      {
-         for(col=0;col<MATRIX_MAX_COL;col++)
-         {
-            keyidx = currentLayer[row][col];
-            if(keyidx == K_FN)
+    uint8_t col, row;
+    uint8_t keyidx;
+    uint8_t i,j;
+    for(i = 0; i < MAX_LAYER; i++)
+    {
+        eeprom_read_block(currentLayer, EEP_KEYMAP_ADDR(i), sizeof(currentLayer));
+        for(j = 0; j < MAX_FN_PER_LAYER; j++)
+        {
+            matrixFN[i][j] = 0xff;
+        }
+        j = 0;
+        for(row=0;row<MATRIX_MAX_ROW;row++)
+        {
+            for(col=0;col<MATRIX_MAX_COL;col++)
             {
-               matrixFN[i] = row << 5 | col;
+                keyidx = currentLayer[row][col];
+                if((keyidx == K_FN) && (j < MAX_FN_PER_LAYER))
+                {
+                    matrixFN[i][j++] = row << 5 | col;
+                }
             }
-         }
-      }
+        }
 
-   }
-   fn_col = 0xff;
-   fn_row = 0xff;
-   eeprom_read_block(currentLayer, EEP_KEYMAP_ADDR(kbdConf.keymapLayerIndex), sizeof(currentLayer));
-   return 0;
+    }
+    fn_col = 0xff;
+    fn_row = 0xff;
+    eeprom_read_block(currentLayer, EEP_KEYMAP_ADDR(kbdConf.keymapLayerIndex), sizeof(currentLayer));
+    return 0;
 }
 
 
@@ -185,7 +189,7 @@ uint32_t scanRow(uint8_t row)
     // Col -> set only one port as input and all others as output low
     MATRIX_COL_DDR  = BV(row+MATRIX_COL_PIN0);        //  only target col bit is output and others are input
     MATRIX_COL_PORT &= ~(BV(row+MATRIX_COL_PIN0));   // only target col bit is LOW and other are pull-up
-    _delay_us(10);
+    _delay_us(20);
     vPinA = ~MATRIX_ROW_PIN0;
     vPinB = ~MATRIX_ROW_PIN1;
     vPinD = (~MATRIX_ROW_PIN2 & 0xf0) >> 4;    // MSB 4bit
@@ -211,11 +215,11 @@ uint8_t getLayer(uint8_t FNcolrow)
 
       tmp = scanRow(fn_row);
 
-      if((tmp >> fn_col) & 0x00000001) 
+      if(((tmp >> fn_col) & 0x00000001) &&(getReportBufferCnt()==0))
       {
          isFNpushed = kbdConf.matrix_debounce;
       }
-      if (isFNpushed != 0)
+      if ((isFNpushed > 0))
       {
          layerIndex = KEY_LAYER_FN;                // FN layer
       }
@@ -378,7 +382,7 @@ uint8_t swap_key(uint8_t keyidx)
     return keyidx;
 }
 
-
+extern uint8_t reportIndex; // keyboardReport[0] contains modifiers
 // return : key modified
 uint8_t scankey(void)
 {
@@ -389,19 +393,14 @@ uint8_t scankey(void)
     uint8_t matrixState = 0;
     uint8_t retVal = 0;
     uint8_t t_layer;
-
+    uint8_t i;
     matrixState = scanmatrix();
     if(matrixState != gDirty)
     {
         gDirty = matrixState;
         tinycmd_dirty(matrixState);
     }
-
-    if (matrixState == 0 && isFNpushed != 0) // release FN key whhen all the matrix comes nutral
-    {
-        isFNpushed--;
-    }
-
+ 
     //static int pushedLevel_prev = 0;
 
     /* LED Blinker */
@@ -410,9 +409,14 @@ uint8_t scankey(void)
     /* LED Fader */
     //led_fader();
 
-    clearReportBuffer();
 
-    t_layer = getLayer(matrixFN[kbdConf.keymapLayerIndex]);
+    for(i = 0; i < MAX_FN_PER_LAYER; i++) 
+    {
+        t_layer = getLayer(matrixFN[kbdConf.keymapLayerIndex][i]);
+        if(t_layer == KEY_LAYER_FN)
+            break;
+    }
+    clearReportBuffer();
 
     // debounce cleared => compare last matrix and current matrix
     for(row = 0; row < MATRIX_MAX_ROW; row++)
@@ -465,13 +469,13 @@ uint8_t scankey(void)
 
             if(kbdConf.ps2usb_mode)
             {
-            if(curBit)
-            {
-                if(debounceMATRIX[row][col]++ >= (uint8_t)kbdConf.matrix_debounce)
+                if(curBit)
                 {
-                    retVal = buildHIDreports(keyidx);
-                    debounceMATRIX[row][col] = (uint8_t)kbdConf.matrix_debounce*2;
-                }
+                    if(debounceMATRIX[row][col]++ >= (uint8_t)kbdConf.matrix_debounce)
+                    {
+                        retVal = buildHIDreports(keyidx);
+                        debounceMATRIX[row][col] = (uint8_t)kbdConf.matrix_debounce*2;
+                    }
                 }else
                 {
                     if(debounceMATRIX[row][col]-- >= (uint8_t)kbdConf.matrix_debounce)
@@ -514,6 +518,11 @@ uint8_t scankey(void)
                 }
             }
         }
+    }
+
+    if (getReportBufferCnt() == 0 && isFNpushed != 0) // release FN key whhen all the matrix comes nutral
+    {
+        isFNpushed--;
     }
 
     retVal |= 0x05;

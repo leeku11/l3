@@ -583,6 +583,11 @@ uint8_t clearReportBuffer(void)
     return 0;
 }
 
+uint8_t getReportBufferCnt(void)
+{   
+    return reportIndex-2;
+}
+
 uint8_t saveReportBuffer(void)
 {
     memcpy(oldReportBuffer, keyboardReport, sizeof(keyboardReport));

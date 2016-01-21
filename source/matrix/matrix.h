@@ -9,6 +9,7 @@
 #define SWAP_TIMER  0x400
 #define KEYLOCK_TIMER  0x600
 #define KEYLOCK_COUNTER_START 0x8000
+#define MAX_FN_PER_LAYER 4
 
 
 #define DEBOUNCE_MAX        4       ////4 /*4*/ 6           // 10 is 5ms at 12MHz XTAL
@@ -52,7 +53,7 @@ extern uint32_t curMATRIX[MATRIX_MAX_ROW];
 extern int8_t debounceMATRIX[MATRIX_MAX_ROW][MATRIX_MAX_COL];
 extern uint8_t  currentLayer[MATRIX_MAX_ROW][MATRIX_MAX_COL];
 
-extern uint8_t matrixFN[MAX_LAYER];           // (col << 4 | row)
+uint8_t matrixFN[MAX_LAYER][MAX_FN_PER_LAYER];           // (col << 4 | row)
 //extern uint8_t layer;
 extern uint8_t kbdsleepmode;
 

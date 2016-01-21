@@ -28,7 +28,7 @@
 
 extern uint8_t clearReportBuffer(void);
 extern uint8_t buildHIDreports(uint8_t keyidx);
-
+extern uint8_t getReportBufferCnt(void);
 
 extern uint8_t reportMatrix;
 
