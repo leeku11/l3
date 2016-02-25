@@ -122,12 +122,6 @@ uint8_t processPushedFNkeys(uint8_t keyidx)
     }else if(keyidx >= K_LFX && keyidx <= K_LARR)
     {
         retVal = 1;
-    }else if(keyidx >= K_L0 && keyidx <= K_L6)
-    {
-        kbdConf.keymapLayerIndex = keyidx - K_L0;
-        updateConf();
-        keymap_init();
-        retVal = 1;
     }else if(keyidx >= K_M01 && keyidx <= K_M52)
     {
         retVal = 1;
@@ -159,6 +153,12 @@ uint8_t processReleasedFNkeys(uint8_t keyidx)
     {
         kbdConf.led_preset_index = keyidx-K_LED0;
 //        led_mode_change(ledblock, ledmode[kbdConf.led_preset_index][ledblock]);
+        retVal = 1;
+    }else if(keyidx >= K_L0 && keyidx <= K_L6)
+    {
+        kbdConf.keymapLayerIndex = keyidx - K_L0;
+        updateConf();
+        keymap_init();
         retVal = 1;
     }else if(keyidx >= K_LFX && keyidx <= K_LARR)
     {

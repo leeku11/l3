@@ -781,7 +781,7 @@ int main(int argc, char **argv)
          status = printcfg(pbuf, 1);
       }else
       {
-         return ERR_INVALID_ARG;
+         status = ERR_INVALID_ARG;
       }
    }else if(strcasecmp((char *)argv[1], "readcfg") == 0)
    {
@@ -832,10 +832,11 @@ int main(int argc, char **argv)
 
    }else
    {
+      status = ERR_INVALID_ARG;
       printf("USAGE : l3cmd [cmd] [filename]\n");
 
    }
    printf("status = %d\n", status);
-   return 0;
+   return status;
 }
 
