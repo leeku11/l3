@@ -635,6 +635,19 @@ uint8_t cmpReportBuffer(void)
     return result;
 }
 
+void handleSpecialKey(uint8_t *keybuf, uint8_t size)
+{
+    uint8_t i;
+    if(keybuf[0] & (MOD_SHIFT_LEFT | MOD_SHIFT_RIGHT))	// change "ESC" to "~" while SHIFT 
+    {
+        for(i = 1; i < size; i++)
+        {
+            if(keybuf[i] == K_ESC)
+                keybuf[i] = K_HASH;
+        }
+    }
+}
+
 
 //extern void testTinyCmd(uint8_t keyidx);
 
@@ -777,6 +790,7 @@ uint8_t usbmain(void) {
 
         if((updateNeeded & 0x01)  && usbInterruptIsReady())
         {
+        	handleSpecialKey(keyboardReport, sizeof(keyboardReport));
             usbSetInterrupt(keyboardReport, sizeof(keyboardReport));
             saveReportBuffer();
             updated = 1;

@@ -305,18 +305,7 @@ char    *file = NULL;
             return 0;
         }
     }
-#if 0
-{
-
-FILE    *output;
-output  = fopen("uploaddata.bin", "w");
-fwrite(dataBuffer, 1, sizeof(dataBuffer),output);
-fclose(output);
-return 0;
-}
-#endif
     // if no file was given, endAddress is less than startAddress and no data is uploaded
-
 
     if(uploadData(dataBuffer))
         return 1;
