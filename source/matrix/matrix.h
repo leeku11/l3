@@ -4,11 +4,11 @@
 #define SCAN_CHANGED        (SCAN_PUSHED | SCAN_RELEASED)
 
 
-#define SCAN_COUNT_IN_MIN    30000  // 1 loops tasks 2.1msec @ 12Mh x-tal : 1min
+#define SCAN_COUNT_IN_MIN       30000  // 1 loops tasks 2.1msec @ 12Mh x-tal : 1min
 
-#define SWAP_TIMER  0x400
-#define KEYLOCK_TIMER  0x600
-#define KEYLOCK_COUNTER_START 0x8000
+#define SWAP_TIMER              0x400
+#define KEYLOCK_TIMER           0x600
+#define KEYLOCK_COUNTER_START   0x8000
 #define MAX_FN_PER_LAYER 4
 
 

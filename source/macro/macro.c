@@ -416,6 +416,10 @@ void playMacroUSB(uint8_t macrokey)
 
     mIndex = macrokey - K_M01;
     address = MACRO_ADDR_START + (0x100 * mIndex);
+    if(address >= (0x7000 - 0x100))
+    {
+        return;
+    }
 
     macroSET = eeprom_read_byte(EEPADDR_MACRO_SET+mIndex);
     if (macroSET != EEPVAL_MACRO_BIT)      // MACRO not recorded
@@ -655,7 +659,11 @@ void recordMacro(uint8_t macrokey)
    uint16_t address;
    mIndex = macrokey - K_M01;
    address = MACRO_ADDR_START + (0x100 * mIndex);
-    
+   if(address >= 0x7000)
+   {
+      sendString((uint16_t) macroend);
+      return;
+   }
    index = 0;
    page = 0;
 

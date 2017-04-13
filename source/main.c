@@ -259,8 +259,8 @@ void kbd_init(void)
     portInit();
     initI2C();
 
-    timer0Init();
-    timer0SetPrescaler(TIMER_CLK_DIV8);
+    //timer0Init();
+    //timer0SetPrescaler(TIMER_CLK_DIV8);
 
     eeprom_read_block(&kbdConf, EEPADDR_KBD_CONF, sizeof(kbdConf));
     if(kbdConf.swapAltGui & 0x01)

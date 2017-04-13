@@ -119,8 +119,13 @@ these macros are defined, the boot loader usees them.
 #define DDR_ROW0    DDRA
 #define PORT_ROW0   PORTA
 #define PIN_ROW0    PINA
+
 #define DDR_COL0    DDRC
 #define PORT_COL0   PORTC
+
+#define DDR_ROW16   DDRD
+#define PORT_ROW16  PORTD
+#define PIN_ROW16   PIND
 
 #define DDR_LED0    DDRD
 #define DDR_LED1    DDRD
@@ -200,22 +205,28 @@ static inline void  bootLoaderInit(void)
 
     DDR_ROW0  &= ~(1 << PINA0);     // PINA0(row0) input
     PORT_ROW0 |= (1 << PINA0);      // PINA0(pullUP)
-    DDR_COL0  |= (1 << PINC3);      // PINB0(column0) output
-    PORT_COL0 &= ~(1 << PINC3);     // drive low
+
+    DDR_ROW16  &= ~(1 << PIND4);     // PIND4(row16) input
+    PORT_ROW16 |= (1 << PIND4);      // PIND4(pullUP)
+    
+    DDR_COL0  |= ((1 << PINC3) | (1 << PINC1));      // PINB0(column0) output
+    PORT_COL0 &= ~((1 << PINC3) | (1 << PINC1));     // drive low
 }
 
 //#define bootLoaderCondition()   ((PIND & (1 << 3)) == 0)   /* True if jumper is set */
 static inline uint8_t bootLoaderCondition() {
-	prevState = PIN_ROW0 & (1 << PINA0);
+	prevState = ((PIN_ROW0 & (1 << PINA0)) | (PIN_ROW16 & (1 << PIND4)));
 	while(counter<=10) {                            // PINA0 should be 0 for 10 cycles
-		if(prevState != (PIN_ROW0 & (1 << PINA0)))
+		if(prevState != ((PIN_ROW0 & (1 << PINA0)) | (PIN_ROW16 & (1 << PIND4))))
 			counter=0;
 		else
 			counter++;
 
-		prevState = (PIN_ROW0 & (1 << PINA0));
+		prevState = ((PIN_ROW0 & (1 << PINA0)) | (PIN_ROW16 & (1 << PIND4)));
 	}
-	if(!prevState) isBootloader = 1;
+	if(prevState != ((1 << PINA0) | (1 << PIND4)))  // if both COL0(~) and COL16(NUM) is not 1 (not holded)
+        isBootloader = 1;
+
     if(eeprom_read_byte(0) == 0xCA) // bootloade signature
     {
         isBootloader = 1;

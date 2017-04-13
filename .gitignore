@@ -228,3 +228,4 @@ pip-log.txt
 *.map
 *.lst
 *.lst
+*.zip
